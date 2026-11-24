@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TwjV998ZyzZnsol/GWDH9Dbra8838V0BwqM7MZqcgF0='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eWch3IAI9zXDuhdCTthzRgWcayMTHTRdVTV4guwyMh0='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="vcc-build" content="c2b3667d82ea 2026-11-24">
+<meta name="vcc-build" content="0f8b2f9cfd09 2026-11-24">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -2547,9 +2547,11 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const end = { pre: false, name: direction < 0 ? t('stopStart') : t('stopEnd') };
     const where = !any ? end : to === null ? { pre: false, name: direction < 0 ? t('atStart') : t('atEnd') } : stopName(to);
     const icon = direction < 0 ? ICON.stopPrev : ICON.stopNext;
-    b.innerHTML = (direction < 0 ? icon : '') + '<span class="jumptext"><span class="pre"></span><span class="nm"></span></span>' + (direction > 0 ? icon : '');
-    b.querySelector('.pre').textContent = where.pre ? t('pointPre') + ' ' : '';
-    b.querySelector('.nm').textContent = where.name;
+    keyed(b, (where.pre ? t('pointPre') : '') + '|' + where.name, () => {
+      b.innerHTML = (direction < 0 ? icon : '') + '<span class="jumptext"><span class="pre"></span><span class="nm"></span></span>' + (direction > 0 ? icon : '');
+      b.querySelector('.pre').textContent = where.pre ? t('pointPre') + ' ' : '';
+      b.querySelector('.nm').textContent = where.name;
+    });
     b.disabled = !any || to === null;
     const what = direction < 0 ? t('prevPoint') : t('nextPoint');
     const full = !any ? what + ': ' + t('pickFirst') : what + ': ' + (to === null ? where.name : (where.pre ? where.name : where.name.toLowerCase()));
@@ -2663,7 +2665,10 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   sheet.querySelector('.sheetclose').addEventListener('click', closeSheet);
   function renderPoints() {
     const current = stopIndex(player.line, player.time);
+    const key = lang + '|' + current + '|' + JSON.stringify(points);
     document.querySelectorAll('.pointlist').forEach((box) => {
+      if (box.__vccKey === key) return;
+      box.__vccKey = key;
       box.textContent = '';
       if (!points.length) { box.appendChild(el('p', 'muted empty-points', t('noPoints'))); return; }
       const list = el('ol', 'plist');
@@ -2692,6 +2697,8 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     speedBtn.classList.toggle('slow', rate < 1);
     label(speedBtn, t('speed') + ' ' + rateLabel(rate), '− / +');
     speedMenu.setAttribute('aria-label', t('speed'));
+    if (speedMenu.__vccKey === lang + rate) return;
+    speedMenu.__vccKey = lang + rate;
     speedMenu.textContent = '';
     RATES.forEach((r) => {
       const b = el('button', '', rateLabel(r));
@@ -2899,6 +2906,11 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   function installable() { return !standalone() && platform() !== 'desktop'; }
   function headFor(view) { return view === 'android' ? t('installAndroid', { app: t('homeName') }) : t('installIos', { app: t('homeName') }); }
   function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+  function keyed(node, key, build) {
+    if (node.__vccKey === key) return;
+    node.__vccKey = key;
+    build();
+  }
   function installBlock(box, view) {
     box.textContent = '';
     box.dataset.view = view;
@@ -3301,6 +3313,8 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       const back = code.startsWith('-');
       const frame = code.endsWith('f');
       const unit = frame ? t('frameUnit') : t('sec', { n: '' }).trim();
+      if (b.__vccKey === lang + code) return;
+      b.__vccKey = lang + code;
       b.textContent = '';
       const arrow = el('span', 'arr', back ? '◀' : '▶');
       arrow.setAttribute('aria-hidden', 'true');
@@ -3332,7 +3346,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     ctl.hidden = !syncing || !s.ready;
     const own = s.q('.own');
     const playing = s.ready && !s.video.paused && !s.video.ended;
-    own.innerHTML = playing ? ICON.pause : ICON.play;
+    keyed(own, String(playing), () => { own.innerHTML = playing ? ICON.pause : ICON.play; });
     label(own, (playing ? t('pause') : t('play')) + ': ' + name);
     stepButtons(ctl);
     ctl.querySelectorAll('button').forEach((b) => { b.disabled = !s.ready; });
@@ -3349,7 +3363,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     snd.setAttribute('aria-pressed', String(on));
     label(snd, on ? t('soundOff') + ': ' + name : t('soundOn') + ': ' + name);
     const disc = $('.disc', snd);
-    disc.innerHTML = on ? ICON.soundOn : ICON.soundOff;
+    keyed(disc, String(on), () => { disc.innerHTML = on ? ICON.soundOn : ICON.soundOff; });
     disc.classList.toggle('on', on);
     s.video.setAttribute('aria-label', name);
     s.el.classList.toggle('chosen', syncing && active === s.i);
@@ -3359,6 +3373,9 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     fitBars(s);
   }
   function renderTicks(box, length, times, onPick) {
+    const names = onPick ? player.line.stops.map((stop, i) => pointLabel(stop.point, i)) : [];
+    if (box.__vccKey === [lang, length, times.join(), names.join('\u0001')].join('|')) return;
+    box.__vccKey = [lang, length, times.join(), names.join('\u0001')].join('|');
     box.textContent = '';
     if (!length) return;
     times.forEach((tm, i) => {
@@ -3416,8 +3433,10 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     $('#jointSteps').querySelectorAll('button').forEach((b) => { b.disabled = !any; });
     const playing = player.playing;
     const what = alone === null ? (playing ? t('pauseBoth') : t('playBoth')) : playing ? t('pause') : t('playOnly', { n: alone + 1 });
-    playBothBtn.innerHTML = (playing ? ICON.pause : ICON.play) + '<span></span>';
-    $('span', playBothBtn).textContent = what;
+    keyed(playBothBtn, playing + '|' + what, () => {
+      playBothBtn.innerHTML = (playing ? ICON.pause : ICON.play) + '<span></span>';
+      $('span', playBothBtn).textContent = what;
+    });
     playBothBtn.setAttribute('aria-disabled', String(!any));
     playBothBtn.title = !any ? t('pickFirst') : what + ' (' + t('keySpace') + ' / K)';
     const before = stopTarget(-1), after = stopTarget(1);
