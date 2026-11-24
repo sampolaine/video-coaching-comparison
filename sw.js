@@ -1,6 +1,8 @@
-const CACHE = 'vcc-22f9290732be';
+const CACHE = 'vcc-c2b3667d82ea';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const OWN = new Set(FILES.map((f) => new URL(f, self.registration.scope).href));
+const PAGE = new Set(['./', './index.html'].map((f) => new URL(f, self.registration.scope).href));
+const WAIT_MS = 3000;
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
@@ -19,13 +21,19 @@ self.addEventListener('fetch', (e) => {
   url.hash = '';
   if (!OWN.has(url.href)) return;
   e.respondWith(
-    caches.open(CACHE).then((c) =>
-      c.match(url.href).then((hit) => {
-        const fresh = fetch(url.href, { cache: 'no-cache' })
-          .then((res) => { if (res.ok) c.put(url.href, res.clone()); return res; });
+    caches.open(CACHE).then((c) => {
+      const fresh = fetch(url.href, { cache: 'no-cache' })
+        .then((res) => { if (res.ok) { const copy = res.clone(); e.waitUntil(c.put(url.href, copy)); } return res; });
+      if (PAGE.has(url.href) || req.mode === 'navigate') {
+        const late = new Promise((ok) => setTimeout(ok, WAIT_MS)).then(() => c.match(url.href)).then((hit) => hit || fresh);
+        const quick = fresh.then((res) => (res.ok ? res : c.match(url.href).then((hit) => hit || res)), () => c.match(url.href).then((hit) => hit || Response.error()));
+        e.waitUntil(fresh.catch(() => {}));
+        return Promise.race([quick, late]);
+      }
+      return c.match(url.href).then((hit) => {
         if (hit) { e.waitUntil(fresh.catch(() => {})); return hit; }
         return fresh;
-      }),
-    ),
+      });
+    }),
   );
 });

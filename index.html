@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QRRy/o2cPCDPNYUoqmmkz5UxQv4iLj+s2QXJFfgSE54='; style-src 'sha256-tooH9cOnZGuG0ZF92yXpp251pf/Dl9e+KF9s8va+lxg='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TwjV998ZyzZnsol/GWDH9Dbra8838V0BwqM7MZqcgF0='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
+<meta name="vcc-build" content="c2b3667d82ea 2026-11-24">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -168,6 +169,8 @@ button { touch-action: manipulation; -webkit-user-select: none; user-select: non
 dialog {
   border: 1px solid var(--hair); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 16px;
   max-width: min(440px, calc(100vw - 32px)); width: 100%;
+  inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);
 }
 dialog::backdrop { background: rgb(0 0 0 / 0.4); }
 .sheethead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
@@ -241,7 +244,7 @@ header { gap: 4px; padding: 2px 8px; }
 #tour { padding: 0; width: 100%; max-width: 520px; }
 #tour[open] { display: flex; flex-direction: column; }
 @media (max-width: 599px), (max-height: 599px) {
-  #tour { max-width: none; max-height: none; width: 100vw; height: 100dvh; margin: 0; border: 0; border-radius: 0;
+  #tour { inset: 0; max-width: none; max-height: none; width: 100vw; height: 100dvh; margin: 0; border: 0; border-radius: 0;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 }
 .tourtop { display: flex; justify-content: flex-end; padding: 4px 8px 0; min-height: 44px; }
@@ -518,7 +521,7 @@ header .seg.icons button { height: 40px; }
 .box.sidecols .over .labels .row { flex-direction: column; align-items: flex-start; }
 .box.sidecols .chip { white-space: normal; font-size: 11px; padding: 2px 5px; overflow-wrap: anywhere; max-width: 100%; }
 .box.sidecols .over .change { position: absolute; right: 0; top: 0; max-width: calc(var(--side) - 8px); pointer-events: auto; }
-.box.sidecols .over .change span { white-space: normal; font-size: 13px; padding: 0 6px; text-align: center; height: auto; min-height: 36px; }
+.box.sidecols .over .change span { white-space: nowrap; font-size: 13px; padding: 0 6px; text-align: center; height: auto; min-height: 36px; }
 .box.sidecols .over .sound { position: absolute; right: 0; top: 48px; pointer-events: auto; }
 .box.sidecols .over .zout { position: absolute; left: 0; bottom: 48px; pointer-events: auto; }
 .box.sidecols .over .zin { position: absolute; left: 0; bottom: 0; pointer-events: auto; }
@@ -602,6 +605,39 @@ body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-temp
   #menu .lang select { flex: 1; min-width: 0; }
   #menu .muted { margin-top: 6px; }
 }
+#together { container-name: together; }
+.btn.jump { flex: 0 1 auto; min-width: 76px; max-width: 34%; padding: 0 10px; gap: 6px; }
+.btn.jump svg { flex: none; width: 20px; height: 20px; }
+.jumptext { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; line-height: 1.2; }
+.jumptext .pre { display: none; font-weight: 500; color: var(--ink-3); }
+@container together (min-width: 560px) { .jumptext .pre { display: inline; } }
+@container together (max-width: 559px) {
+  .btn.jump { flex-direction: column; gap: 2px; padding: 2px 6px; min-width: 64px; max-width: 30%; }
+  .btn.jump svg { order: -1; width: 16px; height: 16px; }
+  .jumptext { font-size: 13px; max-width: 100%; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .btn.jump { flex-direction: column; gap: 2px; padding: 2px 6px; min-width: 64px; max-width: 30%; }
+  .btn.jump svg { order: -1; width: 16px; height: 16px; }
+  .jumptext { font-size: 13px; max-width: 100%; }
+}
+.btn.jump:disabled .nm { font-weight: 500; }
+.demo-jump { margin: 4px 0 12px; pointer-events: none; }
+.demo-jump .btn.jump { flex-direction: column; gap: 2px; padding: 2px 6px; min-width: 64px; }
+.demo-jump .btn.jump svg { order: -1; width: 16px; height: 16px; }
+.demo-jump .jumptext { font-size: 13px; }
+.demo-jump .btn.primary { flex: 1; min-width: 0; overflow: hidden; }
+.demo-jump .btn.primary span { overflow: hidden; text-overflow: ellipsis; }
+.inlineicon { display: inline-flex; vertical-align: -4px; padding: 1px 3px; margin: 0 2px; border: 1px solid var(--hair); border-radius: 5px; color: var(--brand-text); }
+.inlineicon svg { width: 16px; height: 16px; }
+.updatebar { position: fixed; left: 16px; right: 16px; margin: 0 auto; width: fit-content; top: calc(env(safe-area-inset-top) + 8px); z-index: 30; display: flex; align-items: center; gap: 12px;
+  max-width: 440px; padding: 6px 6px 6px 14px; border-radius: 10px; background: var(--ink); color: var(--page); font-size: 15px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.3); }
+.updatebar[hidden] { display: none; }
+.updatebar span { min-width: 0; }
+.updatebar .btn { flex: none; }
+body.syncing .box .over .change { display: none; }
+.steps .glyphs { display: inline-flex; gap: 6px; flex: none; }
+.updatebar .updclose { background: transparent; border-color: transparent; color: var(--page); font-size: 24px; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -612,6 +648,7 @@ body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-temp
 </header>
 <main id="slots"></main>
 <p id="note" class="note" role="status" hidden></p>
+<div id="updateBar" class="updatebar" role="status" aria-live="polite" hidden><span id="updateText"></span><button type="button" id="updateNow" class="btn primary"></button><button type="button" id="updateClose" class="btn ghost iconsq updclose">×</button></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden><span id="toastText"></span><button type="button" id="toastUndo" class="link" data-t="undo" hidden></button></div>
 <footer id="controls">
   <div id="together">
@@ -623,9 +660,9 @@ body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-temp
       <button type="button" class="btn ghost stepbtn sec" data-step="1s"></button>
     </div>
     <div class="playrow">
-      <button type="button" id="prevStop" class="btn ghost iconsq" aria-keyshortcuts="P"></button>
+      <button type="button" id="prevStop" class="btn ghost jump" aria-keyshortcuts="P"></button>
       <button type="button" id="playBoth" class="btn primary" aria-keyshortcuts="Space K"></button>
-      <button type="button" id="nextStop" class="btn ghost iconsq" aria-keyshortcuts="N"></button>
+      <button type="button" id="nextStop" class="btn ghost jump" aria-keyshortcuts="N"></button>
     </div>
     <div class="row3">
       <button type="button" id="pointsBtn" class="btn ghost" aria-haspopup="dialog"></button>
@@ -655,7 +692,7 @@ body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-temp
     <p data-t="forgetWhat"></p>
     <div class="askrow"><button type="button" id="forgetNo" class="btn ghost" data-t="cancel"></button><button type="button" id="forgetYes" class="btn ghost danger" data-t="forget"></button></div>
   </div>
-  <details class="about"><summary data-t="about"></summary><p data-t="tagline"></p><p class="muted">Inter &amp; Gabarito fonts: SIL Open Font License 1.1 (<a href="fonts-LICENSE-Inter.txt">Inter</a>, <a href="fonts-LICENSE-Gabarito.txt">Gabarito</a>).</p></details>
+  <details class="about"><summary data-t="about"></summary><p data-t="tagline"></p><p class="muted">Inter &amp; Gabarito fonts: SIL Open Font License 1.1 (<a href="fonts-LICENSE-Inter.txt">Inter</a>, <a href="fonts-LICENSE-Gabarito.txt">Gabarito</a>).</p><p class="muted" id="buildLine"></p></details>
 </dialog>
 <dialog id="install">
   <div class="sheethead"><h2 id="installHead"></h2><button type="button" id="installClose" class="btn ghost" data-t="close"></button></div>
@@ -701,9 +738,10 @@ const STRINGS = {
     installAndroid: "{app} aloitusnäyttöön",
     installWhy: "Avautuu koko näytölle ja toimii ilman verkkoa.",
     installApart: "Koti-valikon kuvake aloittaa tyhjästä: Safarissa tallennetut videot eivät siirry sinne.",
-    stepShare: "Napauta jakokuvaketta",
-    shareMore: "Jos et näe sitä, napauta ensin ···.",
+    stepShare: "Napauta ··· tai jakokuvaketta",
+    stepShareMenu: "Napauta Jaa, jos se näkyy.",
     stepAddIos: "Valitse Lisää Koti-valikkoon.",
+    scrollHint: "Vieritä tarvittaessa alas.",
     stepConfirm: "Napauta Lisää.",
     iosOther: "Jos valikossa ei ole sitä, avaa tämä sivu Safarissa.",
     stepMenuAndroid: "Napauta selaimen valikkoa osoiterivin vieressä.",
@@ -728,7 +766,7 @@ const STRINGS = {
     video: "Video {n}",
     pick: "Valitse video",
     same: "Sama video",
-    change: "Vaihda",
+    change: "Vaihda video",
     playBoth: "Toista molemmat",
     pause: "Pysäytä",
     pickFirst: "Valitse ensin video",
@@ -766,7 +804,7 @@ const STRINGS = {
     tourPrivacyHead: "Videosi pysyvät puhelimessasi",
     tourPrivacy1: "Tämä sivu ei lähetä videoitasi minnekään. Ei tilejä, ei analytiikkaa, ei seurantaa, ei evästeitä.",
     tourPrivacy2: "Pari ja asetukset tallentuvat vain tähän laitteeseen ensi kertaa varten. Valikon {forget} poistaa tallennetut videot.",
-    tourPrivacy3: "Itse sivu latautuu GitHub Pagesista kuten mikä tahansa verkkosivu.",
+    tourPrivacy3: "Itse sivu latautuu GitHub Pagesista kuten mikä tahansa verkkosivu, ja tarkistaa sieltä, onko uudempi versio tullut.",
     tourFeaturesHead: "Näin se toimii",
     fPick: "Valitse kaksi videota – tai {same}, joka alkaa puolivälistä.",
     fStart: "{sync}: etsi sama hetki kummastakin videosta, nimeä kohta (esim. Kuzushi) ja paina {here}.",
@@ -795,7 +833,15 @@ const STRINGS = {
     positionBoth: "Kohta molemmissa videoissa",
     pauseBoth: "Pysäytä molemmat",
     playOnly: "Toista vain video {n}",
-    start: "alku",
+    stopStart: "Alku",
+    stopEnd: "Loppu",
+    atStart: "Alussa",
+    atEnd: "Lopussa",
+    pointPre: "Kohta:",
+    tourJump: "{prev} ja {next} {play} -painikkeen vieressä hyppäävät edelliseen ja seuraavaan synkkauskohtaan. Painikkeessa lukee, minne se vie: kohdan nimi, Alku tai Loppu.",
+    updateReady: "Uusi versio saatavilla",
+    updateNow: "Päivitä",
+    version: "Versio {date} · {hash}",
     prevPoint: "Edellinen kohta",
     nextPoint: "Seuraava kohta",
     sync: "Synkkaa",
@@ -826,9 +872,10 @@ const STRINGS = {
     installAndroid: "{app} på startskärmen",
     installWhy: "Öppnas i helskärm och fungerar utan nät.",
     installApart: "Ikonen på hemskärmen börjar från noll: videor som sparats i Safari följer inte med.",
-    stepShare: "Tryck på delningsikonen",
-    shareMore: "Ser du den inte, tryck först på ···.",
+    stepShare: "Tryck på ··· eller delningsikonen",
+    stepShareMenu: "Tryck på Dela om det visas.",
     stepAddIos: "Välj Lägg till på hemskärmen.",
+    scrollHint: "Rulla nedåt vid behov.",
     stepConfirm: "Tryck på Lägg till.",
     iosOther: "Saknas det i menyn, öppna sidan i Safari.",
     stepMenuAndroid: "Tryck på webbläsarens meny bredvid adressfältet.",
@@ -853,7 +900,7 @@ const STRINGS = {
     video: "Video {n}",
     pick: "Välj video",
     same: "Samma video",
-    change: "Byt",
+    change: "Byt video",
     playBoth: "Spela båda",
     pause: "Pausa",
     pickFirst: "Välj en video först",
@@ -891,7 +938,7 @@ const STRINGS = {
     tourPrivacyHead: "Dina videor stannar i telefonen",
     tourPrivacy1: "Den här sidan skickar aldrig dina videor någonstans. Inga konton, ingen analys, ingen spårning, inga kakor.",
     tourPrivacy2: "Paret och inställningarna sparas bara på den här enheten till nästa gång. {forget} i menyn tar bort de sparade videorna.",
-    tourPrivacy3: "Själva sidan laddas från GitHub Pages som vilken webbsida som helst.",
+    tourPrivacy3: "Själva sidan laddas från GitHub Pages som vilken webbsida som helst, och kollar där om en nyare version finns.",
     tourFeaturesHead: "Så fungerar det",
     fPick: "Välj två videor – eller {same}, som börjar halvvägs.",
     fStart: "{sync}: hitta samma ögonblick i båda videorna, namnge punkten (t.ex. Kuzushi) och tryck {here}.",
@@ -920,7 +967,15 @@ const STRINGS = {
     positionBoth: "Position i båda videorna",
     pauseBoth: "Pausa båda",
     playOnly: "Spela bara video {n}",
-    start: "början",
+    stopStart: "Början",
+    stopEnd: "Slut",
+    atStart: "I början",
+    atEnd: "I slutet",
+    pointPre: "Punkt:",
+    tourJump: "{prev} och {next} bredvid {play} hoppar till föregående och nästa synkpunkt. Knappen visar vart den går: punktens namn, Början eller Slut.",
+    updateReady: "Ny version finns",
+    updateNow: "Uppdatera",
+    version: "Version {date} · {hash}",
     prevPoint: "Föregående punkt",
     nextPoint: "Nästa punkt",
     sync: "Synka",
@@ -951,9 +1006,10 @@ const STRINGS = {
     installAndroid: "{app} on your home screen",
     installWhy: "Opens full screen and works offline.",
     installApart: "The Home Screen icon starts fresh: videos kept in Safari don't carry over.",
-    stepShare: "Tap the Share icon",
-    shareMore: "Can't see it? Tap ··· first.",
+    stepShare: "Tap ··· or the Share icon",
+    stepShareMenu: "Tap Share, if shown.",
     stepAddIos: "Choose Add to Home Screen.",
+    scrollHint: "Scroll down if needed.",
     stepConfirm: "Tap Add.",
     iosOther: "Not in the menu? Open this page in Safari.",
     stepMenuAndroid: "Tap the browser menu next to the address bar.",
@@ -978,7 +1034,7 @@ const STRINGS = {
     video: "Video {n}",
     pick: "Choose video",
     same: "Same video",
-    change: "Change",
+    change: "Change video",
     playBoth: "Play both",
     pause: "Pause",
     pickFirst: "Choose a video first",
@@ -1016,7 +1072,7 @@ const STRINGS = {
     tourPrivacyHead: "Your videos stay on your phone",
     tourPrivacy1: "This page never sends your videos anywhere. No accounts, no analytics, no tracking, no cookies.",
     tourPrivacy2: "The pair and your settings are saved only on this device, for next time. {forget} in the menu removes the saved videos.",
-    tourPrivacy3: "The page itself loads from GitHub Pages, like any website.",
+    tourPrivacy3: "The page itself loads from GitHub Pages, like any website, and checks there whether a newer version is out.",
     tourFeaturesHead: "How it works",
     fPick: "Choose two videos – or {same}, which starts half way.",
     fStart: "{sync}: find the same moment in both videos, name the point (e.g. Kuzushi) and press {here}.",
@@ -1045,7 +1101,15 @@ const STRINGS = {
     positionBoth: "Position in both videos",
     pauseBoth: "Pause both",
     playOnly: "Play only video {n}",
-    start: "start",
+    stopStart: "Start",
+    stopEnd: "End",
+    atStart: "At start",
+    atEnd: "At end",
+    pointPre: "Point:",
+    tourJump: "{prev} and {next} beside {play} jump to the previous and next sync point. Each says where it goes: the point's name, Start or End.",
+    updateReady: "New version available",
+    updateNow: "Update",
+    version: "Version {date} · {hash}",
     prevPoint: "Previous point",
     nextPoint: "Next point",
     sync: "Sync",
@@ -1076,9 +1140,10 @@ const STRINGS = {
     installAndroid: "{app} на главном экране",
     installWhy: "Открывается на весь экран и работает без сети.",
     installApart: "Значок на экране «Домой» начинает с чистого листа: видео, сохранённые в Safari, туда не переносятся.",
-    stepShare: "Нажмите значок «Поделиться»",
-    shareMore: "Не видите его? Сначала нажмите ···.",
+    stepShare: "Нажмите ··· или значок «Поделиться»",
+    stepShareMenu: "Нажмите «Поделиться», если есть.",
     stepAddIos: "Выберите «На экран „Домой“».",
+    scrollHint: "При необходимости прокрутите вниз.",
     stepConfirm: "Нажмите «Добавить».",
     iosOther: "Если этого пункта нет, откройте страницу в Safari.",
     stepMenuAndroid: "Откройте меню браузера рядом с адресной строкой.",
@@ -1103,7 +1168,7 @@ const STRINGS = {
     video: "Видео {n}",
     pick: "Выбрать видео",
     same: "То же видео",
-    change: "Сменить",
+    change: "Сменить видео",
     playBoth: "Запустить оба",
     pause: "Пауза",
     pickFirst: "Сначала выберите видео",
@@ -1141,7 +1206,7 @@ const STRINGS = {
     tourPrivacyHead: "Ваши видео остаются в телефоне",
     tourPrivacy1: "Эта страница никуда не отправляет ваши видео. Без учётных записей, аналитики, отслеживания и cookie.",
     tourPrivacy2: "Пара видео и настройки сохраняются только на этом устройстве, до следующего раза. «{forget}» в меню удаляет сохранённые видео.",
-    tourPrivacy3: "Сама страница загружается с GitHub Pages, как любой сайт.",
+    tourPrivacy3: "Сама страница загружается с GitHub Pages, как любой сайт, и проверяет там, не вышла ли новая версия.",
     tourFeaturesHead: "Как это работает",
     fPick: "Выберите два видео — или «{same}», которое начнётся с середины.",
     fStart: "«{sync}»: найдите один и тот же момент в обоих видео, назовите точку (например, Kuzushi) и нажмите «{here}».",
@@ -1170,7 +1235,15 @@ const STRINGS = {
     positionBoth: "Позиция в обоих видео",
     pauseBoth: "Пауза для обоих",
     playOnly: "Воспроизвести только видео {n}",
-    start: "начало",
+    stopStart: "Начало",
+    stopEnd: "Конец",
+    atStart: "В начале",
+    atEnd: "В конце",
+    pointPre: "Точка:",
+    tourJump: "{prev} и {next} рядом с «{play}» переходят к предыдущей и следующей точке синхронизации. На кнопке написано, куда она ведёт: имя точки, «Начало» или «Конец».",
+    updateReady: "Доступна новая версия",
+    updateNow: "Обновить",
+    version: "Версия {date} · {hash}",
     prevPoint: "Предыдущая точка",
     nextPoint: "Следующая точка",
     sync: "Сверить",
@@ -1201,9 +1274,10 @@ const STRINGS = {
     installAndroid: "{app} avaekraanile",
     installWhy: "Avaneb täisekraanil ja töötab ka võrguta.",
     installApart: "Avakuva ikoon alustab puhtalt lehelt: Safaris salvestatud videod sinna ei kandu.",
-    stepShare: "Puuduta jagamisikooni",
-    shareMore: "Ei näe seda? Puuduta enne ···.",
+    stepShare: "Puuduta ··· või jagamisikooni",
+    stepShareMenu: "Puuduta Jaga, kui see on näha.",
     stepAddIos: "Vali Lisa avakuvale.",
+    scrollHint: "Vajadusel keri alla.",
     stepConfirm: "Puuduta Lisa.",
     iosOther: "Kui menüüs seda pole, ava leht Safaris.",
     stepMenuAndroid: "Puuduta brauseri menüüd aadressiriba kõrval.",
@@ -1228,7 +1302,7 @@ const STRINGS = {
     video: "Video {n}",
     pick: "Vali video",
     same: "Sama video",
-    change: "Vaheta",
+    change: "Vaheta video",
     playBoth: "Esita mõlemad",
     pause: "Paus",
     pickFirst: "Vali kõigepealt video",
@@ -1266,7 +1340,7 @@ const STRINGS = {
     tourPrivacyHead: "Sinu videod jäävad telefoni",
     tourPrivacy1: "See leht ei saada sinu videoid kuhugi. Pole kontosid, analüütikat, jälgimist ega küpsiseid.",
     tourPrivacy2: "Paar ja seaded salvestatakse ainult sellesse seadmesse järgmiseks korraks. Menüü „{forget}“ kustutab salvestatud videod.",
-    tourPrivacy3: "Leht ise laaditakse GitHub Pagesist nagu iga veebileht.",
+    tourPrivacy3: "Leht ise laaditakse GitHub Pagesist nagu iga veebileht ning kontrollib sealt, kas uuem versioon on olemas.",
     tourFeaturesHead: "Kuidas see töötab",
     fPick: "Vali kaks videot – või {same}, mis algab poolest.",
     fStart: "{sync}: leia mõlemast videost sama hetk, nimeta punkt (nt Kuzushi) ja vajuta {here}.",
@@ -1295,7 +1369,15 @@ const STRINGS = {
     positionBoth: "Koht mõlemas videos",
     pauseBoth: "Peata mõlemad",
     playOnly: "Esita ainult video {n}",
-    start: "algus",
+    stopStart: "Algus",
+    stopEnd: "Lõpp",
+    atStart: "Alguses",
+    atEnd: "Lõpus",
+    pointPre: "Punkt:",
+    tourJump: "{prev} ja {next} nupu {play} kõrval hüppavad eelmisse ja järgmisse sünkroonimispunkti. Nupul on kirjas, kuhu see viib: punkti nimi, Algus või Lõpp.",
+    updateReady: "Uus versioon on saadaval",
+    updateNow: "Uuenda",
+    version: "Versioon {date} · {hash}",
     prevPoint: "Eelmine punkt",
     nextPoint: "Järgmine punkt",
     sync: "Sünkrooni",
@@ -1326,9 +1408,10 @@ const STRINGS = {
     installAndroid: "{app} sur l’écran d’accueil",
     installWhy: "S’ouvre en plein écran et fonctionne hors ligne.",
     installApart: "L’icône de l’écran d’accueil démarre à neuf : les vidéos gardées dans Safari n’y passent pas.",
-    stepShare: "Touchez l’icône Partager",
-    shareMore: "Vous ne la voyez pas ? Touchez d’abord ···.",
+    stepShare: "Touchez ··· ou l’icône Partager",
+    stepShareMenu: "Touchez Partager, s’il apparaît.",
     stepAddIos: "Choisissez Sur l’écran d’accueil.",
+    scrollHint: "Faites défiler si besoin.",
     stepConfirm: "Touchez Ajouter.",
     iosOther: "Absent du menu ? Ouvrez cette page dans Safari.",
     stepMenuAndroid: "Touchez le menu du navigateur, à côté de la barre d’adresse.",
@@ -1353,7 +1436,7 @@ const STRINGS = {
     video: "Vidéo {n}",
     pick: "Choisir une vidéo",
     same: "Même vidéo",
-    change: "Changer",
+    change: "Changer de vidéo",
     playBoth: "Lire les deux",
     pause: "Pause",
     pickFirst: "Choisissez d’abord une vidéo",
@@ -1391,7 +1474,7 @@ const STRINGS = {
     tourPrivacyHead: "Vos vidéos restent sur votre téléphone",
     tourPrivacy1: "Cette page n’envoie jamais vos vidéos nulle part. Pas de compte, pas de statistiques, pas de pistage, pas de cookies.",
     tourPrivacy2: "La paire et vos réglages sont gardés uniquement sur cet appareil, pour la prochaine fois. « {forget} » dans le menu supprime les vidéos gardées.",
-    tourPrivacy3: "La page elle-même se charge depuis GitHub Pages, comme n’importe quel site.",
+    tourPrivacy3: "La page elle-même se charge depuis GitHub Pages, comme n’importe quel site, et y vérifie si une version plus récente existe.",
     tourFeaturesHead: "Comment ça marche",
     fPick: "Choisissez deux vidéos – ou {same}, qui démarre à mi-parcours.",
     fStart: "{sync} : trouvez le même moment dans les deux vidéos, nommez le point (par ex. Kuzushi) et appuyez sur {here}.",
@@ -1420,7 +1503,15 @@ const STRINGS = {
     positionBoth: "Position dans les deux vidéos",
     pauseBoth: "Mettre les deux en pause",
     playOnly: "Lire seulement la vidéo {n}",
-    start: "début",
+    stopStart: "Début",
+    stopEnd: "Fin",
+    atStart: "Au début",
+    atEnd: "À la fin",
+    pointPre: "Point :",
+    tourJump: "{prev} et {next}, à côté de {play}, sautent au point de synchro précédent ou suivant. Chacun indique où il mène : le nom du point, Début ou Fin.",
+    updateReady: "Nouvelle version disponible",
+    updateNow: "Mettre à jour",
+    version: "Version {date} · {hash}",
     prevPoint: "Point précédent",
     nextPoint: "Point suivant",
     sync: "Synchroniser",
@@ -1451,9 +1542,10 @@ const STRINGS = {
     installAndroid: "{app} على الشاشة الرئيسية",
     installWhy: "يفتح بملء الشاشة ويعمل دون اتصال.",
     installApart: "أيقونة الشاشة الرئيسية تبدأ من جديد: الفيديوهات المحفوظة في Safari لا تنتقل إليها.",
-    stepShare: "اضغط على أيقونة المشاركة",
-    shareMore: "لا تراها؟ اضغط أولًا على ···.",
+    stepShare: "اضغط على ··· أو أيقونة المشاركة",
+    stepShareMenu: "اضغط على «مشاركة» إن ظهرت.",
     stepAddIos: "اختر «إضافة إلى الشاشة الرئيسية».",
+    scrollHint: "مرِّر لأسفل إذا لزم الأمر.",
     stepConfirm: "اضغط «إضافة».",
     iosOther: "ليست في القائمة؟ افتح هذه الصفحة في Safari.",
     stepMenuAndroid: "اضغط على قائمة المتصفح بجانب شريط العنوان.",
@@ -1478,7 +1570,7 @@ const STRINGS = {
     video: "فيديو {n}",
     pick: "اختر فيديو",
     same: "الفيديو نفسه",
-    change: "تغيير",
+    change: "تغيير الفيديو",
     playBoth: "تشغيل الاثنين",
     pause: "إيقاف مؤقت",
     pickFirst: "اختر فيديو أولًا",
@@ -1516,7 +1608,7 @@ const STRINGS = {
     tourPrivacyHead: "تبقى فيديوهاتك على هاتفك",
     tourPrivacy1: "هذه الصفحة لا ترسل فيديوهاتك إلى أي مكان. لا حسابات ولا تحليلات ولا تتبّع ولا ملفات تعريف ارتباط.",
     tourPrivacy2: "يُحفظ الزوج وإعداداتك على هذا الجهاز فقط للمرة القادمة. «{forget}» في القائمة يحذف الفيديوهات المحفوظة.",
-    tourPrivacy3: "تُحمَّل الصفحة نفسها من GitHub Pages مثل أي موقع.",
+    tourPrivacy3: "تُحمَّل الصفحة نفسها من GitHub Pages مثل أي موقع، وتتحقق من هناك من وجود إصدار أحدث.",
     tourFeaturesHead: "طريقة الاستخدام",
     fPick: "اختر فيديوين، أو «{same}» الذي يبدأ من منتصفه.",
     fStart: "«{sync}»: ابحث عن اللحظة نفسها في الفيديوين، وسمِّ النقطة (مثل Kuzushi) واضغط «{here}».",
@@ -1545,7 +1637,15 @@ const STRINGS = {
     positionBoth: "الموضع في الفيديوين",
     pauseBoth: "إيقاف الاثنين مؤقتًا",
     playOnly: "تشغيل الفيديو {n} فقط",
-    start: "البداية",
+    stopStart: "البداية",
+    stopEnd: "النهاية",
+    atStart: "في البداية",
+    atEnd: "في النهاية",
+    pointPre: "نقطة:",
+    tourJump: "{prev} و{next} بجانب «{play}» تنتقلان إلى نقطة المزامنة السابقة أو التالية. يظهر على كل زر وجهته: اسم النقطة أو البداية أو النهاية.",
+    updateReady: "يتوفر إصدار جديد",
+    updateNow: "تحديث",
+    version: "الإصدار {date} · {hash}",
     prevPoint: "النقطة السابقة",
     nextPoint: "النقطة التالية",
     sync: "مزامنة",
@@ -1972,6 +2072,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     soundOn: svg('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'),
     share: svg('<path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16"/>'),
     dots: svg('<circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>', true),
+    more: svg('<circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>', true),
     stopPrev: svg('<path d="M19 6.2v11.6a1 1 0 0 1-1.53.85l-8.4-5.8a1 1 0 0 1 0-1.7l8.4-5.8A1 1 0 0 1 19 6.2z"/><rect x="4" y="5" width="3" height="14" rx="1"/>', true),
     stopNext: svg('<path d="M5 6.2v11.6a1 1 0 0 0 1.53.85l8.4-5.8a1 1 0 0 0 0-1.7l-8.4-5.8A1 1 0 0 0 5 6.2z"/><rect x="17" y="5" width="3" height="14" rx="1"/>', true),
     side: svg('<rect x="2.5" y="5" width="8.5" height="14" rx="1.5"/><rect x="13" y="5" width="8.5" height="14" rx="1.5"/>'),
@@ -2427,9 +2528,32 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const by = code === '1f' ? 1 / fps : code === '-1f' ? -1 / fps : code === '1s' ? 1 : code === '-1s' ? -1 : code === '5s' ? 5 : code === '-5s' ? -5 : code === '10s' ? 10 : -10;
     player.seek(player.time + by);
   }
-  function stepToStop(direction) {
+  function stopTarget(direction) {
     const to = stepStop(player.line, player.time, direction);
+    if (to !== null) return to;
+    if (direction === 1 && player.line.length > 0 && player.time < player.line.length - 0.3) return player.line.length;
+    return null;
+  }
+  function stepToStop(direction) {
+    const to = stopTarget(direction);
     if (to !== null) player.seek(to);
+  }
+  function stopName(at) {
+    const i = player.line.stops.findIndex((s) => s.at === at);
+    if (i >= 0) return { pre: true, name: pointLabel(player.line.stops[i].point, i) };
+    return { pre: false, name: at === 0 ? t('stopStart') : t('stopEnd') };
+  }
+  function jumpButton(b, direction, to, any) {
+    const end = { pre: false, name: direction < 0 ? t('stopStart') : t('stopEnd') };
+    const where = !any ? end : to === null ? { pre: false, name: direction < 0 ? t('atStart') : t('atEnd') } : stopName(to);
+    const icon = direction < 0 ? ICON.stopPrev : ICON.stopNext;
+    b.innerHTML = (direction < 0 ? icon : '') + '<span class="jumptext"><span class="pre"></span><span class="nm"></span></span>' + (direction > 0 ? icon : '');
+    b.querySelector('.pre').textContent = where.pre ? t('pointPre') + ' ' : '';
+    b.querySelector('.nm').textContent = where.name;
+    b.disabled = !any || to === null;
+    const what = direction < 0 ? t('prevPoint') : t('nextPoint');
+    const full = !any ? what + ': ' + t('pickFirst') : what + ': ' + (to === null ? where.name : (where.pre ? where.name : where.name.toLowerCase()));
+    label(b, full, direction < 0 ? 'P' : 'N');
   }
   function beginSync() {
     if (!both()) return;
@@ -2785,16 +2909,20 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     } else {
       const ios = view === 'ios' || view === 'iosOther';
       const list = el('ol', 'steps');
-      const steps = ios ? [t('stepShare'), t('stepAddIos'), t('stepConfirm')] : [t('stepMenuAndroid'), t('stepAddAndroid'), t('stepConfirm')];
+      const steps = ios ? [t('stepShare'), t('stepShareMenu'), t('stepAddIos'), t('stepConfirm')] : [t('stepMenuAndroid'), t('stepAddAndroid'), t('stepConfirm')];
       steps.forEach((text, i) => {
         const li = el('li');
         li.appendChild(el('span', '', text));
         if (i === 0) {
-          const g = el('span', 'glyph');
-          g.innerHTML = ios ? ICON.share : ICON.dots;
-          li.appendChild(g);
-          if (ios) li.appendChild(el('small', '', t('shareMore')));
+          const glyphs = el('span', 'glyphs');
+          (ios ? [ICON.more, ICON.share] : [ICON.dots]).forEach((icon) => {
+            const g = el('span', 'glyph');
+            g.innerHTML = icon;
+            glyphs.appendChild(g);
+          });
+          li.appendChild(glyphs);
         }
+        if (ios && i === 2) li.appendChild(el('small', '', t('scrollHint')));
         list.appendChild(li);
       });
       box.appendChild(list);
@@ -2935,6 +3063,22 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       body.appendChild(el('p', '', t('fStart', { sync: t('sync'), here: t('syncHere') })));
       body.appendChild(drawing('wait'));
       body.appendChild(el('p', '', t('fPlay', { play: t('playBoth') })));
+      const demo = el('div', 'playrow demo-jump');
+      demo.setAttribute('aria-hidden', 'true');
+      demo.innerHTML = '<button class="btn ghost jump" tabindex="-1"></button><button class="btn primary" tabindex="-1"></button><button class="btn ghost jump" tabindex="-1"></button>';
+      const [dp, dplay, dn] = demo.children;
+      dp.innerHTML = ICON.stopPrev + '<span class="jumptext"><span class="nm"></span></span>';
+      dp.querySelector('.nm').textContent = t('stopStart');
+      dplay.innerHTML = ICON.play + '<span></span>';
+      dplay.querySelector('span').textContent = t('playBoth');
+      dn.innerHTML = '<span class="jumptext"><span class="nm"></span></span>' + ICON.stopNext;
+      dn.querySelector('.nm').textContent = 'Kuzushi';
+      body.appendChild(demo);
+      const p = el('p');
+      t('tourJump', { play: t('playBoth'), prev: '\u0001', next: '\u0002' }).split(/(\u0001|\u0002)/).forEach((part) => {
+        if (part === '\u0001' || part === '\u0002') { const g = el('span', 'inlineicon'); g.innerHTML = part === '\u0001' ? ICON.stopPrev : ICON.stopNext; p.appendChild(g); } else p.appendChild(document.createTextNode(part));
+      });
+      body.appendChild(p);
     } else if (at === 'steps') {
       head.textContent = t('tourStepHead');
       body.appendChild(head);
@@ -3276,13 +3420,9 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     $('span', playBothBtn).textContent = what;
     playBothBtn.setAttribute('aria-disabled', String(!any));
     playBothBtn.title = !any ? t('pickFirst') : what + ' (' + t('keySpace') + ' / K)';
-    const before = stepStop(player.line, player.time, -1), after = stepStop(player.line, player.time, 1);
-    const stopName = (at) => { const i = player.line.stops.findIndex((s) => s.at === at); return i >= 0 ? pointLabel(player.line.stops[i].point, i) : t('start'); };
-    const prev = $('#prevStop'), next = $('#nextStop');
-    prev.innerHTML = ICON.stopPrev; next.innerHTML = ICON.stopNext;
-    prev.disabled = !any || before === null; next.disabled = !any || after === null;
-    label(prev, before === null ? t('prevPoint') : t('prevPoint') + ': ' + stopName(before), 'P');
-    label(next, after === null ? t('nextPoint') : t('nextPoint') + ': ' + stopName(after), 'N');
+    const before = stopTarget(-1), after = stopTarget(1);
+    jumpButton($('#prevStop'), -1, before, any);
+    jumpButton($('#nextStop'), 1, after, any);
     $('#pointsBtn').textContent = countLabel(points.length);
     $('#pointsBtn').disabled = !any;
     $('#syncBtn').textContent = t('sync');
@@ -3433,6 +3573,8 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     sides.forEach(renderSide);
     renderControls();
     renderSegs();
+    renderUpdate();
+    renderBuild();
     applyLayout();
     if ($('#keysSheet').open) renderKeys();
     renderInstall();
@@ -3455,12 +3597,66 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     renderAll();
   }
   langSel.addEventListener('change', () => setLang(langSel.value));
+  const BUILD = (() => { const m = document.querySelector('meta[name="vcc-build"]'); const [hash, date] = ((m && m.content) || '').split(' '); return { hash: hash || '', date: date || '' }; })();
+  function renderBuild() { $('#buildLine').textContent = t('version', { date: BUILD.date, hash: BUILD.hash }); }
+  let newer = null;
+  let dismissedFor = null;
+  const RELOAD_KEY = 'vcc-reloaded-for';
+  function quiet() {
+    const names = wanted();
+    const allKept = sides.every((s, i) => !s.file || (names[i] && stored[names[i]] === s.file));
+    const typing = document.activeElement && /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+    return allKept && !syncing && !player.playing && !document.querySelector('dialog[open]') && !typing && !sides.some((s) => s.restore);
+  }
+  async function reloadNow() {
+    try { await keeping; } catch (e) {  }
+    writePlace();
+    keepPoints();
+    location.reload();
+  }
+  function renderUpdate() {
+    const bar = $('#updateBar');
+    bar.hidden = !newer;
+    $('#updateText').textContent = t('updateReady');
+    $('#updateNow').textContent = t('updateNow');
+    label($('#updateClose'), t('close'));
+  }
+  $('#updateNow').addEventListener('click', reloadNow);
+  $('#updateClose').addEventListener('click', () => { dismissedFor = newer; newer = null; renderUpdate(); });
+  let checking = false;
+  async function checkVersion() {
+    if (checking || location.protocol === 'file:' || !BUILD.hash) return;
+    checking = true;
+    try {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.getRegistration) {
+        navigator.serviceWorker.getRegistration().then((r) => r && r.update()).catch(() => {});
+      }
+      const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const v = await res.json();
+      if (!v || typeof v.version !== 'string' || v.version === BUILD.hash) return;
+      if (v.version === dismissedFor) return;
+      newer = v.version;
+      let tried = null;
+      try { tried = sessionStorage.getItem(RELOAD_KEY); } catch (e) {  tried = v.version; }
+      if (tried !== v.version && quiet()) {
+        try { sessionStorage.setItem(RELOAD_KEY, v.version); } catch (e) {  }
+        reloadNow();
+        return;
+      }
+      renderUpdate();
+    } catch (e) {  } finally { checking = false; }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkVersion(); });
+  window.addEventListener('pageshow', (e) => { if (e.persisted) checkVersion(); });
   renderAll();
   restorePair();
   if (load(TOUR_KEY) !== 'seen') openTour();
   if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {  });
   }
+  renderBuild();
+  checkVersion();
   window.__vertailu = { sides: sides, get lang() { return lang; }, get rate() { return rate; }, get layout() { return layoutNow(); }, get points() { return points; }, get syncing() { return syncing; }, player: player, kept: () => keeping };
 })();
 </script>
