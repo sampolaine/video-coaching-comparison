@@ -1,4 +1,4 @@
-const CACHE = 'vertailu-1ce71d1b5ff8';
+const CACHE = 'vcc-22f9290732be';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const OWN = new Set(FILES.map((f) => new URL(f, self.registration.scope).href));
 self.addEventListener('install', (e) => {
@@ -7,7 +7,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('vertailu-') && k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => (k.startsWith('vcc-') || /^vertailu-[0-9a-f]{12}$/.test(k)) && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });

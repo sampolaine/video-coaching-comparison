@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-J5hq2iN5267IGeB8DNTN3uLlgLEbXA3CIHTirHGqrxs='; style-src 'sha256-6DUrhMS0g/7zUbT/op5jxIYsM933yuqZ0z4hJlwiQUU='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QRRy/o2cPCDPNYUoqmmkz5UxQv4iLj+s2QXJFfgSE54='; style-src 'sha256-tooH9cOnZGuG0ZF92yXpp251pf/Dl9e+KF9s8va+lxg='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
@@ -11,16 +11,20 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Vertailu">
+<meta name="apple-mobile-web-app-title" content="Video Coach">
+<meta name="description" content="Compare two videos side by side – frame by frame, on your own phone. Nothing is uploaded.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Video Coaching Comparison">
+<meta property="og:description" content="Compare two videos side by side – frame by frame, on your own phone. Nothing is uploaded.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Vertailu</title>
+<title>Video Coaching Comparison</title>
 <style>:root {
   --page: #F6F3EA; --surface: #FFFDF8; --sunken: #ECE7D8; --hair: #DCD5C3; --edge: #958C75;
   --ink: #15140F; --ink-2: #57533F; --ink-3: #736D5B;
   --brand: #2C57CC; --brand-hover: #2449B3; --brand-edge: #1D3C93; --brand-ink: #FFFFFF; --brand-text: #2447A8;
-  --danger: #B3261E; --ring: #2C57CC;
+  --danger: #B3261E; --warn: #9A6200; --ring: #2C57CC;
   --chip: color-mix(in srgb, var(--surface) 85%, transparent);
   color-scheme: light dark;
 }
@@ -29,7 +33,7 @@
     --page: #1A1915; --surface: #24231E; --sunken: #12110E; --hair: #433F35; --edge: #7A7464;
     --ink: #F4F1E8; --ink-2: #BDB6A4; --ink-3: #948D7B;
     --brand: #7C9CF2; --brand-hover: #9DB5F7; --brand-edge: #9DB5F7; --brand-ink: #1A1915; --brand-text: #9DB5F7;
-    --danger: #F28B82; --ring: #7C9CF2;
+    --danger: #F28B82; --warn: #E8B341; --ring: #7C9CF2;
   }
 }
 /* Fonts: Inter 500/600 (latin, cyrillic), Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter).
@@ -84,10 +88,8 @@ h1 { font: 700 20px/1.2 Gabarito, Inter, system-ui, sans-serif; letter-spacing: 
 }
 .disc.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand-edge); }
 svg { width: 20px; height: 20px; flex: none; }
-#slots { flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr; gap: 6px; padding: 0 8px; }
-@media (min-aspect-ratio: 5/4) and (min-width: 600px) {
-  #slots { grid-template-rows: 1fr; grid-template-columns: 1fr 1fr; }
-}
+#slots { flex: 1; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; padding: 0 8px; }
+body[data-layout="side"] #slots { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .slot { display: flex; flex-direction: column; min-height: 0; min-width: 0; gap: 2px; }
 .box {
   position: relative; flex: 1; min-height: 0; border-radius: 8px; background: #000; overflow: hidden; overflow: clip;
@@ -129,8 +131,34 @@ body.kbd .slot.active .box { outline: 2px solid var(--ring); outline-offset: 1px
 .ctl input[type=range] { flex: 1; min-width: 60px; height: 44px; margin: 0 4px; accent-color: var(--brand); touch-action: manipulation; }
 .ctl .iconbtn { color: var(--ink); }
 .ctl .iconbtn:active:not(:disabled) { background: var(--sunken); }
-footer { display: flex; align-items: center; gap: 8px; padding: 6px 8px 8px; flex: none; }
+footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 6px 8px 8px; flex: none; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px 8px; flex: 1 1 100%; }
+.tools .seg { flex: 1 1 auto; }
+.tools .seg button { flex: 1 1 auto; }
+.actions { display: flex; gap: 8px; flex: 1 1 100%; }
 #playBoth { flex: 1; min-width: 0; }
+@media (min-width: 760px) {
+  .tools { flex: 0 0 auto; order: 2; }
+  .actions { flex: 1 1 0; }
+}
+.seg.icons button { min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.steptext { font: 600 14px/1 Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.labels { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.labels .row { display: flex; gap: 4px; min-width: 0; max-width: 100%; }
+.box.learning video { opacity: 0; }
+html { touch-action: manipulation; }
+button { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+@media (max-width: 479px) { h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } header { justify-content: flex-end; } }
+@media (orientation: landscape) and (max-height: 520px) {
+  body { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); }
+  #slots { grid-column: 1; grid-row: 1 / span 2; padding: 6px 4px 6px 8px; }
+  header { grid-column: 2; grid-row: 1; flex-wrap: wrap; justify-content: flex-end; padding: 6px 8px 0 4px; max-width: 220px; }
+  h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  footer { grid-column: 2; grid-row: 2; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-end; padding: 6px 8px 8px 4px; width: 220px; }
+  .tools { flex-direction: column; flex: none; order: 0; }
+  .actions { flex-direction: column-reverse; flex: none; }
+  #playBoth { flex: none; }
+}
 .seg { display: flex; background: var(--sunken); border-radius: 8px; padding: 2px; gap: 2px; flex: none; }
 .seg button {
   min-width: 48px; height: 40px; border: 0; border-radius: 6px; background: none; color: var(--ink-2); cursor: pointer;
@@ -149,281 +177,1639 @@ td { padding: 4px 0; border-top: 1px solid var(--hair); vertical-align: top; }
 td:first-child { white-space: nowrap; padding-right: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 .chip.start { flex: none; }
-.chipbtn.whole { min-width: 44px; flex: 0 1 auto; overflow: hidden; }
-.chipbtn.whole span { overflow: hidden; text-overflow: ellipsis; display: block; line-height: 34px; }
+.chipbtn.whole { min-width: 44px; flex: 0 1 auto; }
+.chipbtn.whole span { white-space: normal; line-height: 1.1; height: auto; min-height: 36px; text-align: center; }
 @media (max-width: 359px) { h1 { font-size: 17px; } }
+.slot { container-type: inline-size; }
+.over { flex-wrap: wrap; }
+.over.bottom { flex-wrap: wrap-reverse; }
+.over .grow { display: none; }
+.over.top .change { margin-left: auto; }
+.over.bottom .wait { margin-left: auto; }
+.over.bottom .start { margin-left: auto; }
+.ctl { flex-wrap: wrap; }
+@container (max-width: 299px) {
+  .ctl input[type=range] { order: -1; flex: 1 1 100%; margin: 0; }
+  .ctl { justify-content: space-between; }
+  .over.top .labels { flex: 1 1 100%; }
+}
+#menu .btn { width: 100%; margin-top: 12px; }
+#menu p { margin: 0; }
+.btn.danger { color: var(--danger); }
+.ask { margin-top: 12px; }
+.ask p { font-size: 15px; }
+.askrow { display: flex; gap: 8px; }
+.askrow .btn { flex: 1; }
+.dots { font-size: 18px; letter-spacing: 1px; line-height: 1; padding-bottom: 6px; }
+header { gap: 4px; padding: 2px 8px; }
+@media (max-width: 399px) { #keysBtn { display: none; } }
+.note {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 132px); z-index: 5;
+  margin: 0; max-width: min(420px, calc(100vw - 32px)); width: max-content; padding: 10px 14px; border-radius: 8px;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--edge); font-size: 14px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+}
+.hint { display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.link {
+  min-height: 44px; border: 0; background: none; padding: 0 10px; cursor: pointer; color: var(--brand-text);
+  font: 600 15px/1.2 Inter, system-ui, sans-serif; text-decoration: underline; text-underline-offset: 3px;
+}
+.link.notnow { color: var(--ink-3); }
+#installOpen { margin-top: 12px; }
+.steps { margin: 12px 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+.steps li { counter-increment: s; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; min-height: 36px; padding-inline-start: 48px; position: relative; }
+.steps li::before {
+  content: counter(s); position: absolute; inset-inline-start: 0; top: 0; width: 36px; height: 36px; border-radius: 999px;
+  background: var(--brand); color: var(--brand-ink); display: flex; align-items: center; justify-content: center;
+  font: 700 18px/1 Gabarito, Inter, system-ui, sans-serif;
+}
+.steps .glyph { display: inline-flex; padding: 4px; border: 1px solid var(--hair); border-radius: 6px; color: var(--brand-text); }
+.steps .glyph svg { width: 24px; height: 24px; }
+.steps small { flex-basis: 100%; font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.apart { margin: 8px 0 0; font-size: 14px; color: var(--warn); }
+.box { container-type: size; }
+@container (max-height: 200px) { .empty .privacy { display: none; } }
+@container (max-height: 150px) { .empty .hint { display: none !important; } .empty { gap: 4px; } }
+[dir="rtl"] .box, [dir="rtl"] .ctl { direction: ltr; }
+[dir="rtl"] .box .chip, [dir="rtl"] .box .chipbtn span, [dir="rtl"] .empty { direction: rtl; unicode-bidi: plaintext; }
+[dir="rtl"] .empty { direction: rtl; }
+.installbody .big { font-size: 18px; font-weight: 600; margin: 12px 0; }
+.installbody .done { font-size: 17px; font-weight: 600; margin: 8px 0; }
+.installbody .note2 { margin-top: 4px; }
+.installbody .installnow { width: 100%; margin-top: 8px; }
+.others { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hair); }
+.others .seg button { min-width: 88px; }
+#tour { padding: 0; width: 100%; max-width: 520px; }
+#tour[open] { display: flex; flex-direction: column; }
+@media (max-width: 599px), (max-height: 599px) {
+  #tour { max-width: none; max-height: none; width: 100vw; height: 100dvh; margin: 0; border: 0; border-radius: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+}
+.tourtop { display: flex; justify-content: flex-end; padding: 4px 8px 0; min-height: 44px; }
+.tourbody { flex: 1; overflow-y: auto; padding: 4px 20px 12px; overscroll-behavior: contain; }
+.tourbody h2 { font-size: 24px; margin: 4px 0 16px; }
+.tourbody p { margin: 0 0 12px; font-size: 16px; }
+.tourbody .lead { font-size: 18px; font-weight: 600; }
+.langs { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.langs .btn { min-height: 52px; font-size: 18px; }
+.langs .btn[aria-checked="true"] { background: var(--brand); color: var(--brand-ink); border-color: var(--brand-edge); }
+.features { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.features li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; }
+.ficon { flex: none; width: 36px; height: 36px; border-radius: 8px; background: var(--sunken); color: var(--brand-text); display: flex; align-items: center; justify-content: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tourfoot { padding: 8px 16px 12px; border-top: 1px solid var(--hair); display: flex; flex-direction: column; gap: 10px; }
+.dots-row { display: flex; justify-content: center; gap: 8px; }
+.dots-row .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--hair); }
+.dots-row .dot.on { background: var(--brand); width: 20px; }
+.tournav { display: flex; gap: 8px; }
+.tournav .btn { flex: 1; min-height: 52px; font-size: 18px; }
+#tourBack[hidden] + #tourNext { flex: 1; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .tourbody h2 { margin-bottom: 8px; }
+  .langs { grid-template-columns: repeat(4, 1fr); }
+  .tournav .btn { min-height: 44px; }
+}
+.empty .btn { min-width: min(200px, 100%); max-width: 100%; white-space: normal; text-align: center; line-height: 1.15; padding: 6px 12px; }
+.empty .link { white-space: normal; text-align: center; max-width: 100%; }
+.empty .hint { max-width: 100%; }
+@container (max-width: 219px) { .empty .hint { display: none !important; } }
+.others .seg button { height: 44px; }
+.tourbody .brand { font: 800 26px/1.15 Gabarito, Inter, system-ui, sans-serif; letter-spacing: -0.01em; margin: 8px 0 4px; }
+.tourbody .tagline { color: var(--ink-2); margin: 0 0 20px; }
+.langs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 600px) { .langs { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.langs .btn { min-height: 48px; }
+#speed button, .chip.amount, .chip.time, .chip.start { direction: ltr; unicode-bidi: isolate; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .langs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .langs .btn { min-height: 44px; }
+  .installbody .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .installbody .steps li { font-size: 15px; padding-inline-start: 0; padding-top: 44px; align-content: flex-start; }
+  .installbody .steps li::before { inset-inline-start: 0; top: 0; }
+  .tourbody .brand { font-size: 20px; margin-top: 0; }
+  .tourbody .tagline { margin-bottom: 8px; }
+}
+:root { --brand-soft: #E6ECFB; }
+@media (prefers-color-scheme: dark) { :root { --brand-soft: #26304D; } }
+.stage { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
+.box.bars { display: flex; flex-direction: column; }
+.box.bars .over { position: static; padding: 4px; }
+.box.bars .over.bottom { order: 3; }
+.box.bars .stage { position: relative; order: 2; flex: 1; min-height: 0; }
+.box.bars .over.top { order: 1; }
+.ctl { gap: 4px; justify-content: flex-end; padding: 2px 0; }
+.scrub { position: relative; flex: 1 1 120px; min-width: 100px; display: flex; align-items: center; }
+.scrub input[type=range] { width: 100%; margin: 0; }
+.tick {
+  position: absolute; top: 8px; bottom: 8px; width: 4px; border-radius: 2px; background: var(--warn); pointer-events: none;
+  left: calc(10px + (100% - 20px) * var(--at, 0)); transform: translateX(-50%); box-shadow: 0 0 0 1px var(--surface);
+}
+.stepbtn { min-width: 64px; padding: 0 8px; font: 600 15px/1 Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.markbtn { padding: 0 12px; border-color: var(--warn); }
+.chip.markat { background: var(--warn); color: var(--page); }
+.nudge { display: flex; align-items: center; justify-content: flex-end; gap: 4px; flex: none; padding: 2px 0; }
+.nudgename { color: var(--ink-2); font-size: 14px; font-weight: 600; margin-inline-end: auto; }
+.slot.chosen .box { outline: 3px solid var(--ring); outline-offset: 1px; }
+.linkbar { display: flex; align-items: center; gap: 4px; padding: 2px 8px 0; flex: none; direction: ltr; }
+.linkbar input[type=range] { flex: 1; min-width: 80px; height: 44px; accent-color: var(--brand); margin: 0 4px; }
+.state { display: flex; align-items: center; gap: 8px; flex: 1 1 100%; }
+.statechip { flex: 1; margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--sunken); color: var(--ink-2); font-weight: 600; font-size: 15px; line-height: 1.25; }
+.statechip.on { background: var(--brand-soft); color: var(--brand-text); }
+#linkBtn { flex: none; }
+#linkBtn[aria-pressed="false"]:not(:disabled) { border-color: var(--brand); color: var(--brand-text); }
+.synchint { flex: 1 1 100%; margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.35; }
+#toMarks { flex: none; }
+#menu .lang { display: flex; flex-direction: column; gap: 4px; margin: 8px 0 12px; font-weight: 600; }
+#menu .lang select { width: 100%; }
+header { min-height: 44px; padding-top: 0; padding-bottom: 0; }
+@media (orientation: landscape) and (max-height: 520px) {
+  body { grid-template-rows: auto minmax(0, 1fr) auto; }
+  #slots { grid-row: 1 / span 2; }
+  .linkbar { grid-column: 1; grid-row: 3; padding: 0 4px 4px 8px; }
+  footer { grid-row: 2 / span 2; overflow-y: auto; gap: 4px; padding-top: 4px; }
+  footer .actions { position: sticky; bottom: 0; background: var(--page); padding-top: 4px; }
+  .state { flex-wrap: wrap; flex: none; }
+  .statechip { padding: 6px 8px; font-size: 14px; }
+  #linkBtn { flex: 1 1 auto; }
+  .synchint { flex: none; font-size: 13px; }
+  .scrub { min-width: 60px; }
+  .stepbtn { min-width: 56px; padding: 0 6px; }
+}
+.nudge { flex: 1 1 100%; }
+@media (orientation: landscape) and (max-height: 520px) {
+  footer { justify-content: flex-start; }
+  .slot .stepbtn, .linkbar .stepbtn { min-width: 48px; }
+  .markbtn { font-size: 14px; padding: 0 8px; }
+  .nudge { flex-wrap: wrap; }
+  .nudgename { flex: 1 1 100%; font-size: 13px; }
+  .nudge .stepbtn { flex: 1; }
+}
+@container (max-width: 459px) {
+  .ctl .scrub { flex: 1 1 100%; order: -1; }
+  .ctl { justify-content: space-between; }
+  .ctl .markbtn { flex: 1 1 auto; }
+}
+.tomarks-side { display: none; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .scrub { flex: 1 1 60px; }
+  .tomarks-side:not([hidden]) { display: inline-flex; }
+  footer #toMarks { display: none; }
+  footer .actions { flex-direction: row; }
+}
+.chip.markat { white-space: normal; }
+#playBoth { white-space: normal; line-height: 1.15; text-align: center; padding: 4px 12px; }
+@media (max-height: 700px) {
+  .slot .stepbtn { min-width: 48px; }
+  .markbtn { font-size: 14px; padding: 0 8px; }
+  .scrub { flex-basis: 60px; min-width: 60px; }
+}
+@media (max-height: 700px) and (orientation: portrait) {
+  @container (min-width: 290px) {
+    .ctl .scrub { flex: 1 1 60px; order: 0; }
+    .ctl { flex-wrap: nowrap; }
+    .ctl .markbtn { flex: none; }
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) { footer { min-height: 0; } header { min-height: 0; } }
+header { min-height: 44px; padding: 0 8px; gap: 8px; }
+h1.brand { position: static !important; width: auto !important; height: auto !important; clip: auto !important; overflow: hidden;
+  font: 600 14px/1.2 Inter, system-ui, sans-serif; letter-spacing: 0; color: var(--ink-2); flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; }
+.menubtn { width: 44px; height: 44px; flex: none; border: 1px solid var(--hair); border-radius: 8px; background: var(--surface); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.menubtn svg { width: 22px; height: 22px; }
+header .seg.icons button { height: 40px; }
+.menurow { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; font-weight: 600; }
+.seg.labelled button { display: inline-flex; gap: 6px; align-items: center; padding: 0 10px; height: 44px; }
+.about { margin-top: 12px; } .about summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.about p { margin: 4px 0 8px; font-size: 14px; }
+#controls { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+#together, #syncing { display: flex; flex-direction: column; gap: 6px; }
+#together[hidden], #syncing[hidden] { display: none; }
+.tl { display: flex; align-items: center; gap: 8px; direction: ltr; }
+.tl .scrub { flex: 1; }
+.tltime { flex: none; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink-2); }
+.scrub input[type=range] { height: 44px; accent-color: var(--brand); }
+.ticks { position: absolute; inset: 0; pointer-events: none; }
+.ticks .tick { position: absolute; top: 10px; bottom: 10px; width: 4px; padding: 0; border: 0; border-radius: 2px; background: var(--warn);
+  left: calc(10px + (100% - 20px) * var(--at, 0)); transform: translateX(-50%); box-shadow: 0 0 0 1px var(--surface); }
+@media (hover: hover) and (pointer: fine) {
+  button.tick { pointer-events: auto; cursor: pointer; width: 10px; top: 6px; bottom: 6px; }
+  button.tick:hover { background: var(--brand); }
+}
+.steps4 { display: flex; gap: 6px; direction: ltr; }
+.steps4 .stepbtn { flex: 1 1 0; min-width: 0; padding: 0 6px; gap: 4px; font: 600 15px/1 Inter, system-ui, sans-serif; }
+.steps4 .stepbtn.sec { color: var(--ink-2); }
+.stepbtn .arr { font-size: 12px; color: var(--brand-text); }
+.playrow { display: flex; gap: 8px; }
+.playrow #playBoth { flex: 1; min-width: 0; }
+.iconsq { width: 44px; min-width: 44px; padding: 0; flex: none; }
+.row3 { display: flex; gap: 8px; }
+.row3 #syncBtn { flex: 1; min-width: 0; }
+.speedwrap { position: relative; flex: none; }
+#speedBtn { min-width: 64px; font-variant-numeric: tabular-nums; }
+#speedBtn.slow { background: var(--brand-soft); color: var(--brand-text); border-color: var(--brand); }
+.speedmenu { position: absolute; right: 0; top: calc(100% + 4px); display: flex; gap: 2px; padding: 4px; background: var(--surface); border: 1px solid var(--edge);
+  border-radius: 10px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.2); z-index: 10; direction: ltr; }
+.speedmenu.up { top: auto; bottom: calc(100% + 4px); }
+.speedmenu[hidden] { display: none; }
+.speedmenu button { min-width: 52px; height: 44px; border: 0; border-radius: 6px; background: none; color: var(--ink); font: 600 15px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+.speedmenu button[aria-checked="true"] { background: var(--brand); color: var(--brand-ink); }
+[dir="rtl"] .speedmenu { right: auto; left: 0; }
+.namefield { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--ink-2); }
+.namefield input { flex: 1; min-width: 0; height: 44px; font-size: 16px; border: 1px solid var(--edge); border-radius: 8px; background: var(--surface); padding: 0 10px; }
+.syncrow { display: flex; gap: 8px; }
+.syncrow #syncSave { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 42px; }
+.slot .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; direction: ltr; }
+.slot .ctl[hidden] { display: none; }
+.slot .ctl .scrub { flex: 1 1 140px; }
+.slot .ctl .steps4 { flex: 1 1 100%; }
+.slot.chosen .box { outline: 3px solid var(--ring); outline-offset: 1px; }
+.pointlist .plist { list-style: none; margin: 0; padding: 0; }
+.plist li { display: flex; align-items: stretch; border-top: 1px solid var(--hair); }
+.plist li:first-child { border-top: 0; }
+.pgo { flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px;
+  border: 0; border-inline-start: 3px solid transparent; background: none; color: var(--ink); font: 500 15px/1.2 Inter, system-ui, sans-serif; text-align: start; cursor: pointer; }
+.pgo.on { border-inline-start-color: var(--brand); }
+@media (hover: hover) { .pgo:hover { background: var(--sunken); } }
+.pname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptime { flex: none; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 14px; color: var(--brand-text); direction: ltr; }
+.pdel { min-width: 44px; min-height: 44px; border: 0; background: none; padding: 0 8px; cursor: pointer; font-size: 14px; }
+.empty-points { padding: 12px; }
+.pointscol { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--hair); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.pointscol[hidden] { display: none; }
+.pointscol h2 { padding: 8px 12px; border-bottom: 1px solid var(--hair); font-size: 16px; }
+.pointscol .pointlist { overflow-y: auto; min-height: 0; flex: 1; }
+.keyslink { align-self: flex-start; min-height: 44px; padding: 0 12px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 200px); z-index: 20; display: flex; align-items: center; gap: 12px;
+  max-width: min(440px, calc(100vw - 32px)); padding: 6px 6px 6px 14px; border-radius: 10px; background: var(--ink); color: var(--page); font-size: 15px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.3); }
+.toast[hidden] { display: none; }
+.toast .link { color: var(--page); min-height: 40px; }
+@media (hover: hover) and (pointer: fine) {
+  .box .over button { opacity: 0; transition: opacity 0.15s; }
+  .box:hover .over button, .box:focus-within .over button, .box .over button:focus-visible { opacity: 1; }
+}
+@media (min-width: 1000px) and (min-height: 560px) {
+  body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: auto minmax(0, 1fr); }
+  header { grid-column: 1 / span 2; }
+  #slots { grid-column: 1; grid-row: 2; padding-bottom: 8px; }
+  #controls { grid-column: 2; grid-row: 2; overflow-y: auto; min-height: 0; padding: 0 8px 8px; gap: 10px; }
+  .pointscol { flex: 1 1 auto; min-height: 160px; }
+  .toast { bottom: 24px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  #controls { grid-row: 2 / span 2; overflow-y: auto; min-height: 0; width: 260px; padding: 4px 8px 8px 4px; gap: 6px; }
+  .slot .ctl .scrub { flex: 1 1 80px; }
+  .slot .ctl .steps4 { flex: 1 1 100%; }
+  .slot .ctl .steps4 .stepbtn { padding: 0 2px; font-size: 13px; }
+  body.syncing #controls { width: 220px; }
+  .toast { bottom: 12px; }
+}
+#together, .slot { container-type: inline-size; }
+@container (max-width: 340px) {
+  .steps4 { display: grid; grid-template-columns: 1fr 1fr; }
+  .steps4 [data-step="-1f"] { order: 1; } .steps4 [data-step="1f"] { order: 2; }
+  .steps4 [data-step="-1s"] { order: 3; } .steps4 [data-step="1s"] { order: 4; }
+}
+@media (orientation: landscape) and (max-height: 520px) { h1.brand { display: none; } }
+.draw { display: block; width: 100%; max-width: 420px; height: auto; margin: 4px 0 14px; color: var(--ink-2); }
+.draw .bar { fill: var(--sunken); stroke: var(--hair); }
+.draw .pt { fill: var(--warn); }
+.draw .link { stroke: var(--warn); stroke-dasharray: 4 3; }
+.draw text { font: 600 12px Inter, system-ui, sans-serif; fill: var(--ink-2); }
+.draw .head { fill: var(--brand); }
+.draw .wait { font-weight: 700; fill: var(--brand-text); }
+@media (prefers-reduced-motion: no-preference) {
+  .draw .h1 { animation: head1 6s linear infinite; }
+  .draw .h2 { animation: head2 6s linear infinite; }
+  .draw .w1 { animation: wait1 6s linear infinite; }
+}
+@keyframes head1 { 0% { transform: translateX(0); } 30% { transform: translateX(150px); } 55% { transform: translateX(150px); } 100% { transform: translateX(300px); } }
+@keyframes head2 { 0% { transform: translateX(0); } 55% { transform: translateX(210px); } 100% { transform: translateX(300px); } }
+@keyframes wait1 { 0%, 29% { opacity: 0; } 30%, 54% { opacity: 1; } 55%, 100% { opacity: 0; } }
+.demo-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0 12px; direction: ltr; pointer-events: none; }
+.demo-steps [data-step="-1f"] { order: 1; } .demo-steps [data-step="1f"] { order: 2; } .demo-steps [data-step="-1s"] { order: 3; } .demo-steps [data-step="1s"] { order: 4; }
+.tourbody .sub { font-weight: 700; margin: 4px 0 6px; }
+#syncBtn, #pointsBtn { white-space: normal; line-height: 1.1; text-align: center; padding: 2px 8px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  #controls { width: 304px; }
+  #together { container-type: normal; }
+  #together .steps4 { display: flex; }
+  #together .steps4 .stepbtn { padding: 0 3px; font-size: 14px; min-width: 44px; }
+  #together .steps4 .stepbtn.sec { flex: 0 1 auto; }
+  #together, #syncing { gap: 4px; }
+  #controls .tl .scrub input { height: 40px; }
+}
+@media (orientation: landscape) and (max-height: 320px) {
+  body.syncing[data-layout="stack"] #slots { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@container (max-width: 240px) {
+  .steps4 { gap: 4px; }
+  .steps4 .stepbtn { padding: 0 2px; font-size: 13px; gap: 2px; letter-spacing: -0.01em; }
+  .stepbtn .arr { font-size: 10px; }
+}
+@container (max-width: 180px) {
+  .steps4 .stepbtn { font-size: 12px; }
+}
+.refusedbox { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px; text-align: center; background: var(--sunken); direction: ltr; }
+.refusedbox[hidden] { display: none; }
+.refusedmsg { margin: 0; color: var(--danger); font-size: 14px; max-width: 32ch; unicode-bidi: plaintext; }
+.box.sidecols .over { display: block; pointer-events: none; }
+.box.sidecols .over.top { inset: 4px 4px auto 4px; height: 0; }
+.box.sidecols .over.bottom { inset: auto 4px 4px 4px; height: 0; }
+.box.sidecols .over .labels { position: absolute; left: 0; top: 0; width: calc(var(--side) - 8px); }
+.box.sidecols .over .labels .row { flex-direction: column; align-items: flex-start; }
+.box.sidecols .chip { white-space: normal; font-size: 11px; padding: 2px 5px; overflow-wrap: anywhere; max-width: 100%; }
+.box.sidecols .over .change { position: absolute; right: 0; top: 0; max-width: calc(var(--side) - 8px); pointer-events: auto; }
+.box.sidecols .over .change span { white-space: normal; font-size: 13px; padding: 0 6px; text-align: center; height: auto; min-height: 36px; }
+.box.sidecols .over .sound { position: absolute; right: 0; top: 48px; pointer-events: auto; }
+.box.sidecols .over .zout { position: absolute; left: 0; bottom: 48px; pointer-events: auto; }
+.box.sidecols .over .zin { position: absolute; left: 0; bottom: 0; pointer-events: auto; }
+.box.sidecols .over .whole { position: absolute; right: 0; bottom: 0; max-width: calc(var(--side) - 8px); pointer-events: auto; }
+.box.sidecols .over .whole span { white-space: normal; font-size: 12px; padding: 0 4px; text-align: center; height: auto; min-height: 36px; }
+.box.sidecols .over .wait { position: absolute; right: 0; bottom: 48px; max-width: calc(var(--side) - 8px); }
+.box.sidecols .over .grow { display: none; }
+.syncrow #syncSave { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; display: inline-flex; padding: 4px 10px; min-height: 44px; height: auto; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .syncrow { flex-direction: column-reverse; }
+  .syncrow .btn { width: 100%; }
+  .namefield { flex-direction: column; align-items: stretch; gap: 2px; }
+}
+.menurow { flex-direction: column; align-items: stretch; }
+.menurow .seg { display: flex; }
+.menurow .seg button { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.15; text-align: start; padding: 4px 8px; height: auto; min-height: 44px; }
+.slot .ctl .fine { flex: 1 1 100%; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.slot .ctl .fine[hidden] { display: none; }
+.slot .ctl .fine input { flex: 1; min-width: 0; height: 44px; accent-color: var(--brand); }
+.box .chipbtn { min-width: 44px; justify-content: center; }
+.box .chipbtn.change { flex: none; }
+.steps4 .stepbtn { padding: 0 4px; }
+body.syncing.syncside #slots { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.box.crowded .over.bottom .zout, .box.crowded .over.bottom .zin, .box.crowded .over.bottom .whole { display: none; }
+.zoombar { display: flex; align-items: center; gap: 4px; flex: none; direction: ltr; }
+.zoombar[hidden] { display: none; }
+.zoombar .chipbtn span { border: 1px solid var(--edge); background: var(--surface); }
+@media (orientation: landscape) and (max-height: 520px) {
+  #menu { max-width: min(720px, calc(100vw - 32px)); }
+  #menu[open] { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; align-content: start; }
+  #menu .sheethead, #menu .about, #menu #forgetAsk { grid-column: 1 / -1; }
+  #menu .lang, #menu .menurow { margin-bottom: 4px; }
+  #menu .btn { margin-top: 6px; }
+}
+body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+.box.crowded2 .over.top .change, .box.crowded2 .over.top .sound { display: none; }
+@media (orientation: landscape) and (max-height: 520px) {
+  body.syncing { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  body.syncing header { grid-column: 1; grid-row: 1; max-width: none; padding: 4px; flex-wrap: nowrap; }
+  body.syncing #controls { grid-column: 2; grid-row: 1; width: auto; overflow: visible; padding: 4px 8px 0 0; }
+  body.syncing #syncing { flex-direction: row; align-items: center; gap: 8px; }
+  body.syncing .namefield { flex: 1 1 auto; flex-direction: row; align-items: center; }
+  body.syncing .syncrow { flex-direction: row; flex: 0 1 auto; }
+  body.syncing .syncrow .btn { width: auto; }
+  body.syncing #syncSave { max-width: 260px; }
+  body.syncing #slots { grid-column: 1 / span 2; grid-row: 2; }
+  body.syncing #pointsCol { display: none; }
+  @container (min-width: 280px) {
+    .slot .ctl .steps4 { display: flex; }
+    .slot .ctl .steps4 .stepbtn { font-size: 13px; padding: 0 2px; }
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  body.syncing #controls, body.syncing #syncing { min-width: 0; }
+  body.syncing .namefield { flex: 1 1 100px; min-width: 0; }
+  body.syncing .namefield input { min-width: 50px; }
+  body.syncing .syncrow { min-width: 0; flex: 0 1 auto; }
+  body.syncing #syncSave { flex: 1 1 auto; min-width: 0; max-width: 240px; }
+}
+.over.top .labels { flex: 0 1 auto; min-width: 0; }
+.chip.time { white-space: normal; }
+#layout.auto { opacity: 0.55; }
+@media (orientation: landscape) and (max-height: 360px) and (min-width: 540px) {
+  #menu[open] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #menu .btn { white-space: normal; line-height: 1.15; min-height: 44px; height: auto; padding: 4px 8px; }
+  #menu .muted { font-size: 13px; }
+}
+.slot .ctl .zoombar.inctl { flex: none; }
+.box.crowded3 .over.top .chip.name, .box.crowded3 .over.top .chip.amount { display: none; }
+#menu .menurow { grid-column: 1 / -1; }
+@media (orientation: landscape) and (max-height: 360px) and (min-width: 540px) {
+  #menu { padding: 10px 14px; }
+  #menu .menurow { flex-direction: row; align-items: center; gap: 12px; }
+  #menu .menurow .seg { flex: 1; }
+  #menu .menurow .seg button { min-height: 40px; }
+  #menu .sheethead { margin-bottom: 4px; }
+  #menu .about summary { min-height: 40px; }
+}
+@media (orientation: landscape) and (max-height: 360px) and (min-width: 540px) {
+  #menu .lang { flex-direction: row; align-items: center; gap: 8px; margin: 6px 0 0; }
+  #menu .lang select { flex: 1; min-width: 0; }
+  #menu .muted { margin-top: 6px; }
+}
 </style>
 </head>
 <body>
 <header>
-  <h1 data-t="appName">Vertailu</h1>
-  <button type="button" id="keysBtn" class="iconbtn fine-only" data-tl="keys" aria-keyshortcuts="?"><span class="disc">?</span></button>
-  <label class="lang"><span class="sr" data-t="language"></span><select id="lang"></select></label>
+  <h1 class="brand" dir="ltr" data-t="appName">Video Coaching Comparison</h1>
+  <div class="seg icons" role="radiogroup" id="layout"></div>
+  <button type="button" id="menuBtn" class="menubtn" data-tl="menu"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>
 <main id="slots"></main>
-<footer>
-  <button type="button" id="playBoth" class="btn primary"></button>
-  <button type="button" id="resume" class="btn ghost" hidden></button>
-  <div class="seg" role="radiogroup" id="speed"></div>
+<p id="note" class="note" role="status" hidden></p>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden><span id="toastText"></span><button type="button" id="toastUndo" class="link" data-t="undo" hidden></button></div>
+<footer id="controls">
+  <div id="together">
+    <div class="tl"><div class="scrub"><input type="range" id="tlRange" min="0" max="0" step="0.01" value="0"><div class="ticks"></div></div><span id="tlTime" class="tltime"></span></div>
+    <div class="steps4" id="jointSteps">
+      <button type="button" class="btn ghost stepbtn sec" data-step="-1s"></button>
+      <button type="button" class="btn ghost stepbtn" data-step="-1f" aria-keyshortcuts="Shift+ArrowLeft"></button>
+      <button type="button" class="btn ghost stepbtn" data-step="1f" aria-keyshortcuts="Shift+ArrowRight"></button>
+      <button type="button" class="btn ghost stepbtn sec" data-step="1s"></button>
+    </div>
+    <div class="playrow">
+      <button type="button" id="prevStop" class="btn ghost iconsq" aria-keyshortcuts="P"></button>
+      <button type="button" id="playBoth" class="btn primary" aria-keyshortcuts="Space K"></button>
+      <button type="button" id="nextStop" class="btn ghost iconsq" aria-keyshortcuts="N"></button>
+    </div>
+    <div class="row3">
+      <button type="button" id="pointsBtn" class="btn ghost" aria-haspopup="dialog"></button>
+      <button type="button" id="syncBtn" class="btn ghost"></button>
+      <div class="speedwrap"><button type="button" id="speedBtn" class="btn ghost" aria-haspopup="true" aria-expanded="false"></button><div id="speedMenu" class="speedmenu" role="radiogroup" hidden></div></div>
+    </div>
+    <p id="aloneNote" class="muted" hidden></p>
+    <p id="stallNote" class="err" role="alert" hidden></p>
+  </div>
+  <div id="syncing" hidden>
+    <label class="field namefield"><span data-t="pointLabel"></span><input id="pointName" type="text" maxlength="60" autocomplete="off" list="presetNames"><datalist id="presetNames"><option value="Kuzushi"><option value="Tsukuri"><option value="Kake"></datalist></label>
+    <div class="syncrow"><button type="button" id="syncDone" class="btn ghost" data-t="done"></button><button type="button" id="syncSave" class="btn primary"></button></div>
+  </div>
+  <section id="pointsCol" class="pointscol" hidden><h2 data-t="points"></h2><div class="pointlist"></div><button type="button" class="link keyslink fine-only" data-t="keys"></button></section>
 </footer>
+<dialog id="pointsSheet"><div class="sheethead"><h2 data-t="points"></h2><button type="button" class="btn ghost sheetclose" data-t="close"></button></div><div class="pointlist"></div></dialog>
+<dialog id="menu">
+  <div class="sheethead"><h2 data-t="menu"></h2><button type="button" id="menuClose" class="btn ghost" data-t="close"></button></div>
+  <label class="lang"><span data-t="language"></span><select id="lang"></select></label>
+  <div class="menurow"><span data-t="layout"></span><div class="seg labelled" role="radiogroup" id="layoutMenu"></div></div>
+  <p class="muted" data-t="privacy"></p>
+  <button type="button" id="tourOpen" class="btn ghost" data-t="tour"></button>
+  <button type="button" id="keysBtn" class="btn ghost fine-only" data-t="keys" aria-keyshortcuts="?"></button>
+  <button type="button" id="installOpen" class="btn ghost" hidden></button>
+  <button type="button" id="forget" class="btn ghost danger" data-t="forget"></button>
+  <div id="forgetAsk" class="ask" hidden>
+    <p data-t="forgetWhat"></p>
+    <div class="askrow"><button type="button" id="forgetNo" class="btn ghost" data-t="cancel"></button><button type="button" id="forgetYes" class="btn ghost danger" data-t="forget"></button></div>
+  </div>
+  <details class="about"><summary data-t="about"></summary><p data-t="tagline"></p><p class="muted">Inter &amp; Gabarito fonts: SIL Open Font License 1.1 (<a href="fonts-LICENSE-Inter.txt">Inter</a>, <a href="fonts-LICENSE-Gabarito.txt">Gabarito</a>).</p></details>
+</dialog>
+<dialog id="install">
+  <div class="sheethead"><h2 id="installHead"></h2><button type="button" id="installClose" class="btn ghost" data-t="close"></button></div>
+  <div class="installbody"></div>
+</dialog>
+<dialog id="tour">
+  <div class="tourtop"><button type="button" id="tourSkip" class="link" data-t="tourSkip"></button></div>
+  <div id="tourBody" class="tourbody"></div>
+  <div class="tourfoot">
+    <div id="tourDots" class="dots-row" role="img"></div>
+    <div class="tournav"><button type="button" id="tourBack" class="btn ghost" data-t="tourBack"></button><button type="button" id="tourNext" class="btn primary"></button></div>
+  </div>
+</dialog>
 <dialog id="keysSheet">
   <div class="sheethead"><h2 data-t="keys"></h2><button type="button" id="keysClose" class="btn ghost" data-t="close"></button></div>
   <table><tbody id="keysRows"></tbody></table>
   <p class="muted" data-t="kNote"></p>
 </dialog>
-<script>const LANGS = ['fi', 'sv', 'en', 'ru', 'et'];
-const LANG_NAMES = { fi: 'Suomi', sv: 'Svenska', en: 'English', ru: 'Русский', et: 'Eesti' };
+<script>const LANGS = ["fi","sv","en","ru","et","fr","ar"];
+const RTL = ["ar"];
+const LANG_NAMES = {
+ "fi": "Suomi",
+ "sv": "Svenska",
+ "en": "English",
+ "ru": "Русский",
+ "et": "Eesti",
+ "fr": "Français",
+ "ar": "العربية"
+};
 const STRINGS = {
   fi: {
-    appName: 'Vertailu',
-    homeName: 'Vertailu',
-    video: 'Video {n}',
-    pick: 'Valitse video',
-    same: 'Sama video',
-    change: 'Vaihda',
-    privacy: 'Videot eivät lähde laitteelta.',
-    playBoth: 'Toista molemmat',
-    playBothTip: 'Molemmat omasta alustaan',
-    pause: 'Pysäytä',
-    resume: 'Jatka',
-    resumeTip: 'Jatka tästä',
-    pickFirst: 'Valitse ensin video',
-    playThis: 'Toista tämä',
-    pauseThis: 'Pysäytä tämä',
-    prevFrame: 'Edellinen ruutu',
-    nextFrame: 'Seuraava ruutu',
-    setStart: 'Aseta alku tähän',
-    startAt: 'Alku {t}',
-    position: 'Kohta videossa',
-    speed: 'Nopeus',
-    zoomIn: 'Lähemmäs',
-    zoomOut: 'Kauemmas',
-    whole: 'Koko kuva',
-    soundOn: 'Ääni päälle',
-    soundOff: 'Ääni pois',
-    waiting: 'Odottaa',
-    cantPlay: 'Tämä selain ei pysty näyttämään tätä videota.',
-    cantStart: 'Selain ei aloittanut toistoa. Paina uudelleen.',
-    keys: 'Näppäimet',
-    close: 'Sulje',
-    language: 'Kieli',
-    keySpace: 'Välilyönti',
-    keyShift: 'Vaihto',
-    kToggle: 'Toista / pysäytä',
-    kFromStart: 'Molemmat alusta',
-    kSeek5: '5 s taakse / eteen',
-    kSeek10: '10 s taakse / eteen',
-    kFrame: 'Ruutu taakse / eteen',
-    kSide: 'Näppäimet videoon 1 / 2',
-    kZoom: 'Lähemmäs / kauemmas',
-    kPan: 'Siirrä kuvaa',
-    kSpeed: 'Hitaammin / nopeammin',
-    kHelp: 'Tämä lista',
-    kNote: 'Näppäimet koskevat viimeksi osoitettua videota.',
+    layoutAuto: "Synkkauksessa asettelu valitaan isompien kuvien mukaan; valintasi palaa sen jälkeen.",
+    retry: "Yritä uudelleen",
+    notStarted: "Selain ei aloittanut tämän videon toistoa.",
+    cantPlayThis: "Selain ei pystynyt toistamaan tätä videota.",
+    fine: "Tarkka",
+    fineAria: "Tarkka kohta kahden minuutin sisällä",
+    tourStepBoth: "Ilman {sync}-tilaa askeleet liikuttavat molempia videoita yhtä aikaa; {sync}-tilassa kummankin videon alla on omat.",
+    tourStepHead: "Ruutu ruudulta",
+    tourSyncHead: "Synkkaa samat hetket",
+    tagline: "Vertaa kahta videota rinnakkain – ruutu ruudulta, omassa puhelimessasi.",
+    installIos: "{app} Koti-valikkoon",
+    installAndroid: "{app} aloitusnäyttöön",
+    installWhy: "Avautuu koko näytölle ja toimii ilman verkkoa.",
+    installApart: "Koti-valikon kuvake aloittaa tyhjästä: Safarissa tallennetut videot eivät siirry sinne.",
+    stepShare: "Napauta jakokuvaketta",
+    shareMore: "Jos et näe sitä, napauta ensin ···.",
+    stepAddIos: "Valitse Lisää Koti-valikkoon.",
+    stepConfirm: "Napauta Lisää.",
+    iosOther: "Jos valikossa ei ole sitä, avaa tämä sivu Safarissa.",
+    stepMenuAndroid: "Napauta selaimen valikkoa osoiterivin vieressä.",
+    stepAddAndroid: "Valitse Lisää aloitusnäyttöön.",
+    stepDesktop: "Avaa tämä sivu puhelimella.",
+    notNow: "Ei nyt",
+    menu: "Valikko",
+    forget: "Unohda videot",
+    forgetWhat: "Molemmat videot poistuvat tästä laitteesta ja näkymästä.",
+    cancel: "Peru",
+    notSaved: "Videoita ei voitu tallentaa laitteeseen. Ne pitää valita uudelleen ensi kerralla.",
+    privacy: "Videot säilyvät vain tässä laitteessa.",
+    sec: "{n} s",
+    secBack: "{n} s taakse",
+    secFwd: "{n} s eteen",
+    frameNo: "ruutu {n}",
+    layout: "Asettelu",
+    layoutSide: "Rinnakkain",
+    layoutStack: "Päällekkäin",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Video {n}",
+    pick: "Valitse video",
+    same: "Sama video",
+    change: "Vaihda",
+    playBoth: "Toista molemmat",
+    pause: "Pysäytä",
+    pickFirst: "Valitse ensin video",
+    prevFrame: "Edellinen ruutu",
+    nextFrame: "Seuraava ruutu",
+    position: "Kohta videossa",
+    speed: "Nopeus",
+    zoomIn: "Lähemmäs",
+    zoomOut: "Kauemmas",
+    whole: "Koko kuva",
+    soundOn: "Ääni päälle",
+    soundOff: "Ääni pois",
+    waiting: "Odottaa",
+    cantPlay: "Tämä selain ei pysty näyttämään tätä videota.",
+    keys: "Näppäimet",
+    close: "Sulje",
+    language: "Kieli",
+    keySpace: "Välilyönti",
+    keyShift: "Vaihto",
+    kToggle: "Toista / pysäytä",
+    kSeek10: "10 s taakse / eteen",
+    kFrame: "Ruutu taakse / eteen",
+    kZoom: "Lähemmäs / kauemmas",
+    kPan: "Siirrä kuvaa",
+    kSpeed: "Hitaammin / nopeammin",
+    kHelp: "Tämä lista",
+    kNote: "Näppäimet koskevat viimeksi osoitettua videota.",
+    tour: "Opastus",
+    tourSkip: "Ohita",
+    tourNext: "Seuraava",
+    tourBack: "Takaisin",
+    tourStart: "Aloita",
+    tourStepOf: "Vaihe {n}/{m}",
+    tourLangHead: "Valitse kieli",
+    tourPrivacyHead: "Videosi pysyvät puhelimessasi",
+    tourPrivacy1: "Tämä sivu ei lähetä videoitasi minnekään. Ei tilejä, ei analytiikkaa, ei seurantaa, ei evästeitä.",
+    tourPrivacy2: "Pari ja asetukset tallentuvat vain tähän laitteeseen ensi kertaa varten. Valikon {forget} poistaa tallennetut videot.",
+    tourPrivacy3: "Itse sivu latautuu GitHub Pagesista kuten mikä tahansa verkkosivu.",
+    tourFeaturesHead: "Näin se toimii",
+    fPick: "Valitse kaksi videota – tai {same}, joka alkaa puolivälistä.",
+    fStart: "{sync}: etsi sama hetki kummastakin videosta, nimeä kohta (esim. Kuzushi) ja paina {here}.",
+    fPlay: "{play} toistaa molemmat omalla nopeudellaan; nopeampi odottaa jokaisessa kohdassa.",
+    fStep: "◀ 1 ruutu ▶ ja ◀ 1 s ▶ askeltavat taakse ja eteen. Pidä painettuna, niin askel jatkuu.",
+    fZoom: "Nipistä kuvaa tai käytä suurennuslaseja; vedä siirtääksesi.",
+    fLayout: "Yläreunan kuvakkeet: rinnakkain tai päällekkäin.",
+    fSpeed: "Nopeus 0,25×–2×.",
+    installDone: "{app} on jo kotinäytölläsi.",
+    otherPhones: "Muut puhelimet",
+    installNow: "Asenna",
+    frameUnit: "ruutu",
+    synced: "Synkattu.",
+    pointRemoved: "Kohta poistettu.",
+    undone: "Kumottu.",
+    undo: "Kumoa",
+    pointN: "Kohta {n}",
+    onePoint: "1 kohta",
+    nPoints: "{n} kohtaa",
+    syncHere: "Synkkaa tästä",
+    replaceN: "Korvaa {n} kohtaa",
+    replace: "Korvaa {name}",
+    noPoints: "Ei synkkauskohtia. Paina Synkkaa ja hae sama hetki kummastakin videosta.",
+    remove: "Poista",
+    play: "Toista",
+    positionBoth: "Kohta molemmissa videoissa",
+    pauseBoth: "Pysäytä molemmat",
+    playOnly: "Toista vain video {n}",
+    start: "alku",
+    prevPoint: "Edellinen kohta",
+    nextPoint: "Seuraava kohta",
+    sync: "Synkkaa",
+    syncNeedsBoth: "Synkkaus vaatii molemmat videot.",
+    noName: "Ei nimeä",
+    pointLabel: "Kohta",
+    done: "Valmis",
+    points: "Kohdat",
+    about: "Tietoja",
+    kSeek5: "5 s taakse / eteen",
+    kPoints: "Edellinen / seuraava synkkauskohta",
+    keyWheel: "Rulla / veto",
+    kWheel: "Kuvan päällä: zoomaa (myös nipistys) / siirrä",
+    kEsc: "Pois synkkauksesta",
   },
   sv: {
-    appName: 'Jämför videor',
-    homeName: 'Jämför',
-    video: 'Video {n}',
-    pick: 'Välj video',
-    same: 'Samma video',
-    change: 'Byt',
-    privacy: 'Videorna lämnar aldrig enheten.',
-    playBoth: 'Spela båda',
-    playBothTip: 'Båda från sin startpunkt',
-    pause: 'Pausa',
-    resume: 'Fortsätt',
-    resumeTip: 'Fortsätt härifrån',
-    pickFirst: 'Välj en video först',
-    playThis: 'Spela den här',
-    pauseThis: 'Pausa den här',
-    prevFrame: 'Föregående bildruta',
-    nextFrame: 'Nästa bildruta',
-    setStart: 'Sätt start här',
-    startAt: 'Start {t}',
-    position: 'Position i videon',
-    speed: 'Hastighet',
-    zoomIn: 'Zooma in',
-    zoomOut: 'Zooma ut',
-    whole: 'Hela bilden',
-    soundOn: 'Ljud på',
-    soundOff: 'Ljud av',
-    waiting: 'Laddar',
-    cantPlay: 'Webbläsaren kan inte spela den här videon.',
-    cantStart: 'Webbläsaren startade inte uppspelningen. Tryck igen.',
-    keys: 'Tangenter',
-    close: 'Stäng',
-    language: 'Språk',
-    keySpace: 'Mellanslag',
-    keyShift: 'Skift',
-    kToggle: 'Spela / pausa',
-    kFromStart: 'Båda från start',
-    kSeek5: '5 s bakåt / framåt',
-    kSeek10: '10 s bakåt / framåt',
-    kFrame: 'Bildruta bakåt / framåt',
-    kSide: 'Tangenterna styr video 1 / 2',
-    kZoom: 'Zooma in / ut',
-    kPan: 'Flytta bilden',
-    kSpeed: 'Långsammare / snabbare',
-    kHelp: 'Den här listan',
-    kNote: 'Tangenterna gäller videon du senast pekade på.',
+    layoutAuto: "Vid synkning väljs layouten för större bilder; ditt val kommer tillbaka efteråt.",
+    retry: "Försök igen",
+    notStarted: "Webbläsaren startade inte den här videon.",
+    cantPlayThis: "Webbläsaren kunde inte spela den här videon.",
+    fine: "Fin",
+    fineAria: "Exakt position inom två minuter",
+    tourStepBoth: "Utanför {sync} flyttar stegen båda videorna samtidigt; i {sync} har varje video egna under sig.",
+    tourStepHead: "Bildruta för bildruta",
+    tourSyncHead: "Synka samma ögonblick",
+    tagline: "Jämför två videor sida vid sida – bildruta för bildruta, i din egen telefon.",
+    installIos: "{app} på hemskärmen",
+    installAndroid: "{app} på startskärmen",
+    installWhy: "Öppnas i helskärm och fungerar utan nät.",
+    installApart: "Ikonen på hemskärmen börjar från noll: videor som sparats i Safari följer inte med.",
+    stepShare: "Tryck på delningsikonen",
+    shareMore: "Ser du den inte, tryck först på ···.",
+    stepAddIos: "Välj Lägg till på hemskärmen.",
+    stepConfirm: "Tryck på Lägg till.",
+    iosOther: "Saknas det i menyn, öppna sidan i Safari.",
+    stepMenuAndroid: "Tryck på webbläsarens meny bredvid adressfältet.",
+    stepAddAndroid: "Välj Lägg till på startskärmen.",
+    stepDesktop: "Öppna sidan på telefonen.",
+    notNow: "Inte nu",
+    menu: "Meny",
+    forget: "Glöm videorna",
+    forgetWhat: "Båda videorna tas bort från enheten och från vyn.",
+    cancel: "Avbryt",
+    notSaved: "Videorna kunde inte sparas på enheten. Välj dem igen nästa gång.",
+    privacy: "Videorna sparas bara på den här enheten.",
+    sec: "{n} s",
+    secBack: "{n} s bakåt",
+    secFwd: "{n} s framåt",
+    frameNo: "ruta {n}",
+    layout: "Layout",
+    layoutSide: "Sida vid sida",
+    layoutStack: "Över varandra",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Video {n}",
+    pick: "Välj video",
+    same: "Samma video",
+    change: "Byt",
+    playBoth: "Spela båda",
+    pause: "Pausa",
+    pickFirst: "Välj en video först",
+    prevFrame: "Föregående bildruta",
+    nextFrame: "Nästa bildruta",
+    position: "Position i videon",
+    speed: "Hastighet",
+    zoomIn: "Zooma in",
+    zoomOut: "Zooma ut",
+    whole: "Hela bilden",
+    soundOn: "Ljud på",
+    soundOff: "Ljud av",
+    waiting: "Laddar",
+    cantPlay: "Webbläsaren kan inte spela den här videon.",
+    keys: "Tangenter",
+    close: "Stäng",
+    language: "Språk",
+    keySpace: "Mellanslag",
+    keyShift: "Skift",
+    kToggle: "Spela / pausa",
+    kSeek10: "10 s bakåt / framåt",
+    kFrame: "Bildruta bakåt / framåt",
+    kZoom: "Zooma in / ut",
+    kPan: "Flytta bilden",
+    kSpeed: "Långsammare / snabbare",
+    kHelp: "Den här listan",
+    kNote: "Tangenterna gäller videon du senast pekade på.",
+    tour: "Guide",
+    tourSkip: "Hoppa över",
+    tourNext: "Nästa",
+    tourBack: "Tillbaka",
+    tourStart: "Börja",
+    tourStepOf: "Steg {n} av {m}",
+    tourLangHead: "Välj språk",
+    tourPrivacyHead: "Dina videor stannar i telefonen",
+    tourPrivacy1: "Den här sidan skickar aldrig dina videor någonstans. Inga konton, ingen analys, ingen spårning, inga kakor.",
+    tourPrivacy2: "Paret och inställningarna sparas bara på den här enheten till nästa gång. {forget} i menyn tar bort de sparade videorna.",
+    tourPrivacy3: "Själva sidan laddas från GitHub Pages som vilken webbsida som helst.",
+    tourFeaturesHead: "Så fungerar det",
+    fPick: "Välj två videor – eller {same}, som börjar halvvägs.",
+    fStart: "{sync}: hitta samma ögonblick i båda videorna, namnge punkten (t.ex. Kuzushi) och tryck {here}.",
+    fPlay: "{play} spelar båda i sin egen takt; den snabbare väntar vid varje punkt.",
+    fStep: "◀ 1 ruta ▶ och ◀ 1 s ▶ stegar bakåt och framåt. Håll intryckt så fortsätter det.",
+    fZoom: "Nyp i bilden eller använd förstoringsglasen; dra för att flytta.",
+    fLayout: "Ikonerna högst upp: sida vid sida eller över varandra.",
+    fSpeed: "Hastighet 0,25×–2×.",
+    installDone: "{app} finns redan på hemskärmen.",
+    otherPhones: "Andra telefoner",
+    installNow: "Installera",
+    frameUnit: "ruta",
+    synced: "Synkat.",
+    pointRemoved: "Punkten borttagen.",
+    undone: "Ångrat.",
+    undo: "Ångra",
+    pointN: "Punkt {n}",
+    onePoint: "1 punkt",
+    nPoints: "{n} punkter",
+    syncHere: "Synka här",
+    replaceN: "Ersätt {n} punkter",
+    replace: "Ersätt {name}",
+    noPoints: "Inga synkpunkter. Tryck Synka och leta upp samma ögonblick i båda videorna.",
+    remove: "Ta bort",
+    play: "Spela",
+    positionBoth: "Position i båda videorna",
+    pauseBoth: "Pausa båda",
+    playOnly: "Spela bara video {n}",
+    start: "början",
+    prevPoint: "Föregående punkt",
+    nextPoint: "Nästa punkt",
+    sync: "Synka",
+    syncNeedsBoth: "Synkning kräver båda videorna.",
+    noName: "Inget namn",
+    pointLabel: "Punkt",
+    done: "Klar",
+    points: "Punkter",
+    about: "Om",
+    kSeek5: "5 s bakåt / framåt",
+    kPoints: "Föregående / nästa synkpunkt",
+    keyWheel: "Hjul / drag",
+    kWheel: "På bilden: zooma (även nyp) / flytta",
+    kEsc: "Lämna synkningen",
   },
   en: {
-    appName: 'Compare videos',
-    homeName: 'Compare',
-    video: 'Video {n}',
-    pick: 'Choose video',
-    same: 'Same video',
-    change: 'Change',
-    privacy: 'Videos never leave this device.',
-    playBoth: 'Play both',
-    playBothTip: 'Both from their start points',
-    pause: 'Pause',
-    resume: 'Resume',
-    resumeTip: 'Continue from here',
-    pickFirst: 'Choose a video first',
-    playThis: 'Play this one',
-    pauseThis: 'Pause this one',
-    prevFrame: 'Previous frame',
-    nextFrame: 'Next frame',
-    setStart: 'Set start here',
-    startAt: 'Start {t}',
-    position: 'Position in video',
-    speed: 'Speed',
-    zoomIn: 'Zoom in',
-    zoomOut: 'Zoom out',
-    whole: 'Whole picture',
-    soundOn: 'Sound on',
-    soundOff: 'Sound off',
-    waiting: 'Loading',
+    layoutAuto: "While syncing, the layout is chosen for bigger pictures; your pick comes back after.",
+    retry: "Try again",
+    notStarted: "The browser didn't start this video.",
+    cantPlayThis: "The browser couldn't play this video.",
+    fine: "Fine",
+    fineAria: "Exact position within two minutes",
+    tourStepBoth: "Outside {sync} the steps move both videos together; in {sync} each video has its own under it.",
+    tourStepHead: "Frame by frame",
+    tourSyncHead: "Sync the same moments",
+    tagline: "Compare two videos side by side – frame by frame, on your own phone.",
+    installIos: "{app} on your Home Screen",
+    installAndroid: "{app} on your home screen",
+    installWhy: "Opens full screen and works offline.",
+    installApart: "The Home Screen icon starts fresh: videos kept in Safari don't carry over.",
+    stepShare: "Tap the Share icon",
+    shareMore: "Can't see it? Tap ··· first.",
+    stepAddIos: "Choose Add to Home Screen.",
+    stepConfirm: "Tap Add.",
+    iosOther: "Not in the menu? Open this page in Safari.",
+    stepMenuAndroid: "Tap the browser menu next to the address bar.",
+    stepAddAndroid: "Choose Add to Home screen.",
+    stepDesktop: "Open this page on your phone.",
+    notNow: "Not now",
+    menu: "Menu",
+    forget: "Forget videos",
+    forgetWhat: "Both videos are removed from this device and from the view.",
+    cancel: "Cancel",
+    notSaved: "Couldn't keep the videos on this device. Choose them again next time.",
+    privacy: "Videos are kept only on this device.",
+    sec: "{n} s",
+    secBack: "Back {n} s",
+    secFwd: "Forward {n} s",
+    frameNo: "frame {n}",
+    layout: "Layout",
+    layoutSide: "Side by side",
+    layoutStack: "One above the other",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Video {n}",
+    pick: "Choose video",
+    same: "Same video",
+    change: "Change",
+    playBoth: "Play both",
+    pause: "Pause",
+    pickFirst: "Choose a video first",
+    prevFrame: "Previous frame",
+    nextFrame: "Next frame",
+    position: "Position in video",
+    speed: "Speed",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    whole: "Full view",
+    soundOn: "Sound on",
+    soundOff: "Sound off",
+    waiting: "Loading",
     cantPlay: "This browser can't play this video.",
-    cantStart: "The browser didn't start playback. Press again.",
-    keys: 'Keys',
-    close: 'Close',
-    language: 'Language',
-    keySpace: 'Space',
-    keyShift: 'Shift',
-    kToggle: 'Play / pause',
-    kFromStart: 'Both from start',
-    kSeek5: 'Back / forward 5 s',
-    kSeek10: 'Back / forward 10 s',
-    kFrame: 'Frame back / forward',
-    kSide: 'Keys act on video 1 / 2',
-    kZoom: 'Zoom in / out',
-    kPan: 'Move the picture',
-    kSpeed: 'Slower / faster',
-    kHelp: 'This list',
-    kNote: 'Keys act on the video you last pointed at.',
+    keys: "Keys",
+    close: "Close",
+    language: "Language",
+    keySpace: "Space",
+    keyShift: "Shift",
+    kToggle: "Play / pause",
+    kSeek10: "Back / forward 10 s",
+    kFrame: "Frame back / forward",
+    kZoom: "Zoom in / out",
+    kPan: "Move the picture",
+    kSpeed: "Slower / faster",
+    kHelp: "This list",
+    kNote: "Keys act on the video you last pointed at.",
+    tour: "Guide",
+    tourSkip: "Skip",
+    tourNext: "Next",
+    tourBack: "Back",
+    tourStart: "Start",
+    tourStepOf: "Step {n} of {m}",
+    tourLangHead: "Choose your language",
+    tourPrivacyHead: "Your videos stay on your phone",
+    tourPrivacy1: "This page never sends your videos anywhere. No accounts, no analytics, no tracking, no cookies.",
+    tourPrivacy2: "The pair and your settings are saved only on this device, for next time. {forget} in the menu removes the saved videos.",
+    tourPrivacy3: "The page itself loads from GitHub Pages, like any website.",
+    tourFeaturesHead: "How it works",
+    fPick: "Choose two videos – or {same}, which starts half way.",
+    fStart: "{sync}: find the same moment in both videos, name the point (e.g. Kuzushi) and press {here}.",
+    fPlay: "{play} plays both at their own pace; the faster one waits at each point.",
+    fStep: "◀ 1 frame ▶ and ◀ 1 s ▶ step back and forward. Hold one down to keep stepping.",
+    fZoom: "Pinch the picture or use the magnifiers; drag to move it.",
+    fLayout: "The icons at the top: side by side or one above the other.",
+    fSpeed: "Speed 0.25×–2×.",
+    installDone: "{app} is already on your home screen.",
+    otherPhones: "Other phones",
+    installNow: "Install",
+    frameUnit: "frame",
+    synced: "Synced.",
+    pointRemoved: "Point removed.",
+    undone: "Undone.",
+    undo: "Undo",
+    pointN: "Point {n}",
+    onePoint: "1 point",
+    nPoints: "{n} points",
+    syncHere: "Sync here",
+    replaceN: "Replace {n} points",
+    replace: "Replace {name}",
+    noPoints: "No sync points. Press Sync and find the same moment in both videos.",
+    remove: "Remove",
+    play: "Play",
+    positionBoth: "Position in both videos",
+    pauseBoth: "Pause both",
+    playOnly: "Play only video {n}",
+    start: "start",
+    prevPoint: "Previous point",
+    nextPoint: "Next point",
+    sync: "Sync",
+    syncNeedsBoth: "Syncing needs both videos.",
+    noName: "No name",
+    pointLabel: "Point",
+    done: "Done",
+    points: "Points",
+    about: "About",
+    kSeek5: "Back / forward 5 s",
+    kPoints: "Previous / next sync point",
+    keyWheel: "Wheel / drag",
+    kWheel: "Over the picture: zoom (pinch too) / move",
+    kEsc: "Leave syncing",
   },
   ru: {
-    appName: 'Сравнение видео',
-    homeName: 'Сравнение',
-    video: 'Видео {n}',
-    pick: 'Выбрать видео',
-    same: 'То же видео',
-    change: 'Сменить',
-    privacy: 'Видео не покидают устройство.',
-    playBoth: 'Запустить оба',
-    playBothTip: 'Оба со своей начальной точки',
-    pause: 'Пауза',
-    resume: 'Продолжить',
-    resumeTip: 'Продолжить отсюда',
-    pickFirst: 'Сначала выберите видео',
-    playThis: 'Воспроизвести это',
-    pauseThis: 'Приостановить это',
-    prevFrame: 'Предыдущий кадр',
-    nextFrame: 'Следующий кадр',
-    setStart: 'Начало здесь',
-    startAt: 'Начало {t}',
-    position: 'Позиция в видео',
-    speed: 'Скорость',
-    zoomIn: 'Приблизить',
-    zoomOut: 'Отдалить',
-    whole: 'Весь кадр',
-    soundOn: 'Включить звук',
-    soundOff: 'Выключить звук',
-    waiting: 'Загрузка',
-    cantPlay: 'Браузер не может воспроизвести это видео.',
-    cantStart: 'Браузер не начал воспроизведение. Нажмите ещё раз.',
-    keys: 'Клавиши',
-    close: 'Закрыть',
-    language: 'Язык',
-    keySpace: 'Пробел',
-    keyShift: 'Shift',
-    kToggle: 'Пуск / пауза',
-    kFromStart: 'Оба с начала',
-    kSeek5: '5 с назад / вперёд',
-    kSeek10: '10 с назад / вперёд',
-    kFrame: 'Кадр назад / вперёд',
-    kSide: 'Клавиши для видео 1 / 2',
-    kZoom: 'Приблизить / отдалить',
-    kPan: 'Сдвинуть кадр',
-    kSpeed: 'Медленнее / быстрее',
-    kHelp: 'Этот список',
-    kNote: 'Клавиши действуют на видео, которое вы выбрали последним.',
+    layoutAuto: "Во время синхронизации расположение выбирается для более крупных кадров; ваш выбор вернётся потом.",
+    retry: "Повторить",
+    notStarted: "Браузер не запустил это видео.",
+    cantPlayThis: "Браузер не смог воспроизвести это видео.",
+    fine: "Точно",
+    fineAria: "Точная позиция в пределах двух минут",
+    tourStepBoth: "Вне режима «{sync}» шаги двигают оба видео вместе; в режиме «{sync}» у каждого видео свои кнопки под ним.",
+    tourStepHead: "Кадр за кадром",
+    tourSyncHead: "Синхронизируйте одни и те же моменты",
+    tagline: "Сравнивайте два видео рядом — кадр за кадром, на своём телефоне.",
+    installIos: "{app} на экране «Домой»",
+    installAndroid: "{app} на главном экране",
+    installWhy: "Открывается на весь экран и работает без сети.",
+    installApart: "Значок на экране «Домой» начинает с чистого листа: видео, сохранённые в Safari, туда не переносятся.",
+    stepShare: "Нажмите значок «Поделиться»",
+    shareMore: "Не видите его? Сначала нажмите ···.",
+    stepAddIos: "Выберите «На экран „Домой“».",
+    stepConfirm: "Нажмите «Добавить».",
+    iosOther: "Если этого пункта нет, откройте страницу в Safari.",
+    stepMenuAndroid: "Откройте меню браузера рядом с адресной строкой.",
+    stepAddAndroid: "Выберите «Добавить на главный экран».",
+    stepDesktop: "Откройте эту страницу на телефоне.",
+    notNow: "Не сейчас",
+    menu: "Меню",
+    forget: "Забыть видео",
+    forgetWhat: "Оба видео будут удалены с устройства и с экрана.",
+    cancel: "Отмена",
+    notSaved: "Не удалось сохранить видео на устройстве. В следующий раз выберите их снова.",
+    privacy: "Видео хранятся только на этом устройстве.",
+    sec: "{n} с",
+    secBack: "Назад на {n} с",
+    secFwd: "Вперёд на {n} с",
+    frameNo: "кадр {n}",
+    layout: "Расположение",
+    layoutSide: "Рядом",
+    layoutStack: "Друг над другом",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Видео {n}",
+    pick: "Выбрать видео",
+    same: "То же видео",
+    change: "Сменить",
+    playBoth: "Запустить оба",
+    pause: "Пауза",
+    pickFirst: "Сначала выберите видео",
+    prevFrame: "Предыдущий кадр",
+    nextFrame: "Следующий кадр",
+    position: "Позиция в видео",
+    speed: "Скорость",
+    zoomIn: "Приблизить",
+    zoomOut: "Отдалить",
+    whole: "Весь кадр",
+    soundOn: "Включить звук",
+    soundOff: "Выключить звук",
+    waiting: "Загрузка",
+    cantPlay: "Браузер не может воспроизвести это видео.",
+    keys: "Клавиши",
+    close: "Закрыть",
+    language: "Язык",
+    keySpace: "Пробел",
+    keyShift: "Shift",
+    kToggle: "Пуск / пауза",
+    kSeek10: "10 с назад / вперёд",
+    kFrame: "Кадр назад / вперёд",
+    kZoom: "Приблизить / отдалить",
+    kPan: "Сдвинуть кадр",
+    kSpeed: "Медленнее / быстрее",
+    kHelp: "Этот список",
+    kNote: "Клавиши действуют на видео, которое вы выбрали последним.",
+    tour: "Инструкция",
+    tourSkip: "Пропустить",
+    tourNext: "Далее",
+    tourBack: "Назад",
+    tourStart: "Начать",
+    tourStepOf: "Шаг {n} из {m}",
+    tourLangHead: "Выберите язык",
+    tourPrivacyHead: "Ваши видео остаются в телефоне",
+    tourPrivacy1: "Эта страница никуда не отправляет ваши видео. Без учётных записей, аналитики, отслеживания и cookie.",
+    tourPrivacy2: "Пара видео и настройки сохраняются только на этом устройстве, до следующего раза. «{forget}» в меню удаляет сохранённые видео.",
+    tourPrivacy3: "Сама страница загружается с GitHub Pages, как любой сайт.",
+    tourFeaturesHead: "Как это работает",
+    fPick: "Выберите два видео — или «{same}», которое начнётся с середины.",
+    fStart: "«{sync}»: найдите один и тот же момент в обоих видео, назовите точку (например, Kuzushi) и нажмите «{here}».",
+    fPlay: "«{play}» воспроизводит оба в их собственном темпе; более быстрое ждёт в каждой точке.",
+    fStep: "◀ 1 кадр ▶ и ◀ 1 с ▶ — шаги назад и вперёд. Удерживайте, чтобы шагать дальше.",
+    fZoom: "Сводите и разводите пальцы или нажимайте лупы; перетаскивайте кадр.",
+    fLayout: "Значки вверху: рядом или друг над другом.",
+    fSpeed: "Скорость 0,25×–2×.",
+    installDone: "{app} уже на главном экране.",
+    otherPhones: "Другие телефоны",
+    installNow: "Установить",
+    frameUnit: "кадр",
+    synced: "Синхронизировано.",
+    pointRemoved: "Точка удалена.",
+    undone: "Отменено.",
+    undo: "Отменить",
+    pointN: "Точка {n}",
+    onePoint: "1 точка",
+    nPoints: "Точек: {n}",
+    syncHere: "Сверить здесь",
+    replaceN: "Заменить точки: {n}",
+    replace: "Заменить «{name}»",
+    noPoints: "Нет точек синхронизации. Нажмите «Синхронизировать» и найдите один и тот же момент в обоих видео.",
+    remove: "Удалить",
+    play: "Воспроизвести",
+    positionBoth: "Позиция в обоих видео",
+    pauseBoth: "Пауза для обоих",
+    playOnly: "Воспроизвести только видео {n}",
+    start: "начало",
+    prevPoint: "Предыдущая точка",
+    nextPoint: "Следующая точка",
+    sync: "Сверить",
+    syncNeedsBoth: "Для синхронизации нужны оба видео.",
+    noName: "Без названия",
+    pointLabel: "Точка",
+    done: "Готово",
+    points: "Точки",
+    about: "О приложении",
+    kSeek5: "5 с назад / вперёд",
+    kPoints: "Предыдущая / следующая точка",
+    keyWheel: "Колесо / перетаскивание",
+    kWheel: "Над кадром: масштаб (и щипок) / сдвиг",
+    kEsc: "Выйти из синхронизации",
   },
   et: {
-    appName: 'Videote võrdlus',
-    homeName: 'Võrdlus',
-    video: 'Video {n}',
-    pick: 'Vali video',
-    same: 'Sama video',
-    change: 'Vaheta',
-    privacy: 'Videod ei lahku seadmest.',
-    playBoth: 'Esita mõlemad',
-    playBothTip: 'Mõlemad oma algusest',
-    pause: 'Paus',
-    resume: 'Jätka',
-    resumeTip: 'Jätka siit',
-    pickFirst: 'Vali kõigepealt video',
-    playThis: 'Esita see',
-    pauseThis: 'Peata see',
-    prevFrame: 'Eelmine kaader',
-    nextFrame: 'Järgmine kaader',
-    setStart: 'Algus siia',
-    startAt: 'Algus {t}',
-    position: 'Koht videos',
-    speed: 'Kiirus',
-    zoomIn: 'Suumi sisse',
-    zoomOut: 'Suumi välja',
-    whole: 'Kogu pilt',
-    soundOn: 'Heli sisse',
-    soundOff: 'Heli välja',
-    waiting: 'Laadimine',
-    cantPlay: 'Brauser ei suuda seda videot esitada.',
-    cantStart: 'Brauser ei alustanud esitust. Vajuta uuesti.',
-    keys: 'Klahvid',
-    close: 'Sulge',
-    language: 'Keel',
-    keySpace: 'Tühik',
-    keyShift: 'Shift',
-    kToggle: 'Esita / paus',
-    kFromStart: 'Mõlemad algusest',
-    kSeek5: '5 s tagasi / edasi',
-    kSeek10: '10 s tagasi / edasi',
-    kFrame: 'Kaader tagasi / edasi',
-    kSide: 'Klahvid videole 1 / 2',
-    kZoom: 'Suumi sisse / välja',
-    kPan: 'Liiguta pilti',
-    kSpeed: 'Aeglasemalt / kiiremini',
-    kHelp: 'See loend',
-    kNote: 'Klahvid mõjuvad viimati valitud videole.',
+    layoutAuto: "Sünkroonimise ajal valitakse paigutus suuremate piltide järgi; sinu valik tuleb hiljem tagasi.",
+    retry: "Proovi uuesti",
+    notStarted: "Brauser ei alustanud selle video esitust.",
+    cantPlayThis: "Brauser ei suutnud seda videot esitada.",
+    fine: "Täpne",
+    fineAria: "Täpne koht kahe minuti piires",
+    tourStepBoth: "Väljaspool {sync} liigutavad sammud mõlemat videot koos; {sync} ajal on igal videol oma nupud selle all.",
+    tourStepHead: "Kaader kaadri haaval",
+    tourSyncHead: "Sünkrooni samad hetked",
+    tagline: "Võrdle kahte videot kõrvuti – kaader kaadri haaval, oma telefonis.",
+    installIos: "{app} avakuvale",
+    installAndroid: "{app} avaekraanile",
+    installWhy: "Avaneb täisekraanil ja töötab ka võrguta.",
+    installApart: "Avakuva ikoon alustab puhtalt lehelt: Safaris salvestatud videod sinna ei kandu.",
+    stepShare: "Puuduta jagamisikooni",
+    shareMore: "Ei näe seda? Puuduta enne ···.",
+    stepAddIos: "Vali Lisa avakuvale.",
+    stepConfirm: "Puuduta Lisa.",
+    iosOther: "Kui menüüs seda pole, ava leht Safaris.",
+    stepMenuAndroid: "Puuduta brauseri menüüd aadressiriba kõrval.",
+    stepAddAndroid: "Vali Lisa avaekraanile.",
+    stepDesktop: "Ava see leht telefonis.",
+    notNow: "Mitte praegu",
+    menu: "Menüü",
+    forget: "Unusta videod",
+    forgetWhat: "Mõlemad videod eemaldatakse sellest seadmest ja vaatest.",
+    cancel: "Loobu",
+    notSaved: "Videoid ei saanud seadmesse salvestada. Vali need järgmisel korral uuesti.",
+    privacy: "Videod jäävad ainult sellesse seadmesse.",
+    sec: "{n} s",
+    secBack: "{n} s tagasi",
+    secFwd: "{n} s edasi",
+    frameNo: "kaader {n}",
+    layout: "Paigutus",
+    layoutSide: "Kõrvuti",
+    layoutStack: "Üksteise kohal",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Video {n}",
+    pick: "Vali video",
+    same: "Sama video",
+    change: "Vaheta",
+    playBoth: "Esita mõlemad",
+    pause: "Paus",
+    pickFirst: "Vali kõigepealt video",
+    prevFrame: "Eelmine kaader",
+    nextFrame: "Järgmine kaader",
+    position: "Koht videos",
+    speed: "Kiirus",
+    zoomIn: "Suumi sisse",
+    zoomOut: "Suumi välja",
+    whole: "Kogu pilt",
+    soundOn: "Heli sisse",
+    soundOff: "Heli välja",
+    waiting: "Laadimine",
+    cantPlay: "Brauser ei suuda seda videot esitada.",
+    keys: "Klahvid",
+    close: "Sulge",
+    language: "Keel",
+    keySpace: "Tühik",
+    keyShift: "Shift",
+    kToggle: "Esita / paus",
+    kSeek10: "10 s tagasi / edasi",
+    kFrame: "Kaader tagasi / edasi",
+    kZoom: "Suumi sisse / välja",
+    kPan: "Liiguta pilti",
+    kSpeed: "Aeglasemalt / kiiremini",
+    kHelp: "See loend",
+    kNote: "Klahvid mõjuvad viimati valitud videole.",
+    tour: "Juhend",
+    tourSkip: "Jäta vahele",
+    tourNext: "Edasi",
+    tourBack: "Tagasi",
+    tourStart: "Alusta",
+    tourStepOf: "Samm {n}/{m}",
+    tourLangHead: "Vali keel",
+    tourPrivacyHead: "Sinu videod jäävad telefoni",
+    tourPrivacy1: "See leht ei saada sinu videoid kuhugi. Pole kontosid, analüütikat, jälgimist ega küpsiseid.",
+    tourPrivacy2: "Paar ja seaded salvestatakse ainult sellesse seadmesse järgmiseks korraks. Menüü „{forget}“ kustutab salvestatud videod.",
+    tourPrivacy3: "Leht ise laaditakse GitHub Pagesist nagu iga veebileht.",
+    tourFeaturesHead: "Kuidas see töötab",
+    fPick: "Vali kaks videot – või {same}, mis algab poolest.",
+    fStart: "{sync}: leia mõlemast videost sama hetk, nimeta punkt (nt Kuzushi) ja vajuta {here}.",
+    fPlay: "{play} esitab mõlemad omas tempos; kiirem ootab igas punktis.",
+    fStep: "◀ 1 kaader ▶ ja ◀ 1 s ▶ sammuvad tagasi ja edasi. Hoia all, et edasi sammuda.",
+    fZoom: "Näpista pilti või kasuta luupe; lohista, et liigutada.",
+    fLayout: "Ülal olevad ikoonid: kõrvuti või üksteise kohal.",
+    fSpeed: "Kiirus 0,25×–2×.",
+    installDone: "{app} on juba avakuval.",
+    otherPhones: "Teised telefonid",
+    installNow: "Paigalda",
+    frameUnit: "kaader",
+    synced: "Sünkroonitud.",
+    pointRemoved: "Punkt eemaldatud.",
+    undone: "Tagasi võetud.",
+    undo: "Võta tagasi",
+    pointN: "Punkt {n}",
+    onePoint: "1 punkt",
+    nPoints: "{n} punkti",
+    syncHere: "Sünkrooni siit",
+    replaceN: "Asenda {n} punkti",
+    replace: "Asenda {name}",
+    noPoints: "Sünkroonpunkte pole. Vajuta Sünkrooni ja leia mõlemast videost sama hetk.",
+    remove: "Eemalda",
+    play: "Esita",
+    positionBoth: "Koht mõlemas videos",
+    pauseBoth: "Peata mõlemad",
+    playOnly: "Esita ainult video {n}",
+    start: "algus",
+    prevPoint: "Eelmine punkt",
+    nextPoint: "Järgmine punkt",
+    sync: "Sünkrooni",
+    syncNeedsBoth: "Sünkroonimiseks on vaja mõlemat videot.",
+    noName: "Nimeta",
+    pointLabel: "Punkt",
+    done: "Valmis",
+    points: "Punktid",
+    about: "Teave",
+    kSeek5: "5 s tagasi / edasi",
+    kPoints: "Eelmine / järgmine sünkpunkt",
+    keyWheel: "Ratas / lohistus",
+    kWheel: "Pildi kohal: suumi (ka näpistus) / liiguta",
+    kEsc: "Välju sünkroonimisest",
+  },
+  fr: {
+    layoutAuto: "Pendant la synchro, la disposition est choisie pour des images plus grandes ; votre choix revient ensuite.",
+    retry: "Réessayer",
+    notStarted: "Le navigateur n’a pas lancé cette vidéo.",
+    cantPlayThis: "Le navigateur n’a pas pu lire cette vidéo.",
+    fine: "Précis",
+    fineAria: "Position précise sur deux minutes",
+    tourStepBoth: "Hors de {sync}, les pas déplacent les deux vidéos ensemble ; dans {sync}, chaque vidéo a les siens en dessous.",
+    tourStepHead: "Image par image",
+    tourSyncHead: "Synchronisez les mêmes moments",
+    tagline: "Comparez deux vidéos côte à côte – image par image, sur votre téléphone.",
+    installIos: "{app} sur l’écran d’accueil",
+    installAndroid: "{app} sur l’écran d’accueil",
+    installWhy: "S’ouvre en plein écran et fonctionne hors ligne.",
+    installApart: "L’icône de l’écran d’accueil démarre à neuf : les vidéos gardées dans Safari n’y passent pas.",
+    stepShare: "Touchez l’icône Partager",
+    shareMore: "Vous ne la voyez pas ? Touchez d’abord ···.",
+    stepAddIos: "Choisissez Sur l’écran d’accueil.",
+    stepConfirm: "Touchez Ajouter.",
+    iosOther: "Absent du menu ? Ouvrez cette page dans Safari.",
+    stepMenuAndroid: "Touchez le menu du navigateur, à côté de la barre d’adresse.",
+    stepAddAndroid: "Choisissez Ajouter à l’écran d’accueil.",
+    stepDesktop: "Ouvrez cette page sur votre téléphone.",
+    notNow: "Pas maintenant",
+    menu: "Menu",
+    forget: "Oublier les vidéos",
+    forgetWhat: "Les deux vidéos sont retirées de cet appareil et de l’écran.",
+    cancel: "Annuler",
+    notSaved: "Impossible de garder les vidéos sur cet appareil. Choisissez-les à nouveau la prochaine fois.",
+    privacy: "Les vidéos restent uniquement sur cet appareil.",
+    sec: "{n} s",
+    secBack: "Reculer de {n} s",
+    secFwd: "Avancer de {n} s",
+    frameNo: "image {n}",
+    layout: "Disposition",
+    layoutSide: "Côte à côte",
+    layoutStack: "L’une au-dessus de l’autre",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "Vidéo {n}",
+    pick: "Choisir une vidéo",
+    same: "Même vidéo",
+    change: "Changer",
+    playBoth: "Lire les deux",
+    pause: "Pause",
+    pickFirst: "Choisissez d’abord une vidéo",
+    prevFrame: "Image précédente",
+    nextFrame: "Image suivante",
+    position: "Position dans la vidéo",
+    speed: "Vitesse",
+    zoomIn: "Zoom avant",
+    zoomOut: "Zoom arrière",
+    whole: "Image entière",
+    soundOn: "Activer le son",
+    soundOff: "Couper le son",
+    waiting: "Chargement",
+    cantPlay: "Ce navigateur ne peut pas lire cette vidéo.",
+    keys: "Raccourcis",
+    close: "Fermer",
+    language: "Langue",
+    keySpace: "Espace",
+    keyShift: "Maj",
+    kToggle: "Lecture / pause",
+    kSeek10: "10 s en arrière / en avant",
+    kFrame: "Image en arrière / en avant",
+    kZoom: "Zoom avant / arrière",
+    kPan: "Déplacer l’image",
+    kSpeed: "Plus lent / plus rapide",
+    kHelp: "Cette liste",
+    kNote: "Les touches agissent sur la dernière vidéo pointée.",
+    tour: "Guide",
+    tourSkip: "Passer",
+    tourNext: "Suivant",
+    tourBack: "Retour",
+    tourStart: "Commencer",
+    tourStepOf: "Étape {n} sur {m}",
+    tourLangHead: "Choisissez votre langue",
+    tourPrivacyHead: "Vos vidéos restent sur votre téléphone",
+    tourPrivacy1: "Cette page n’envoie jamais vos vidéos nulle part. Pas de compte, pas de statistiques, pas de pistage, pas de cookies.",
+    tourPrivacy2: "La paire et vos réglages sont gardés uniquement sur cet appareil, pour la prochaine fois. « {forget} » dans le menu supprime les vidéos gardées.",
+    tourPrivacy3: "La page elle-même se charge depuis GitHub Pages, comme n’importe quel site.",
+    tourFeaturesHead: "Comment ça marche",
+    fPick: "Choisissez deux vidéos – ou {same}, qui démarre à mi-parcours.",
+    fStart: "{sync} : trouvez le même moment dans les deux vidéos, nommez le point (par ex. Kuzushi) et appuyez sur {here}.",
+    fPlay: "{play} lit les deux à leur rythme ; la plus rapide attend à chaque point.",
+    fStep: "◀ 1 image ▶ et ◀ 1 s ▶ reculent et avancent. Maintenez appuyé pour continuer.",
+    fZoom: "Pincez l’image ou utilisez les loupes ; faites glisser pour la déplacer.",
+    fLayout: "Les icônes en haut : côte à côte ou l’une au-dessus de l’autre.",
+    fSpeed: "Vitesse 0,25×–2×.",
+    installDone: "{app} est déjà sur votre écran d’accueil.",
+    otherPhones: "Autres téléphones",
+    installNow: "Installer",
+    frameUnit: "image",
+    synced: "Synchronisé.",
+    pointRemoved: "Point supprimé.",
+    undone: "Annulé.",
+    undo: "Annuler",
+    pointN: "Point {n}",
+    onePoint: "1 point",
+    nPoints: "{n} points",
+    syncHere: "Synchroniser ici",
+    replaceN: "Remplacer {n} points",
+    replace: "Remplacer {name}",
+    noPoints: "Aucun point de synchro. Appuyez sur Synchroniser et trouvez le même moment dans les deux vidéos.",
+    remove: "Supprimer",
+    play: "Lire",
+    positionBoth: "Position dans les deux vidéos",
+    pauseBoth: "Mettre les deux en pause",
+    playOnly: "Lire seulement la vidéo {n}",
+    start: "début",
+    prevPoint: "Point précédent",
+    nextPoint: "Point suivant",
+    sync: "Synchroniser",
+    syncNeedsBoth: "La synchro demande les deux vidéos.",
+    noName: "Sans nom",
+    pointLabel: "Point",
+    done: "Terminé",
+    points: "Points",
+    about: "À propos",
+    kSeek5: "5 s en arrière / en avant",
+    kPoints: "Point de synchro précédent / suivant",
+    keyWheel: "Molette / glisser",
+    kWheel: "Sur l’image : zoomer (pincer aussi) / déplacer",
+    kEsc: "Quitter la synchro",
+  },
+  ar: {
+    layoutAuto: "أثناء المزامنة يُختار التخطيط لصور أكبر؛ ويعود اختيارك بعد ذلك.",
+    retry: "إعادة المحاولة",
+    notStarted: "لم يبدأ المتصفح تشغيل هذا الفيديو.",
+    cantPlayThis: "لم يتمكن المتصفح من تشغيل هذا الفيديو.",
+    fine: "دقيق",
+    fineAria: "موضع دقيق ضمن دقيقتين",
+    tourStepBoth: "خارج «{sync}» تحرّك الخطوات الفيديوين معًا؛ وفي «{sync}» لكل فيديو أزراره تحته.",
+    tourStepHead: "إطارًا بإطار",
+    tourSyncHead: "زامن اللحظات نفسها",
+    tagline: "قارن بين فيديوين جنبًا إلى جنب، إطارًا بإطار، على هاتفك.",
+    installIos: "{app} على الشاشة الرئيسية",
+    installAndroid: "{app} على الشاشة الرئيسية",
+    installWhy: "يفتح بملء الشاشة ويعمل دون اتصال.",
+    installApart: "أيقونة الشاشة الرئيسية تبدأ من جديد: الفيديوهات المحفوظة في Safari لا تنتقل إليها.",
+    stepShare: "اضغط على أيقونة المشاركة",
+    shareMore: "لا تراها؟ اضغط أولًا على ···.",
+    stepAddIos: "اختر «إضافة إلى الشاشة الرئيسية».",
+    stepConfirm: "اضغط «إضافة».",
+    iosOther: "ليست في القائمة؟ افتح هذه الصفحة في Safari.",
+    stepMenuAndroid: "اضغط على قائمة المتصفح بجانب شريط العنوان.",
+    stepAddAndroid: "اختر «إضافة إلى الشاشة الرئيسية».",
+    stepDesktop: "افتح هذه الصفحة على هاتفك.",
+    notNow: "ليس الآن",
+    menu: "القائمة",
+    forget: "انسَ الفيديوهات",
+    forgetWhat: "سيُحذف الفيديوهان من هذا الجهاز ومن الشاشة.",
+    cancel: "إلغاء",
+    notSaved: "تعذّر حفظ الفيديوهات على هذا الجهاز. اخترها مرة أخرى في المرة القادمة.",
+    privacy: "تبقى الفيديوهات على هذا الجهاز فقط.",
+    sec: "{n} ث",
+    secBack: "رجوع {n} ث",
+    secFwd: "تقدّم {n} ث",
+    frameNo: "الإطار {n}",
+    layout: "التخطيط",
+    layoutSide: "جنبًا إلى جنب",
+    layoutStack: "واحد فوق الآخر",
+    appName: "Video Coaching Comparison",
+    homeName: "Video Coach",
+    video: "فيديو {n}",
+    pick: "اختر فيديو",
+    same: "الفيديو نفسه",
+    change: "تغيير",
+    playBoth: "تشغيل الاثنين",
+    pause: "إيقاف مؤقت",
+    pickFirst: "اختر فيديو أولًا",
+    prevFrame: "الإطار السابق",
+    nextFrame: "الإطار التالي",
+    position: "الموضع في الفيديو",
+    speed: "السرعة",
+    zoomIn: "تكبير",
+    zoomOut: "تصغير",
+    whole: "الصورة كاملة",
+    soundOn: "تشغيل الصوت",
+    soundOff: "كتم الصوت",
+    waiting: "جارٍ التحميل",
+    cantPlay: "لا يستطيع هذا المتصفح تشغيل هذا الفيديو.",
+    keys: "المفاتيح",
+    close: "إغلاق",
+    language: "اللغة",
+    keySpace: "مسافة",
+    keyShift: "Shift",
+    kToggle: "تشغيل / إيقاف مؤقت",
+    kSeek10: "10 ث للخلف / للأمام",
+    kFrame: "إطار للخلف / للأمام",
+    kZoom: "تكبير / تصغير",
+    kPan: "تحريك الصورة",
+    kSpeed: "أبطأ / أسرع",
+    kHelp: "هذه القائمة",
+    kNote: "تعمل المفاتيح على آخر فيديو أشرت إليه.",
+    tour: "الدليل",
+    tourSkip: "تخطي",
+    tourNext: "التالي",
+    tourBack: "السابق",
+    tourStart: "ابدأ",
+    tourStepOf: "الخطوة {n} من {m}",
+    tourLangHead: "اختر لغتك",
+    tourPrivacyHead: "تبقى فيديوهاتك على هاتفك",
+    tourPrivacy1: "هذه الصفحة لا ترسل فيديوهاتك إلى أي مكان. لا حسابات ولا تحليلات ولا تتبّع ولا ملفات تعريف ارتباط.",
+    tourPrivacy2: "يُحفظ الزوج وإعداداتك على هذا الجهاز فقط للمرة القادمة. «{forget}» في القائمة يحذف الفيديوهات المحفوظة.",
+    tourPrivacy3: "تُحمَّل الصفحة نفسها من GitHub Pages مثل أي موقع.",
+    tourFeaturesHead: "طريقة الاستخدام",
+    fPick: "اختر فيديوين، أو «{same}» الذي يبدأ من منتصفه.",
+    fStart: "«{sync}»: ابحث عن اللحظة نفسها في الفيديوين، وسمِّ النقطة (مثل Kuzushi) واضغط «{here}».",
+    fPlay: "«{play}» يشغّل الاثنين بسرعتهما؛ والأسرع ينتظر عند كل نقطة.",
+    fStep: "◀ 1 إطار ▶ و◀ 1 ث ▶ للرجوع والتقدّم. اضغط مطولًا للاستمرار.",
+    fZoom: "باعِد أصابعك على الصورة أو استخدم العدسات، واسحب لتحريكها.",
+    fLayout: "الأيقونات في الأعلى: جنبًا إلى جنب أو واحد فوق الآخر.",
+    fSpeed: "السرعة من 0,25× إلى 2×.",
+    installDone: "{app} موجود بالفعل على شاشتك الرئيسية.",
+    otherPhones: "هواتف أخرى",
+    installNow: "تثبيت",
+    frameUnit: "إطار",
+    synced: "تمت المزامنة.",
+    pointRemoved: "حُذفت النقطة.",
+    undone: "تم التراجع.",
+    undo: "تراجع",
+    pointN: "النقطة {n}",
+    onePoint: "نقطة واحدة",
+    nPoints: "{n} نقاط",
+    syncHere: "زامن من هنا",
+    replaceN: "استبدال {n} نقاط",
+    replace: "استبدال «{name}»",
+    noPoints: "لا توجد نقاط مزامنة. اضغط «مزامنة» وابحث عن اللحظة نفسها في الفيديوين.",
+    remove: "حذف",
+    play: "تشغيل",
+    positionBoth: "الموضع في الفيديوين",
+    pauseBoth: "إيقاف الاثنين مؤقتًا",
+    playOnly: "تشغيل الفيديو {n} فقط",
+    start: "البداية",
+    prevPoint: "النقطة السابقة",
+    nextPoint: "النقطة التالية",
+    sync: "مزامنة",
+    syncNeedsBoth: "تحتاج المزامنة إلى الفيديوين.",
+    noName: "بلا اسم",
+    pointLabel: "النقطة",
+    done: "تم",
+    points: "النقاط",
+    about: "حول",
+    kSeek5: "5 ث للخلف / للأمام",
+    kPoints: "نقطة المزامنة السابقة / التالية",
+    keyWheel: "العجلة / السحب",
+    kWheel: "فوق الصورة: تكبير (والقرص أيضًا) / تحريك",
+    kEsc: "الخروج من المزامنة",
   },
 };
-if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS };
+if (typeof module !== 'undefined') module.exports = { LANGS, RTL, LANG_NAMES, STRINGS };
+const SAME_MOMENT = 0.5;
+function buildTimeline(points, top, bottom, opened) {
+  const ends = [Math.max(0, top), Math.max(0, bottom)];
+  const moments = points.slice().sort((a, b) => a.top - b.top)
+    .map((point) => ({ point: point, times: [Math.min(point.top, ends[0]), Math.min(point.bottom, ends[1])] }));
+  const segments = [];
+  const stops = [];
+  let at = 0;
+  const starts = [0, 0];
+  const stopsAt = [ends[0], ends[1]];
+  const meet = moments.length === 0 && opened && (opened[0] !== 0 || opened[1] !== 0)
+    ? [Math.min(Math.max(0, opened[0]), ends[0]), Math.min(Math.max(0, opened[1]), ends[1])] : null;
+  const anchors = meet ? [{ times: meet, point: null }] : moments;
+  const first = anchors[0];
+  if (first) {
+    const runs = [Math.max(0, first.times[0] - starts[0]), Math.max(0, first.times[1] - starts[1])];
+    const from = [first.times[0] - runs[0], first.times[1] - runs[1]];
+    const length = Math.max(runs[0], runs[1]);
+    segments.push({ at: at, length: length, from: from, runs: runs, lead: true });
+    at += length;
+  } else {
+    const runs = [Math.max(0, stopsAt[0] - starts[0]), Math.max(0, stopsAt[1] - starts[1])];
+    const length = Math.max(runs[0], runs[1]);
+    segments.push({ at: at, length: length, from: starts, runs: runs, lead: false });
+    at += length;
+  }
+  anchors.forEach((a, i) => {
+    const following = anchors[i + 1];
+    const next = following ? following.times : stopsAt;
+    const runs = [Math.max(0, next[0] - a.times[0]), Math.max(0, next[1] - a.times[1])];
+    const length = Math.max(runs[0], runs[1]);
+    if (a.point) stops.push({ point: a.point, at: at });
+    segments.push({ at: at, length: length, from: a.times, runs: runs, lead: false });
+    at += length;
+  });
+  return { segments: segments, length: at, stops: stops };
+}
+function aloneTimeline(side, length) { return side === 0 ? buildTimeline([], length, 0) : buildTimeline([], 0, length); }
+function openingAt(line) {
+  return line.stops.length === 0 && line.segments[0] && line.segments[0].lead ? (line.segments[1] ? line.segments[1].at : 0) : 0;
+}
+function positionAt(line, t) {
+  let index = 0;
+  line.segments.forEach((s, i) => { if (s.at <= t) index = i; });
+  const seg = line.segments[index];
+  const last = index === line.segments.length - 1;
+  const into = Math.max(0, t - seg.at);
+  const side = (i) => {
+    const run = seg.runs[i];
+    const u = seg.lead ? into - (seg.length - run) : into;
+    const runs = u >= 0 && u < run;
+    return { time: seg.from[i] + Math.min(run, Math.max(0, u)), runs: runs, waits: !runs && into < seg.length && !(last && u >= run) };
+  };
+  return [side(0), side(1)];
+}
+function placeOf(line, t) {
+  const at = positionAt(line, t);
+  const side = [0, 1].find((i) => at[i].runs && at[i].time > 0) ?? [0, 1].find((i) => at[i].runs) ?? (at[1].time > at[0].time ? 1 : 0);
+  return { side: side, time: at[side].time };
+}
+function timelineAt(line, i, time) {
+  for (let index = 0; index < line.segments.length; index++) {
+    const seg = line.segments[index];
+    const u = time - seg.from[i];
+    const run = seg.runs[i];
+    const inIt = index === line.segments.length - 1 ? u <= run + 0.002 : u < run - 0.002;
+    if (inIt || (seg.lead && time <= 0)) {
+      const waited = seg.lead ? seg.length - seg.runs[i] : 0;
+      if (seg.lead && time <= 0) return 0;
+      return Math.min(line.length, seg.at + waited + Math.max(0, u));
+    }
+  }
+  return line.length;
+}
+function stepStop(line, t, direction) {
+  if (direction === 1) { const s = line.stops.find((stop) => stop.at > t + 0.3); return s ? s.at : null; }
+  const before = line.stops.filter((stop) => stop.at < t - 1);
+  return before.length ? before[before.length - 1].at : (t > 0 ? 0 : null);
+}
+function stopIndex(line, t) {
+  let index = -1;
+  line.stops.forEach((stop, i) => { if (stop.at <= t + 0.05) index = i; });
+  return index;
+}
+const ms3 = (s) => Math.round(s * 1000) / 1000;
+function withPoint(points, point) {
+  const added = { top: ms3(point.top), bottom: ms3(point.bottom), name: point.name };
+  const replaced = [];
+  const kept = [];
+  for (const p of points) {
+    const top = p.top - added.top, bottom = p.bottom - added.bottom;
+    const clash = Math.abs(top) < SAME_MOMENT || Math.abs(bottom) < SAME_MOMENT || top * bottom < 0;
+    (clash ? replaced : kept).push(p);
+  }
+  return { points: kept.concat([added]).sort((a, b) => a.top - b.top), replaced: replaced };
+}
+const TICK_MS = 40;
+const DRIFT_ADJUST = 0.04, DRIFT_OK = 0.015, DRIFT_SEEK = 0.2, ADJUST = 0.08;
+const END = 0.3, SEEK_TIMEOUT_MS = 1500, FIRST_FRAME = 0.001, CAN_PLAY = 3;
+class PairPlayer {
+  constructor() {
+    this.line = buildTimeline([], 0, 0);
+    this.time = 0; this.playing = false; this.rate = 1; this.separate = false;
+    this.slots = [0, 1].map(() => ({ media: null, queued: null, soughtAt: 0, held: null, adjusting: false }));
+    this.last = 0; this.stalledSince = null;
+    this.onChange = () => {};
+    this.onRefused = () => {};
+    this.snap = (i, t) => t;
+  }
+  attach(i, media) { Object.assign(this.slots[i], { media: media, queued: null, soughtAt: 0, held: null, adjusting: false }); if (media) media.playbackRate = this.rate; }
+  setLine(line, time) {
+    const place = placeOf(this.line, this.time);
+    const was = this.line.length > 0;
+    const unmoved = JSON.stringify(line) === JSON.stringify(this.line);
+    this.line = line;
+    this.seek(time !== undefined ? time : (was && !unmoved ? timelineAt(line, place.side, place.time) : this.time));
+  }
+  setRate(rate) { this.rate = rate; for (const s of this.slots) { s.adjusting = false; if (s.media) s.media.playbackRate = rate; } }
+  toggle() { if (this.playing) this.pause(); else this.play(); }
+  play() {
+    if (this.line.length <= 0 || !this.slots.some((s) => s.media)) return;
+    if (this.time >= this.line.length - 0.05) this.time = 0;
+    this.separate = false; this.playing = true; this.stalledSince = null; this.last = performance.now();
+    const at = positionAt(this.line, this.time);
+    for (const i of [0, 1]) {
+      const slot = this.slots[i], media = slot.media;
+      if (!media) continue;
+      slot.held = null;
+      if (Math.abs(media.currentTime - at[i].time) > 0.05) this.put(i, at[i].time);
+      media.playbackRate = this.rate;
+      if (media.ended && !at[i].runs) continue;
+      this.playOne(i);
+      if (!at[i].runs) media.pause();
+    }
+    this.onChange();
+  }
+  pause() { this.playing = false; this.stalledSince = null; for (const s of this.slots) if (s.media) s.media.pause(); this.onChange(); }
+  seek(time) {
+    this.time = Math.max(0, Math.min(this.line.length, time));
+    if (!this.separate) {
+      const at = positionAt(this.line, this.time);
+      for (const i of [0, 1]) { this.slots[i].held = null; this.put(i, this.playing ? at[i].time : this.snap(i, at[i].time)); }
+    }
+    this.last = performance.now();
+    this.onChange();
+  }
+  split() { this.pause(); this.separate = true; }
+  join(time) { this.separate = false; for (const s of this.slots) if (s.media) s.media.pause(); this.seek(time === undefined ? this.time : time); }
+  put(i, time) {
+    const slot = this.slots[i], media = slot.media;
+    if (!media) return;
+    const to = Math.max(FIRST_FRAME, Math.min(media.duration || Infinity, time));
+    if (media.seeking && performance.now() - slot.soughtAt < SEEK_TIMEOUT_MS) { slot.queued = to; return; }
+    slot.queued = null; slot.soughtAt = performance.now();
+    media.currentTime = to;
+  }
+  whereIs(i) { const s = this.slots[i]; return s.queued !== null ? s.queued : (s.media ? s.media.currentTime : 0); }
+  settled(i) { const s = this.slots[i]; if (s.queued === null || (s.media && s.media.seeking)) return; this.put(i, s.queued); }
+  loaded(i) { const m = this.slots[i].media; if (!m) return; m.playbackRate = this.rate; if (!this.separate) this.put(i, this.snap(i, positionAt(this.line, this.time)[i].time)); }
+  tick() {
+    const now = performance.now();
+    for (const i of [0, 1]) { const s = this.slots[i]; if (s.queued !== null && now - s.soughtAt >= SEEK_TIMEOUT_MS) this.put(i, s.queued); }
+    if (!this.playing || this.separate) return;
+    const at0 = positionAt(this.line, this.time);
+    const buffering = [this.lacksData(0, at0[0]), this.lacksData(1, at0[1])];
+    if (buffering[0] || buffering[1]) {
+      if (this.stalledSince === null) this.stalledSince = now;
+      this.last = now;
+      for (const i of [0, 1]) {
+        const m = this.slots[i].media;
+        if (!m) continue;
+        if (buffering[i]) { if (m.paused && !m.ended && at0[i].runs) this.playOne(i); } else if (!m.paused) m.pause();
+      }
+      this.onChange();
+      return;
+    }
+    this.stalledSince = null;
+    this.time += (Math.min(1000, now - this.last) / 1000) * this.rate;
+    this.last = now;
+    if (this.time >= this.line.length) { this.time = this.line.length; this.pause(); return; }
+    const at = positionAt(this.line, this.time);
+    for (const i of [0, 1]) this.follow(i, at[i]);
+    this.onChange();
+  }
+  follow(i, side) {
+    const slot = this.slots[i], media = slot.media;
+    if (!media) return;
+    const off = media.currentTime - side.time;
+    if (!side.runs) {
+      if (!media.paused) media.pause();
+      if (slot.held !== side.time) { slot.held = side.time; if (Math.abs(off) > 0.02) this.put(i, side.time); }
+      return;
+    }
+    slot.held = null;
+    if (media.seeking) return;
+    if (media.ended) { if (off > DRIFT_SEEK) this.put(i, side.time); return; }
+    if (Math.abs(off) > DRIFT_SEEK) { this.put(i, side.time); slot.adjusting = false; }
+    else if (Math.abs(off) > DRIFT_ADJUST) slot.adjusting = true;
+    else if (Math.abs(off) < DRIFT_OK) slot.adjusting = false;
+    const rate = slot.adjusting ? this.rate * (off > 0 ? 1 - ADJUST : 1 + ADJUST) : this.rate;
+    if (Math.abs(media.playbackRate - rate) > 0.001) media.playbackRate = rate;
+    if (media.paused) this.playOne(i);
+  }
+  lacksData(i, side) {
+    const m = this.slots[i].media;
+    if (!m || !side.runs || m.ended) return false;
+    if (m.seeking) return true;
+    if (m.readyState >= CAN_PLAY) return false;
+    const own = this.line.segments[this.line.segments.length - 1];
+    return side.time < own.from[i] + own.runs[i] - END;
+  }
+  waiting() {
+    const at = positionAt(this.line, this.time);
+    return [this.playing && at[0].waits, this.playing && at[1].waits];
+  }
+  playOne(i) {
+    const m = this.slots[i].media;
+    if (!m) return;
+    const refused = (error) => {
+      if (this.slots[i].media !== m || (error && error.name === 'AbortError')) return;
+      this.pause();
+      this.onRefused(i, error);
+    };
+    try { const p = m.play(); if (p && p.catch) p.catch(refused); } catch (e) { refused(e); }
+  }
+}
+if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stepStop, stopIndex, withPoint, placeOf, openingAt };
 (function () {
   'use strict';
-  const LANG_KEY = 'vertailu:lang';
-  const RATE_KEY = 'vertailu:rate';
+  const LANG_KEY = 'vcc-lang';
+  const RATE_KEY = 'vcc-rate';
   function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
   function save(key, value) { try { localStorage.setItem(key, value); } catch (e) {  } }
+  try {
+    [['vertailu:lang', LANG_KEY], ['vertailu:rate', RATE_KEY]].forEach(([old, now]) => {
+      const v = localStorage.getItem(old);
+      if (v !== null && localStorage.getItem(now) === null) localStorage.setItem(now, v);
+      localStorage.removeItem(old);
+    });
+  } catch (e) {  }
   function firstLang() {
     const kept = load(LANG_KEY);
     if (kept && STRINGS[kept]) return kept;
     const asked = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']);
     for (const tag of asked) {
       const base = String(tag).toLowerCase().split('-')[0];
-      if (base === 'fi' || base === 'sv' || base === 'ru' || base === 'et') return base;
+      if (STRINGS[base]) return base;
       if (base === 'en') return 'en';
     }
     return 'en';
@@ -435,12 +1821,13 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     return s;
   }
   function decimal() { return lang === 'en' ? '.' : ','; }
-  function fineTime(seconds) {
-    const tenths = Math.floor(Math.max(0, seconds) * 10 + 1e-6);
-    const whole = Math.floor(tenths / 10);
+  function fineTime(seconds, digits) {
+    const per = digits === 2 ? 100 : 10;
+    const parts = Math.floor(Math.max(0, seconds) * per + 1e-6);
+    const whole = Math.floor(parts / per);
     const h = Math.floor(whole / 3600), m = Math.floor((whole % 3600) / 60), s = whole % 60;
     const mmss = h ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') : m + ':' + String(s).padStart(2, '0');
-    return mmss + decimal() + (tenths % 10);
+    return mmss + decimal() + String(parts % per).padStart(digits === 2 ? 2 : 1, '0');
   }
   function rateLabel(r) { return String(r).replace('.', decimal()) + '×'; }
   const WHOLE = { scale: 1, x: 0.5, y: 0.5 };
@@ -504,16 +1891,16 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
   }
   function makeStepper(side) {
-    const st = { last: null, lastPlayed: false, samples: [], inFlight: null, since: 0, queued: null };
+    const st = { last: null, lastPlayed: false, samples: [], inFlight: null, since: 0, queued: null, collect: false };
     const v = side.video;
     if (typeof v.requestVideoFrameCallback === 'function') {
       const tick = (now, meta) => {
         const played = !v.paused && !v.seeking;
-        if (played && st.lastPlayed && st.last) {
+        if (st.collect && played && st.lastPlayed && st.last) {
           const frames = meta.presentedFrames - st.last.presentedFrames, dt = meta.mediaTime - st.last.mediaTime;
           if (frames >= 1 && frames <= 4 && dt > 0) {
             const one = dt / frames;
-            if (one >= 1 / 120 && one <= 1 / 10) { st.samples.push(one); if (st.samples.length > 9) st.samples.shift(); }
+            if (one >= 1 / 250 && one <= 1 / 10) { st.samples.push(one); if (st.samples.length > 9) st.samples.shift(); }
           }
         }
         st.last = { mediaTime: meta.mediaTime, presentedFrames: meta.presentedFrames };
@@ -524,7 +1911,24 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     }
     function go(target) { st.inFlight = target; st.since = performance.now(); v.currentTime = target; }
     return {
-      reset() { st.inFlight = null; st.queued = null; st.samples = []; st.last = null; },
+      reset() { st.inFlight = null; st.queued = null; },
+      collect(on) { st.collect = on; if (on) st.samples = []; },
+      snap(pausedAt) {
+        if (!st.last || st.inFlight !== null || v.seeking || !v.paused || v.currentTime !== pausedAt) return;
+        if (!st.lastPlayed && Math.abs(st.last.mediaTime - v.currentTime) < 1e-4) return;
+        const frame = median(st.samples);
+        const mid = st.last.mediaTime + frame / 2;
+        if (Math.abs(v.currentTime - mid) > frame / 2 && mid <= (v.duration || 0)) go(mid);
+      },
+      forget() { st.inFlight = null; st.queued = null; st.samples = []; st.last = null; },
+      frame() { return median(st.samples); },
+      shown() {
+        if (!st.last) return null;
+        const at = st.last.mediaTime;
+        return st.lastPlayed || Math.abs(at - v.currentTime) > 1e-4 ? at : null;
+      },
+      learned() { return st.samples.length; },
+      measures: typeof v.requestVideoFrameCallback === 'function',
       settled() {
         if (st.inFlight === null || v.seeking) return;
         st.inFlight = null;
@@ -548,7 +1952,8 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
           const at = st.last.mediaTime;
           if (st.lastPlayed || at < frame / 2 || Math.abs(at - now) > 1e-4) shown = at;
         }
-        let target = shown !== null && now >= shown - 0.002 && now < shown + frame + 0.002 ? shown + frame / 2 + n * frame : now + n * frame;
+        const onScreen = shown !== null && ((now >= shown - 0.002 && now < shown + frame + 0.002) || (v.paused && shown > now && shown - now < 3 * frame));
+        let target = onScreen ? shown + frame / 2 + n * frame : now + n * frame;
         target = Math.max(0, Math.min(end, target));
         if (Math.abs(target - now) < 1e-3) return;
         go(target);
@@ -565,44 +1970,73 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     zoomIn: svg('<circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/><path d="M7.5 10.5h6M10.5 7.5v6"/>'),
     zoomOut: svg('<circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/><path d="M7.5 10.5h6"/>'),
     soundOn: svg('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'),
+    share: svg('<path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16"/>'),
+    dots: svg('<circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>', true),
+    stopPrev: svg('<path d="M19 6.2v11.6a1 1 0 0 1-1.53.85l-8.4-5.8a1 1 0 0 1 0-1.7l8.4-5.8A1 1 0 0 1 19 6.2z"/><rect x="4" y="5" width="3" height="14" rx="1"/>', true),
+    stopNext: svg('<path d="M5 6.2v11.6a1 1 0 0 0 1.53.85l8.4-5.8a1 1 0 0 0 0-1.7l-8.4-5.8A1 1 0 0 0 5 6.2z"/><rect x="17" y="5" width="3" height="14" rx="1"/>', true),
+    side: svg('<rect x="2.5" y="5" width="8.5" height="14" rx="1.5"/><rect x="13" y="5" width="8.5" height="14" rx="1.5"/>'),
+    stack: svg('<rect x="4" y="2.5" width="16" height="8.5" rx="1.5"/><rect x="4" y="13" width="16" height="8.5" rx="1.5"/>'),
     soundOff: svg('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6m0-6-6 6"/>'),
   };
   const $ = (sel, root) => (root || document).querySelector(sel);
   const slotsEl = $('#slots');
   const playBothBtn = $('#playBoth');
-  const resumeBtn = $('#resume');
-  const speedEl = $('#speed');
-  const RATES = [1, 0.5, 0.25];
+  const tlRange = $('#tlRange');
+  const RATES = [0.25, 0.5, 1, 1.5, 2];
+  const LAYOUT_KEY = 'vcc-layout';
+  const POINTS_KEY = 'vcc-points';
+  const layoutEl = $('#layout');
+  const layoutMenuEl = $('#layoutMenu');
+  let layoutPick = (() => { const kept = load(LAYOUT_KEY); return kept === 'side' || kept === 'stack' ? kept : null; })();
   let rate = Number(load(RATE_KEY));
   if (!RATES.includes(rate)) rate = 1;
   let sound = null;
   let active = 0;
-  let pairOffset = null;
-  let refused = null;
+  let pointed = 0;
+  let points = [];
+  let syncing = false;
+  let picked = undefined;
+  let problems = [null, null];
+  const player = new PairPlayer();
   const SLOT_HTML =
     '<div class="box">' +
-    '<video playsinline muted preload="auto" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>' +
+    '<div class="stage"><video playsinline muted preload="auto" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video></div>' +
     '<div class="empty"><p class="err" role="alert" hidden></p>' +
     '<button type="button" class="btn ghost pick" data-t="pick"></button>' +
     '<button type="button" class="btn ghost same" data-t="same" hidden></button>' +
-    '<p class="muted privacy" data-t="privacy"></p></div>' +
-    '<div class="over top"><p class="chip name"></p><p class="chip amount" hidden></p><span class="grow"></span>' +
+    '<p class="muted privacy" data-t="privacy"></p>' +
+    '<div class="hint" hidden><button type="button" class="link install"></button><button type="button" class="link notnow" data-t="notNow"></button></div></div>' +
+    '<div class="refusedbox" role="alert" hidden><p class="refusedmsg"></p><button type="button" class="btn ghost retry"></button></div>' +
+    '<div class="over top"><div class="labels"><div class="row"><p class="chip name"></p><p class="chip amount" hidden></p></div>' +
+    '<p class="chip time"></p></div><span class="grow"></span>' +
     '<button type="button" class="chipbtn change"><span data-t="change"></span></button>' +
     '<button type="button" class="iconbtn sound"><span class="disc"></span></button></div>' +
     '<div class="over bottom">' +
     '<button type="button" class="iconbtn zout" aria-keyshortcuts="Shift+Z"><span class="disc">' + ICON.zoomOut + '</span></button>' +
     '<button type="button" class="iconbtn zin" aria-keyshortcuts="Z"><span class="disc">' + ICON.zoomIn + '</span></button>' +
     '<button type="button" class="chipbtn whole" aria-keyshortcuts="0" hidden><span data-t="whole"></span></button>' +
-    '<span class="grow"></span><p class="chip wait" data-t="waiting" hidden></p><span class="grow"></span>' +
-    '<p class="chip start"></p></div>' +
+    '<span class="grow"></span><p class="chip wait" hidden></p></div>' +
     '</div>' +
-    '<div class="ctl">' +
-    '<button type="button" class="iconbtn own"></button>' +
-    '<input type="range" min="0" max="0" step="0.01" value="0">' +
-    '<button type="button" class="iconbtn prev" aria-keyshortcuts="Shift+ArrowLeft">' + ICON.prev + '</button>' +
-    '<button type="button" class="iconbtn next" aria-keyshortcuts="Shift+ArrowRight">' + ICON.next + '</button>' +
-    '<button type="button" class="iconbtn mark" aria-keyshortcuts="M">' + ICON.flag + '</button>' +
+    '<div class="zoombar" hidden>' +
+    '<button type="button" class="iconbtn zout" aria-keyshortcuts="Shift+Z"><span class="disc">' + ICON.zoomOut + '</span></button>' +
+    '<button type="button" class="iconbtn zin" aria-keyshortcuts="Z"><span class="disc">' + ICON.zoomIn + '</span></button>' +
+    '<button type="button" class="chipbtn whole" aria-keyshortcuts="0" hidden><span data-t="whole"></span></button>' +
     '</div>' +
+    '<div class="ctl" hidden>' +
+    '<div class="zoombar inctl" hidden>' +
+    '<button type="button" class="iconbtn zout" aria-keyshortcuts="Shift+Z"><span class="disc">' + ICON.zoomOut + '</span></button>' +
+    '<button type="button" class="iconbtn zin" aria-keyshortcuts="Z"><span class="disc">' + ICON.zoomIn + '</span></button>' +
+    '<button type="button" class="chipbtn whole" aria-keyshortcuts="0" hidden><span data-t="whole"></span></button>' +
+    '</div>' +
+    '<button type="button" class="btn ghost iconsq own"></button>' +
+    '<div class="scrub"><input type="range" min="0" max="0" step="0.01" value="0"><div class="ticks"></div></div>' +
+    '<label class="fine" hidden><span class="finelabel"></span><input type="range" class="finerange" min="0" max="120" step="0.01" value="0"></label>' +
+    '<div class="steps4">' +
+    '<button type="button" class="btn ghost stepbtn sec" data-step="-1s"></button>' +
+    '<button type="button" class="btn ghost stepbtn" data-step="-1f" aria-keyshortcuts="Shift+ArrowLeft"></button>' +
+    '<button type="button" class="btn ghost stepbtn" data-step="1f" aria-keyshortcuts="Shift+ArrowRight"></button>' +
+    '<button type="button" class="btn ghost stepbtn sec" data-step="1s"></button>' +
+    '</div></div>' +
     '<input type="file" accept="video/*" class="file" hidden>';
   const sides = [0, 1].map(makeSide);
   function makeSide(i) {
@@ -611,25 +2045,27 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     el.innerHTML = SLOT_HTML;
     slotsEl.appendChild(el);
     const side = {
-      i: i, el: el, box: $('.box', el), video: $('video', el), file: null, url: null, ready: false,
+      i: i, el: el, box: $('.box', el), stage: $('.stage', el), video: $('video', el), file: null, url: null, ready: false, refused: null,
+      fineFrom: 0, fineHeld: false,
       start: 0, view: WHOLE, pic: null, problem: null, loadTimer: 0, sameAsHalf: false,
       q: (s) => $(s, el),
     };
     side.video.muted = true;
     side.video.defaultMuted = true;
     side.stepper = makeStepper(side);
+    player.attach(i, side.video);
     wireSide(side);
     return side;
   }
   function wireSide(s) {
-    const v = s.video, input = s.q('.file'), range = s.q('input[type=range]');
+    const v = s.video, input = s.q('.file'), range = s.q('.ctl input[type=range]');
     s.q('.pick').addEventListener('click', () => input.click());
     s.q('.change').addEventListener('click', () => input.click());
-    s.q('.same').addEventListener('click', () => { if (sides[0].file) openFile(s, sides[0].file, true); });
+    s.q('.same').addEventListener('click', () => { if (sides[0].file) { openFile(s, sides[0].file, true); keep(); } });
     input.addEventListener('change', () => {
       const f = input.files && input.files[0];
       input.value = '';
-      if (f) openFile(s, f, false);
+      if (f) { openFile(s, f, false); keep(); }
     });
     v.addEventListener('loadedmetadata', () => {
       clearTimeout(s.loadTimer);
@@ -638,55 +2074,89 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
       if (s.sameAsHalf && v.duration) s.start = v.duration / 2;
       v.playbackRate = rate;
       v.muted = sound !== s.i;
-      s.ready = true;
-      seekTo(s, s.start);
-      renderSide(s); renderFooter();
+      renderSide(s);
+    });
+    v.addEventListener('loadeddata', () => {
+      if (v.videoWidth === 0 || s.ready || s.learning) return;
+      learnFrames(s).then(() => {
+        if (!s.url) return;
+        clearTimeout(s.loadTimer);
+        const back = s.restore;
+        s.restore = null;
+        if (back) {
+          s.view = back.view && back.view.scale > 1 && back.view.scale <= MAX_ZOOM ? back.view : WHOLE;
+          placeVideo(s);
+        }
+        s.ready = true;
+        problems[s.i] = null;
+        newLine(back ? back.place : null);
+        renderAll();
+        keep();
+      });
     });
     v.addEventListener('loadeddata', () => { if (v.videoWidth === 0) fail(s); });
     v.addEventListener('error', () => { if (s.url) fail(s); });
-    v.addEventListener('seeked', () => { s.stepper.settled(); renderTime(s); renderFooter(); });
+    v.addEventListener('seeked', () => { s.stepper.settled(); player.settled(s.i); renderTime(s); renderControls(); });
     v.addEventListener('timeupdate', () => renderTime(s));
-    v.addEventListener('play', () => { renderSide(s); renderFooter(); loop(); });
-    v.addEventListener('pause', () => { renderSide(s); renderFooter(); });
-    v.addEventListener('ended', () => { pairOffset = null; renderSide(s); renderFooter(); });
-    v.addEventListener('waiting', () => s.q('.wait').hidden = false);
-    v.addEventListener('playing', () => s.q('.wait').hidden = true);
-    v.addEventListener('canplay', () => s.q('.wait').hidden = true);
+    v.addEventListener('play', () => { if (s.learning) return; renderControls(); renderSide(s); loop(); });
+    v.addEventListener('pause', () => {
+      if (s.learning) return;
+      renderControls(); renderSide(s); keepPlace();
+      if (syncing) {
+        const pausedAt = v.currentTime;
+        requestAnimationFrame(() => requestAnimationFrame(() => { if (!s.learning && syncing) s.stepper.snap(pausedAt); }));
+      }
+    });
+    v.addEventListener('waiting', () => renderSide(s));
+    v.addEventListener('playing', () => renderSide(s));
     v.addEventListener('contextmenu', (e) => e.preventDefault());
     v.addEventListener('dragstart', (e) => e.preventDefault());
-    s.q('.own').addEventListener('click', () => {
-      if (!s.ready) return;
-      pairOffset = null;
-      if (v.paused) startPlay([s]); else v.pause();
+    s.q('.own').addEventListener('click', () => { active = s.i; ownToggle(s.i); });
+    s.q('.retry').addEventListener('click', () => retry(s));
+    range.addEventListener('input', () => { active = s.i; s.fineFrom = fineStart(Number(range.value), s.video.duration || 0); ownScrub(s.i, Number(range.value)); });
+    const fine = s.q('.finerange');
+    fine.addEventListener('input', () => { active = s.i; ownScrub(s.i, Number(fine.value)); });
+    fine.addEventListener('pointerdown', () => {
+      if (s.fineHeld) return;
+      s.fineHeld = true;
+      const release = () => {
+        window.removeEventListener('pointerup', release, true);
+        window.removeEventListener('pointercancel', release, true);
+        setTimeout(() => { s.fineHeld = false; s.fineFrom = fineStart(Number(fine.value), s.video.duration || 0); renderTime(s); }, 50);
+      };
+      window.addEventListener('pointerup', release, true);
+      window.addEventListener('pointercancel', release, true);
     });
-    range.addEventListener('input', () => {
-      if (!s.ready) return;
-      pairOffset = null;
-      s.stepper.reset();
-      v.currentTime = Number(range.value);
-      renderTime(s);
-    });
-    holdRepeat(s.q('.prev'), () => { pairOffset = null; if (s.ready) s.stepper.step(-1); });
-    holdRepeat(s.q('.next'), () => { pairOffset = null; if (s.ready) s.stepper.step(1); });
-    s.q('.mark').addEventListener('click', () => setStart(s));
+    s.q('.ctl .steps4').querySelectorAll('button').forEach((b) => holdRepeat(b, () => { active = s.i; ownStep(s.i, b.dataset.step); }));
     s.q('.sound').addEventListener('click', () => {
       sound = sound === s.i ? null : s.i;
-      sides.forEach((x) => { x.video.muted = sound !== x.i; renderSide(x); });
+      sides.forEach((x) => { if (sound !== x.i) x.video.muted = true; });
+      if (sound !== null) sides[sound].video.muted = false;
+      sides.forEach(renderSide);
     });
-    s.q('.zin').addEventListener('click', () => zoomAct(s, 'in'));
-    s.q('.zout').addEventListener('click', () => zoomAct(s, 'out'));
-    s.q('.whole').addEventListener('click', () => zoomAct(s, 'whole'));
-    s.el.addEventListener('pointerdown', () => setActive(s.i), true);
-    s.el.addEventListener('focusin', () => setActive(s.i));
-    s.el.addEventListener('pointerover', () => setActive(s.i));
+    s.el.querySelectorAll('.zin').forEach((b) => b.addEventListener('click', () => zoomAct(s, 'in')));
+    s.el.querySelectorAll('.zout').forEach((b) => b.addEventListener('click', () => zoomAct(s, 'out')));
+    s.el.querySelectorAll('.whole').forEach((b) => b.addEventListener('click', () => zoomAct(s, 'whole')));
+    s.el.addEventListener('pointerover', () => { pointed = s.i; });
+    s.el.addEventListener('focusin', () => { pointed = s.i; });
+    s.el.addEventListener('pointerdown', () => { pointed = s.i; }, true);
     wireZoom(s);
-    new ResizeObserver(() => placeVideo(s)).observe(s.box);
+    new ResizeObserver(() => placeVideo(s)).observe(s.stage);
+    new ResizeObserver(() => fitBars(s)).observe(s.box);
   }
-  function openFile(s, file, sameHalf) {
+  function openFile(s, file, sameHalf, back) {
     if (s.url && !sides.some((x) => x !== s && x.url === s.url)) URL.revokeObjectURL(s.url);
     pauseAll();
     s.file = file; s.problem = null; s.ready = false; s.start = 0; s.view = WHOLE; s.pic = null; s.sameAsHalf = sameHalf;
-    s.stepper.reset();
+    s.restore = back || null;
+    s.refused = null;
+    player.attach(s.i, s.video);
+    if (back) s.start = back.t;
+    if (syncing) endSync();
+    points = [];
+    keepPoints();
+    s.stepper.forget();
+    s.learning = false;
     s.url = URL.createObjectURL(file);
     s.video.src = s.url;
     s.video.load();
@@ -694,26 +2164,20 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     s.loadTimer = setTimeout(() => { if (!s.ready) fail(s); }, 10000);
     renderAll();
   }
-  function fail(s) {
+  function fail(s) { clearSide(s, 'cantPlay'); keep(); }
+  function clearSide(s, problem) {
     clearTimeout(s.loadTimer);
-    s.ready = false;
-    s.problem = 'cantPlay';
+    s.ready = false; s.learning = false; s.restore = null;
+    s.problem = problem;
     if (s.url && !sides.some((x) => x !== s && x.url === s.url)) URL.revokeObjectURL(s.url);
-    s.url = null; s.file = null;
+    s.url = null; s.file = null; s.view = WHOLE; s.start = 0; s.refused = null;
+    if (syncing) endSync();
+    newLine();
+    s.box.classList.remove('learning');
+    placeVideo(s);
     s.video.removeAttribute('src');
     s.video.load();
     renderAll();
-  }
-  function setStart(s) {
-    if (!s.ready) return;
-    s.start = s.video.currentTime;
-    s.sameAsHalf = false;
-    renderSide(s); renderFooter();
-  }
-  function setActive(i) {
-    if (active === i) return;
-    active = i;
-    sides.forEach((x) => x.el.classList.toggle('active', x.i === active));
   }
   function holdRepeat(btn, act) {
     let timer = 0, repeated = false;
@@ -722,23 +2186,73 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
       if (e.button !== 0 || btn.disabled) return;
       repeated = false;
       stop();
-      timer = setTimeout(() => { repeated = true; act(); timer = setInterval(act, 110); }, 450);
+      timer = setTimeout(() => { repeated = true; act(); timer = setInterval(act, btn.dataset.step && !btn.dataset.step.endsWith('f') ? 250 : 110); }, 450);
     });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((n) => btn.addEventListener(n, stop));
-    btn.addEventListener('click', () => { if (repeated) { repeated = false; return; } act(); });
+    ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach((n) => btn.addEventListener(n, stop));
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+    btn.addEventListener('click', (e) => {
+      if (repeated && e.detail !== 0) { repeated = false; return; }
+      repeated = false;
+      act();
+    });
   }
-  function boxSize(s) { const r = s.box.getBoundingClientRect(); return { width: r.width, height: r.height, rect: r }; }
+  function learnFrames(s) {
+    const v = s.video;
+    if (!s.stepper.measures) return Promise.resolve();
+    s.learning = true;
+    s.box.classList.add('learning');
+    const muted = v.muted;
+    v.muted = true;
+    v.playbackRate = 1;
+    return new Promise((done) => {
+      let over = false;
+      const finish = () => {
+        if (over) return;
+        over = true;
+        clearInterval(poll); clearTimeout(limit);
+        s.stepper.collect(false);
+        v.pause();
+        v.playbackRate = rate;
+        v.muted = s.url ? sound !== s.i : muted;
+        seekTo(s, s.start).then(() => { s.learning = false; s.box.classList.remove('learning'); done(); });
+      };
+      let slow = false;
+      let limit = 0;
+      const poll = setInterval(() => {
+        if (s.stepper.learned() < 5) return;
+        if (!slow && s.stepper.frame() < 1 / 50) {
+          slow = true;
+          s.stepper.collect(true);
+          v.playbackRate = 0.2;
+          clearTimeout(limit);
+          limit = setTimeout(finish, 2000);
+          return;
+        }
+        finish();
+      }, 40);
+      limit = setTimeout(finish, 1500);
+      s.stepper.collect(true);
+      const p = v.play();
+      if (p && p.catch) p.catch(finish);
+    });
+  }
+  function boxSize(s) { const r = s.stage.getBoundingClientRect(); return { width: r.width, height: r.height, rect: r }; }
   function changeView(s, next) {
     if (!s.ready || !s.pic) return;
     const b = boxSize(s);
     if (!b.width || !b.height) return;
     const to = next(s.view, b, s.pic);
     if (to.scale === s.view.scale && to.x === s.view.x && to.y === s.view.y) return;
-    const wholeFocused = document.activeElement === s.q('.whole');
+    const act = document.activeElement;
+    const wholeFocused = !!act && act.classList && act.classList.contains('whole') && s.el.contains(act);
     s.view = to;
     placeVideo(s);
     renderZoom(s);
-    if (to.scale === 1 && wholeFocused) s.q('.zin').focus();
+    keepPlace();
+    if (to.scale === 1 && wholeFocused) {
+      const zin = [...s.el.querySelectorAll('.zin')].find((b) => !b.closest('[hidden]') && b.getBoundingClientRect().width);
+      if (zin) zin.focus();
+    }
   }
   function around(s, factor, client) {
     changeView(s, (from, b, pic) => zoomAround(from, factor, { x: client.x - b.rect.left - b.width / 2, y: client.y - b.rect.top - b.height / 2 }, b, pic));
@@ -822,17 +2336,13 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     v.addEventListener('click', () => {
       const took = press.dragged;
       press.dragged = false;
-      if (!took && s.ready) toggleBoth();
+      if (!took && s.ready) { if (syncing) { active = s.i; ownToggle(s.i); renderAll(); } else togglePair(); }
     });
   }
-  function live() { return sides.filter((s) => s.ready); }
-  function anyPlaying() { return sides.some((s) => s.ready && !s.video.paused && !s.video.ended); }
-  function pauseAll() { pairOffset = null; sides.forEach((s) => { if (!s.video.paused) s.video.pause(); }); }
   function seekTo(s, time) {
     return new Promise((done) => {
       const v = s.video;
-      const end = v.duration || 0;
-      const to = Math.max(0, Math.min(end, time));
+      const to = Math.max(0, Math.min(v.duration || 0, time));
       if (Math.abs(v.currentTime - to) < 0.001 && !v.seeking) return done();
       let timer = 0;
       const ok = () => { clearTimeout(timer); v.removeEventListener('seeked', ok); done(); };
@@ -842,106 +2352,718 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
       v.currentTime = to;
     });
   }
-  function startPlay(list) {
-    refused = null;
-    return Promise.all(list.map((s) => {
-      s.video.playbackRate = rate;
-      const p = s.video.play();
-      if (!p || !p.catch) return null;
-      return p.catch((err) => {
-        if (err && err.name === 'NotAllowedError' && !s.video.muted) {
-          s.video.muted = true;
-          sound = null;
-          sides.forEach(renderSide);
-          return s.video.play().catch((again) => { if (again && again.name !== 'AbortError') refused = again; });
-        }
-        if (err && err.name !== 'AbortError') refused = err;
-      });
-    })).then(() => { renderFooter(); });
+  function usable(s) { return s.ready && !s.refused; }
+  function both() { return usable(sides[0]) && usable(sides[1]); }
+  function aloneSide() { return usable(sides[0]) && !usable(sides[1]) ? 0 : usable(sides[1]) && !usable(sides[0]) ? 1 : null; }
+  function lengths() { return [sides[0].video.duration || 0, sides[1].video.duration || 0]; }
+  function lineFor(pts) {
+    const [a, b] = lengths();
+    const alone = aloneSide();
+    if (alone !== null) return aloneTimeline(alone, alone === 0 ? a : b);
+    return buildTimeline(pts, a, b, pts.length ? null : [sides[0].start || 0, sides[1].start || 0]);
   }
-  function playBothFromStart() {
-    const list = live();
-    if (!list.length) return;
-    pauseAll();
-    Promise.all(list.map((s) => seekTo(s, s.start))).then(() => {
-      pairOffset = list.length === 2 ? sides[0].start - sides[1].start : null;
-      return startPlay(list);
+  function newLine(place) {
+    const line = lineFor(points);
+    if (place && (place.side === 0 || place.side === 1)) player.setLine(line, timelineAt(line, place.side, place.time));
+    else if (!points.length) player.setLine(line, openingAt(line));
+    else player.setLine(line);
+  }
+  function snapTo(s, t) {
+    const f = s.stepper.frame();
+    const end = s.video.duration || 0;
+    return Math.max(0, Math.min(end, (Math.floor(t / f + 1e-6) + 0.5) * f));
+  }
+  player.snap = (i, t) => (sides[i].ready ? snapTo(sides[i], t) : t);
+  player.onChange = () => { renderControls(); sides.forEach((s) => renderWait(s)); };
+  player.onRefused = (i, error) => {
+    sides[i].refused = error && error.name === 'NotAllowedError' ? 'notStarted' : 'cantPlayThis';
+    if (syncing) endSync();
+    player.attach(i, null);
+    newLine();
+    renderAll();
+  };
+  function retry(s) {
+    s.refused = null;
+    player.attach(s.i, s.video);
+    newLine();
+    renderAll();
+  }
+  setInterval(() => player.tick(), TICK_MS);
+  function togglePair() {
+    if (!sides.some((s) => s.ready)) return;
+    if (syncing) endSync();
+    if (player.playing) pausePair(); else player.play();
+  }
+  let snapping = false;
+  const waitingSteps = [];
+  function pausePair() {
+    const at0 = positionAt(player.line, player.time);
+    const lead = sides.find((x) => usable(x) && at0[x.i].runs) || (usable(sides[0]) ? sides[0] : sides[1]);
+    const shownAtPause = lead && lead.ready ? lead.stepper.shown() : null;
+    player.pause();
+    const at = player.time;
+    snapping = true;
+    const done = () => {
+      if (!snapping) return;
+      snapping = false;
+      clearTimeout(safety);
+      waitingSteps.splice(0).forEach((code) => jointStep(code));
+    };
+    const safety = setTimeout(done, 300);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!player.playing && !syncing && player.time === at && lead && lead.ready) {
+        const shown = shownAtPause !== null ? shownAtPause : lead.stepper.shown();
+        const mid = shown !== null ? shown + lead.stepper.frame() / 2 : snapTo(lead, lead.video.currentTime);
+        player.seek(timelineAt(player.line, lead.i, mid));
+      }
+      done();
+    }));
+  }
+  function jointStep(code) {
+    if (!sides.some((s) => s.ready)) return;
+    if (player.playing) pausePair();
+    if (snapping) { waitingSteps.push(code); return; }
+    const fps = Math.max(...sides.filter((s) => s.ready).map((s) => 1 / s.stepper.frame()));
+    const by = code === '1f' ? 1 / fps : code === '-1f' ? -1 / fps : code === '1s' ? 1 : code === '-1s' ? -1 : code === '5s' ? 5 : code === '-5s' ? -5 : code === '10s' ? 10 : -10;
+    player.seek(player.time + by);
+  }
+  function stepToStop(direction) {
+    const to = stepStop(player.line, player.time, direction);
+    if (to !== null) player.seek(to);
+  }
+  function beginSync() {
+    if (!both()) return;
+    player.split();
+    syncing = true;
+    picked = undefined;
+    active = 1;
+    hideToast();
+    renderAll();
+    const r = sides[active].q('.ctl input[type=range]');
+    if (r) r.focus({ preventScroll: true });
+  }
+  function endSync(at) {
+    syncing = false;
+    player.join(at);
+    renderAll();
+  }
+  function ownScrub(i, time) {
+    const s = sides[i];
+    s.stepper.reset();
+    player.put(i, time);
+    renderTime(s); renderControls();
+  }
+  function ownStep(i, code) {
+    const s = sides[i];
+    if (!s.ready) return;
+    if (code === '1f' || code === '-1f') { s.stepper.step(code === '1f' ? 1 : -1); return; }
+    const by = code === '1s' ? 1 : code === '-1s' ? -1 : code === '5s' ? 5 : code === '-5s' ? -5 : code === '10s' ? 10 : -10;
+    s.video.pause();
+    ownScrub(i, Math.max(0, Math.min(s.video.duration || 0, player.whereIs(i) + by)));
+  }
+  function ownToggle(i) {
+    const v = sides[i].video;
+    if (!sides[i].ready) return;
+    if (v.paused) { v.playbackRate = rate; player.playOne(i); } else v.pause();
+  }
+  function draft() { return withPoint(points, { top: player.whereIs(0), bottom: player.whereIs(1), name: null }); }
+  function nameNow() {
+    if (picked !== undefined) return picked;
+    const d = draft();
+    return d.replaced.length === 1 ? d.replaced[0].name : null;
+  }
+  function savePoint() {
+    sides.forEach((s) => s.video.pause());
+    const at = { top: player.whereIs(0), bottom: player.whereIs(1) };
+    const before = points;
+    const name = (nameNow() || '').trim() || null;
+    points = withPoint(points, { top: at.top, bottom: at.bottom, name: name }).points;
+    keepPoints();
+    picked = undefined;
+    const line = lineFor(points);
+    const index = points.findIndex((p) => Math.abs(p.top - at.top) < 0.002);
+    player.setLine(line);
+    endSync(line.stops[index] ? line.stops[index].at : undefined);
+    sayToast(t('synced'), () => restorePoints(before));
+  }
+  function removePoint(index) {
+    closeSheet();
+    const before = points;
+    points = points.filter((_, i) => i !== index);
+    keepPoints();
+    player.setLine(lineFor(points));
+    renderAll();
+    sayToast(t('pointRemoved'), () => restorePoints(before));
+  }
+  function restorePoints(before) {
+    points = before;
+    keepPoints();
+    player.setLine(lineFor(points));
+    renderAll();
+    sayToast(t('undone'));
+  }
+  function playFrom(index) {
+    const alone = aloneSide();
+    const p = points[index];
+    const at = alone === null ? (player.line.stops[index] ? player.line.stops[index].at : undefined)
+      : p && timelineAt(player.line, alone, alone === 0 ? p.top : p.bottom);
+    if (at === undefined) return;
+    closeSheet();
+    if (syncing) endSync(at); else player.seek(at);
+    player.play();
+  }
+  function pointLabel(p, i) { return p.name || t('pointN', { n: i + 1 }); }
+  function countLabel(n) { return n === 1 ? t('onePoint') : t('nPoints', { n: n }); }
+  function saveLabel(replaced) {
+    if (replaced.length === 0) return t('syncHere');
+    if (replaced.length > 1) return t('replaceN', { n: replaced.length });
+    return t('replace', { name: replaced[0].name || fineTime(replaced[0].top) });
+  }
+  let toastTimer = 0;
+  let toastUndo = null;
+  function sayToast(text, undo, alert) {
+    const box = $('#toast');
+    $('#toastText').textContent = text;
+    box.setAttribute('role', alert ? 'alert' : 'status');
+    toastUndo = undo || null;
+    $('#toastUndo').hidden = !undo;
+    box.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 5000);
+  }
+  function hideToast() { $('#toast').hidden = true; toastUndo = null; }
+  $('#toastUndo').addEventListener('click', () => { const u = toastUndo; hideToast(); if (u) u(); });
+  const sheet = $('#pointsSheet');
+  function closeSheet() { if (sheet.open) sheet.close(); }
+  $('#pointsBtn').addEventListener('click', () => { renderPoints(); if (typeof sheet.showModal === 'function') sheet.showModal(); });
+  sheet.querySelector('.sheetclose').addEventListener('click', closeSheet);
+  function renderPoints() {
+    const current = stopIndex(player.line, player.time);
+    document.querySelectorAll('.pointlist').forEach((box) => {
+      box.textContent = '';
+      if (!points.length) { box.appendChild(el('p', 'muted empty-points', t('noPoints'))); return; }
+      const list = el('ol', 'plist');
+      points.forEach((p, i) => {
+        const li = el('li');
+        const go = el('button', 'pgo' + (i === current ? ' on' : ''));
+        go.type = 'button';
+        if (i === current) go.setAttribute('aria-current', 'true');
+        go.appendChild(el('span', 'pname', pointLabel(p, i)));
+        go.appendChild(el('span', 'ptime', fineTime(p.top)));
+        go.addEventListener('click', () => playFrom(i));
+        const del = el('button', 'pdel');
+        del.type = 'button';
+        del.appendChild(el('span', 'link', t('remove')));
+        del.setAttribute('aria-label', t('remove') + ' ' + pointLabel(p, i));
+        del.addEventListener('click', () => removePoint(i));
+        li.appendChild(go); li.appendChild(del);
+        list.appendChild(li);
+      });
+      box.appendChild(list);
     });
   }
-  function toggleBoth() {
-    if (anyPlaying()) { pauseAll(); return; }
-    const list = live().filter((s) => !s.video.ended || s.video.currentTime < s.video.duration - 0.05);
-    if (!list.length) return;
-    pairOffset = list.length === 2 ? sides[0].video.currentTime - sides[1].video.currentTime : null;
-    startPlay(list);
+  const speedBtn = $('#speedBtn'), speedMenu = $('#speedMenu');
+  function renderSpeed() {
+    speedBtn.textContent = rateLabel(rate);
+    speedBtn.classList.toggle('slow', rate < 1);
+    label(speedBtn, t('speed') + ' ' + rateLabel(rate), '− / +');
+    speedMenu.setAttribute('aria-label', t('speed'));
+    speedMenu.textContent = '';
+    RATES.forEach((r) => {
+      const b = el('button', '', rateLabel(r));
+      b.type = 'button';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', String(r === rate));
+      b.addEventListener('click', () => { setRate(r); closeSpeed(true); });
+      speedMenu.appendChild(b);
+    });
+  }
+  function closeSpeed(refocus) { speedMenu.hidden = true; speedBtn.setAttribute('aria-expanded', 'false'); if (refocus) speedBtn.focus(); }
+  speedBtn.addEventListener('click', () => {
+    if (!speedMenu.hidden) { closeSpeed(false); return; }
+    const box = speedBtn.getBoundingClientRect();
+    speedMenu.classList.toggle('up', window.innerHeight - box.bottom < 60 && box.top > window.innerHeight - box.bottom);
+    speedMenu.hidden = false;
+    speedBtn.setAttribute('aria-expanded', 'true');
+  });
+  document.addEventListener('pointerdown', (e) => { if (!speedMenu.hidden && !e.target.closest('.speedwrap')) closeSpeed(false); });
+  function setRate(r) {
+    rate = r;
+    save(RATE_KEY, String(r));
+    player.setRate(r);
+    renderSpeed();
   }
   let looping = false;
   function loop() {
     if (looping) return;
     looping = true;
-    let lastFix = 0;
-    const frame = (now) => {
+    const frame = () => {
       sides.forEach(renderTime);
-      if (pairOffset !== null && now - lastFix > 250) {
-        lastFix = now;
-        const a = sides[0].video, b = sides[1].video;
-        if (!a.paused && !b.paused && !a.seeking && !b.seeking && !a.ended && !b.ended) {
-          const off = a.currentTime - b.currentTime - pairOffset;
-          const target = a.currentTime - pairOffset;
-          if (Math.abs(off) > 0.2 && target >= 0 && target < (b.duration || 0)) b.currentTime = target;
-        }
-      }
-      if (anyPlaying()) requestAnimationFrame(frame);
-      else { looping = false; sides.forEach(renderTime); renderFooter(); }
+      if (sides.some((s) => s.ready && !s.video.paused)) requestAnimationFrame(frame);
+      else { looping = false; sides.forEach(renderTime); renderControls(); }
     };
     requestAnimationFrame(frame);
   }
-  function setRate(r) {
-    rate = r;
-    save(RATE_KEY, String(r));
-    sides.forEach((s) => { s.video.playbackRate = r; });
-    renderSpeed();
+  function pauseAll() { player.pause(); sides.forEach((s) => { if (!s.video.paused) s.video.pause(); }); }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { pauseAll(); writePlace(); } });
+  window.addEventListener('pagehide', writePlace);
+  $('#prevStop').addEventListener('click', () => stepToStop(-1));
+  $('#nextStop').addEventListener('click', () => stepToStop(1));
+  playBothBtn.addEventListener('click', () => { if (playBothBtn.getAttribute('aria-disabled') !== 'true') togglePair(); });
+  $('#syncBtn').addEventListener('click', beginSync);
+  $('#syncDone').addEventListener('click', () => endSync());
+  $('#syncSave').addEventListener('click', savePoint);
+  $('#pointName').addEventListener('input', (e) => { picked = e.target.value; renderControls(); });
+  $('#pointName').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); e.target.blur(); } });
+  $('#jointSteps').querySelectorAll('button').forEach((b) => holdRepeat(b, () => jointStep(b.dataset.step)));
+  tlRange.addEventListener('input', () => { if (player.playing) player.pause(); player.seek(Number(tlRange.value)); });
+  document.querySelector('#pointsCol .keyslink').addEventListener('click', () => openKeys());
+  const PAIR_KEY = 'vcc-pair';
+  const FILE_NAMES = ['vcc-video-0', 'vcc-video-1'];
+  const stored = {};
+  let keeping = Promise.resolve();
+  let asked = false;
+  let failedSay = false;
+  async function folder() {
+    if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') throw new Error('no folder');
+    return navigator.storage.getDirectory();
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseAll(); });
-  playBothBtn.addEventListener('click', () => {
-    if (playBothBtn.getAttribute('aria-disabled') === 'true') return;
-    if (anyPlaying()) pauseAll(); else playBothFromStart();
-  });
-  resumeBtn.addEventListener('click', () => { if (!anyPlaying()) toggleBoth(); });
+  function idb(mode, fn) {
+    return new Promise((ok, no) => {
+      let open;
+      try { open = indexedDB.open('vcc-videos', 1); } catch (e) { no(e); return; }
+      open.onupgradeneeded = () => open.result.createObjectStore('files');
+      open.onerror = () => no(open.error);
+      open.onsuccess = () => {
+        const db = open.result;
+        const tx = db.transaction('files', mode);
+        const req = fn(tx.objectStore('files'));
+        tx.oncomplete = () => { db.close(); ok(req ? req.result : undefined); };
+        tx.onerror = tx.onabort = () => { db.close(); no(tx.error); };
+      };
+    });
+  }
+  async function putFile(name, file) {
+    try {
+      const dir = await folder();
+      const handle = await dir.getFileHandle(name, { create: true });
+      if (typeof handle.createWritable !== 'function') { await dir.removeEntry(name).catch(() => {}); throw new Error('no writer'); }
+      const out = await handle.createWritable();
+      try { await out.write(file); await out.close(); } catch (e) { await out.abort().catch(() => {}); await dir.removeEntry(name).catch(() => {}); throw e; }
+      await idb('readwrite', (st) => st.delete(name)).catch(() => {});
+    } catch (e) {
+      await idb('readwrite', (st) => st.put(file, name));
+    }
+  }
+  async function getFile(name) {
+    try {
+      const dir = await folder();
+      const f = await (await dir.getFileHandle(name)).getFile();
+      if (f.size) return f;
+    } catch (e) {  }
+    const b = await idb('readonly', (st) => st.get(name)).catch(() => null);
+    return b instanceof Blob ? b : null;
+  }
+  async function dropFile(name) {
+    try { await (await folder()).removeEntry(name); } catch (e) {  }
+    await idb('readwrite', (st) => st.delete(name)).catch(() => {});
+  }
+  function wanted() {
+    const a = sides[0].file, b = sides[1].file;
+    return [a ? FILE_NAMES[0] : null, b ? (b === a ? FILE_NAMES[0] : FILE_NAMES[1]) : null];
+  }
+  function keep() {
+    keeping = keeping.then(async () => {
+      const names = wanted();
+      const files = [sides[0].file, sides[1].file];
+      let ok = true;
+      for (let i = 0; i < 2; i++) {
+        const name = names[i];
+        if (!name || stored[name] === files[i]) continue;
+        try {
+          delete stored[name];
+          await putFile(name, files[i]);
+          stored[name] = files[i];
+          if (!asked && navigator.storage && navigator.storage.persist) { asked = true; navigator.storage.persist().catch(() => {}); }
+        } catch (e) { ok = false; }
+      }
+      for (const name of FILE_NAMES) {
+        if (!names.includes(name)) { delete stored[name]; await dropFile(name); }
+      }
+      if (!ok && !failedSay) { failedSay = true; say(t('notSaved')); }
+      if (ok) failedSay = false;
+      writePlace();
+    });
+    return keeping;
+  }
+  let placeTimer = 0;
+  function keepPlace() { clearTimeout(placeTimer); placeTimer = setTimeout(writePlace, 400); }
+  function writePlace() {
+    const names = wanted();
+    const pair = sides.map((s, i) => (names[i] && stored[names[i]] === s.file && (s.ready || s.restore) ? {
+      name: names[i],
+      t: s.ready ? s.video.currentTime : s.restore.t,
+      view: s.ready ? s.view : s.restore.view,
+    } : null));
+    if (pair.some(Boolean)) save(PAIR_KEY, JSON.stringify({ sides: pair, place: both() && !syncing ? placeOf(player.line, player.time) : null })); else { try { localStorage.removeItem(PAIR_KEY); } catch (e) {  } }
+  }
+  function keepPoints() {
+    if (points.length) save(POINTS_KEY, JSON.stringify(points)); else { try { localStorage.removeItem(POINTS_KEY); } catch (e) {  } }
+  }
+  async function restorePair() {
+    let pair = null;
+    try { pair = JSON.parse(load(PAIR_KEY) || 'null'); } catch (e) { pair = null; }
+    const place = pair && pair.place && (pair.place.side === 0 || pair.place.side === 1) && typeof pair.place.time === 'number' ? pair.place : null;
+    pair = pair && Array.isArray(pair.sides) ? pair.sides : null;
+    if (!Array.isArray(pair)) return;
+    let kept = [];
+    try { kept = JSON.parse(load(POINTS_KEY) || '[]'); } catch (e) { kept = []; }
+    const got = {};
+    for (const side of pair) {
+      if (!side || !FILE_NAMES.includes(side.name) || got[side.name] !== undefined) continue;
+      got[side.name] = await getFile(side.name);
+    }
+    pair.forEach((side, i) => {
+      if (!side || !got[side.name] || sides[i].file) return;
+      const num = (x, d) => (typeof x === 'number' && isFinite(x) && x >= 0 ? x : d);
+      const view = side.view && typeof side.view.scale === 'number' ? { scale: side.view.scale, x: num(side.view.x, 0.5), y: num(side.view.y, 0.5) } : WHOLE;
+      stored[side.name] = got[side.name];
+      openFile(sides[i], got[side.name], false, { t: num(side.t, 0), view: view, place: place });
+    });
+    const ok = Array.isArray(kept) ? kept.filter((p) => p && typeof p.top === 'number' && typeof p.bottom === 'number').map((p) => ({ top: p.top, bottom: p.bottom, name: typeof p.name === 'string' ? p.name.slice(0, 60) : null })) : [];
+    if (ok.length && pair.every((x) => x && got[x.name])) {
+      const again = () => {
+        if (!both() || sides.some((x) => x.restore)) { if (sides.every((x) => x.file)) setTimeout(again, 100); return; }
+        points = ok;
+        keepPoints();
+        newLine(place);
+        renderAll();
+      };
+      setTimeout(again, 100);
+    }
+  }
+  function forgetVideos() {
+    pauseAll();
+    sides.forEach((s) => clearSide(s, null));
+    points = [];
+    try { localStorage.removeItem(PAIR_KEY); localStorage.removeItem(POINTS_KEY); } catch (e) {  }
+    keeping = keeping.then(() => Promise.all(FILE_NAMES.map((n) => { delete stored[n]; return dropFile(n); })));
+    return keeping;
+  }
+  let noteTimer = 0;
+  function say(text) {
+    const note = $('#note');
+    note.textContent = text;
+    note.hidden = false;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => { note.hidden = true; }, 8000);
+  }
+  const HINT_KEY = 'vcc-install-hint';
+  let installEvent = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; renderInstall(); });
+  window.addEventListener('appinstalled', () => { installEvent = null; renderInstall(); });
+  function standalone() {
+    try { return navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; } catch (e) { return false; }
+  }
+  function platform() {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) {
+      return /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|GSA[/]/.test(ua) ? 'iosOther' : 'ios';
+    }
+    return /Android/.test(ua) ? 'android' : 'desktop';
+  }
+  function installable() { return !standalone() && platform() !== 'desktop'; }
+  function headFor(view) { return view === 'android' ? t('installAndroid', { app: t('homeName') }) : t('installIos', { app: t('homeName') }); }
+  function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+  function installBlock(box, view) {
+    box.textContent = '';
+    box.dataset.view = view;
+    if (standalone()) { box.appendChild(el('p', 'done', t('installDone', { app: t('homeName') }))); return; }
+    box.appendChild(el('p', 'muted', t('installWhy')));
+    if (view === 'desktop') {
+      box.appendChild(el('p', 'big', t('stepDesktop')));
+    } else {
+      const ios = view === 'ios' || view === 'iosOther';
+      const list = el('ol', 'steps');
+      const steps = ios ? [t('stepShare'), t('stepAddIos'), t('stepConfirm')] : [t('stepMenuAndroid'), t('stepAddAndroid'), t('stepConfirm')];
+      steps.forEach((text, i) => {
+        const li = el('li');
+        li.appendChild(el('span', '', text));
+        if (i === 0) {
+          const g = el('span', 'glyph');
+          g.innerHTML = ios ? ICON.share : ICON.dots;
+          li.appendChild(g);
+          if (ios) li.appendChild(el('small', '', t('shareMore')));
+        }
+        list.appendChild(li);
+      });
+      box.appendChild(list);
+      if (view === 'iosOther') box.appendChild(el('p', 'muted note2', t('iosOther')));
+      if (ios) box.appendChild(el('p', 'apart', t('installApart')));
+      if (view === 'android' && installEvent && platform() === 'android') {
+        const now = el('button', 'btn primary installnow', t('installNow'));
+        now.type = 'button';
+        now.addEventListener('click', () => {
+          const ev = installEvent;
+          installEvent = null;
+          ev.prompt();
+          Promise.resolve(ev.userChoice).catch(() => {}).then(() => renderInstall());
+        });
+        box.appendChild(now);
+      }
+    }
+    const other = el('div', 'others');
+    const pickView = el('div', 'seg');
+    pickView.setAttribute('role', 'radiogroup');
+    pickView.setAttribute('aria-label', t('otherPhones'));
+    [['ios', 'iPhone'], ['android', 'Android']].forEach(([v, name]) => {
+      const b = el('button', '', name);
+      b.type = 'button';
+      b.setAttribute('role', 'radio');
+      const on = v === 'ios' ? view === 'ios' || view === 'iosOther' : view === v;
+      b.setAttribute('aria-checked', String(on));
+      b.addEventListener('click', () => { installBlock(box, v === 'ios' && platform() === 'iosOther' ? 'iosOther' : v); const c = box.querySelector('.others [aria-checked="true"]'); if (c) c.focus(); });
+      pickView.appendChild(b);
+    });
+    other.appendChild(el('span', 'muted', t('otherPhones')));
+    other.appendChild(pickView);
+    box.appendChild(other);
+  }
+  function renderInstall() {
+    const on = installable();
+    const open = $('#installOpen');
+    open.hidden = !on;
+    open.textContent = headFor(platform());
+    const hint = sides[0].q('.hint');
+    let gone = false;
+    try { gone = localStorage.getItem(HINT_KEY) === 'gone'; } catch (e) { gone = false; }
+    hint.hidden = !on || gone;
+    $('.install', hint).textContent = headFor(platform());
+    const dlg = $('#install');
+    if (dlg.open) { $('#installHead').textContent = headFor(dlg.querySelector('.installbody').dataset.view || platform()); installBlock(dlg.querySelector('.installbody'), dlg.querySelector('.installbody').dataset.view || platform()); }
+    if (tour.open && tourSteps()[tourAt] === 'install') renderTour();
+  }
+  function hintGone() { try { localStorage.setItem(HINT_KEY, 'gone'); } catch (e) {  } sides[0].q('.hint').hidden = true; }
+  function openInstall() {
+    if (menu.open) menu.close();
+    const d = $('#install');
+    const body = d.querySelector('.installbody');
+    $('#installHead').textContent = headFor(platform());
+    installBlock(body, platform());
+    if (typeof d.showModal === 'function' && !d.open) d.showModal();
+  }
+  sides[0].q('.hint .install').addEventListener('click', () => { hintGone(); openInstall(); });
+  sides[0].q('.hint .notnow').addEventListener('click', hintGone);
+  $('#installClose').addEventListener('click', () => $('#install').close());
+  const TOUR_KEY = 'vcc-tour';
+  const tour = $('#tour');
+  let tourAt = 0;
+  function tourSteps() { return ['lang', 'privacy', 'sync', 'steps', 'features'].concat(standalone() ? [] : ['install']); }
+  function tourSeen() { save(TOUR_KEY, 'seen'); }
+  function openTour() {
+    tourAt = 0;
+    renderTour();
+    if (typeof tour.showModal === 'function' && !tour.open) tour.showModal();
+    $('#tourNext').focus();
+    showChosen();
+  }
+  function showChosen() {
+    const b = $('#tourBody .langs [aria-checked="true"]');
+    if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' });
+  }
+  function closeTour() { tourSeen(); if (tour.open) tour.close(); }
+  function goTour(d) {
+    const n = tourSteps().length;
+    if (tourAt + d >= n) { closeTour(); return; }
+    tourAt = Math.max(0, tourAt + d);
+    renderTour();
+    const next = $('#tourNext');
+    if (next) next.focus();
+  }
+  function drawing(kind) {
+    const v1 = esc(t('video', { n: 1 })), v2 = esc(t('video', { n: 2 }));
+    const svgText = kind === 'mark'
+      ? '<svg class="draw" viewBox="0 0 340 96" aria-hidden="true"><text x="0" y="20">' + v1 + '</text><rect class="bar" x="0" y="26" width="330" height="14" rx="4"/>' +
+        '<text x="0" y="70">' + v2 + '</text><rect class="bar" x="0" y="76" width="330" height="14" rx="4"/>' +
+        '<line class="link" x1="120" y1="40" x2="200" y2="76"/><rect class="pt" x="117" y="24" width="6" height="18" rx="2"/><rect class="pt" x="197" y="74" width="6" height="18" rx="2"/>' +
+        '<text x="210" y="58">Kuzushi</text></svg>'
+      : '<svg class="draw" viewBox="0 0 340 100" aria-hidden="true"><text x="0" y="20">' + v1 + '</text><rect class="bar" x="10" y="26" width="310" height="10" rx="4"/>' +
+        '<text x="0" y="66">' + v2 + '</text><rect class="bar" x="10" y="72" width="310" height="10" rx="4"/>' +
+        '<rect class="pt" x="157" y="22" width="6" height="18" rx="2"/><rect class="pt" x="217" y="68" width="6" height="18" rx="2"/>' +
+        '<circle class="head h1" cx="10" cy="31" r="7"/><circle class="head h2" cx="10" cy="77" r="7"/>' +
+        '<text class="wait w1" x="172" y="54">' + esc(t('waiting')) + '</text></svg>';
+    const box = el('div');
+    box.innerHTML = svgText;
+    return box.firstChild;
+  }
+  function esc(x) { return String(x).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
+  function renderTour() {
+    const steps = tourSteps();
+    const at = steps[tourAt];
+    const body = $('#tourBody');
+    body.textContent = '';
+    const head = el('h2');
+    if (at === 'lang') {
+      body.appendChild(el('p', 'brand', t('appName')));
+      body.appendChild(el('p', 'tagline', t('tagline')));
+      head.textContent = t('tourLangHead');
+      body.appendChild(head);
+      const list = el('div', 'langs');
+      list.setAttribute('role', 'radiogroup');
+      list.setAttribute('aria-label', t('language'));
+      LANGS.forEach((code) => {
+        const b = el('button', 'btn ghost', LANG_NAMES[code]);
+        b.type = 'button';
+        b.lang = code;
+        b.dir = RTL.includes(code) ? 'rtl' : 'ltr';
+        b.setAttribute('role', 'radio');
+        b.setAttribute('aria-checked', String(code === lang));
+        b.addEventListener('click', () => { setLang(code); renderTour(); const again = $('#tourBody .langs [aria-checked="true"]'); if (again) again.focus(); showChosen(); });
+        list.appendChild(b);
+      });
+      body.appendChild(list);
+    } else if (at === 'privacy') {
+      head.textContent = t('tourPrivacyHead');
+      body.appendChild(head);
+      body.appendChild(el('p', 'lead', t('tourPrivacy1')));
+      body.appendChild(el('p', '', t('tourPrivacy2', { forget: t('forget') })));
+      body.appendChild(el('p', 'muted', t('tourPrivacy3')));
+    } else if (at === 'sync') {
+      head.textContent = t('tourSyncHead');
+      body.appendChild(head);
+      body.appendChild(drawing('mark'));
+      body.appendChild(el('p', '', t('fStart', { sync: t('sync'), here: t('syncHere') })));
+      body.appendChild(drawing('wait'));
+      body.appendChild(el('p', '', t('fPlay', { play: t('playBoth') })));
+    } else if (at === 'steps') {
+      head.textContent = t('tourStepHead');
+      body.appendChild(head);
+      const demo = el('div', 'demo-steps');
+      demo.setAttribute('aria-hidden', 'true');
+      demo.innerHTML = '<button class="btn ghost stepbtn sec" data-step="-1s" tabindex="-1"></button><button class="btn ghost stepbtn" data-step="-1f" tabindex="-1"></button>' +
+        '<button class="btn ghost stepbtn" data-step="1f" tabindex="-1"></button><button class="btn ghost stepbtn sec" data-step="1s" tabindex="-1"></button>';
+      stepButtons(demo);
+      body.appendChild(demo);
+      body.appendChild(el('p', '', t('fStep')));
+      body.appendChild(el('p', 'muted', t('tourStepBoth', { sync: t('sync') })));
+    } else if (at === 'features') {
+      head.textContent = t('tourFeaturesHead');
+      body.appendChild(head);
+      const list = el('ul', 'features');
+      [[ICON.side, t('fPick', { same: t('same') })],
+        [ICON.zoomIn, t('fZoom')], [ICON.stack, t('fLayout')], ['1×', t('fSpeed')]].forEach(([icon, text]) => {
+        const li = el('li');
+        const g = el('span', 'ficon');
+        if (icon.startsWith('<')) g.innerHTML = icon; else g.textContent = icon;
+        li.appendChild(g);
+        li.appendChild(el('span', '', text));
+        list.appendChild(li);
+      });
+      body.appendChild(list);
+    } else {
+      head.textContent = headFor(platform() === 'desktop' ? 'ios' : platform());
+      body.appendChild(head);
+      const box = el('div', 'installbody');
+      body.appendChild(box);
+      installBlock(box, platform());
+    }
+    const dots = $('#tourDots');
+    dots.textContent = '';
+    dots.setAttribute('aria-label', t('tourStepOf', { n: tourAt + 1, m: steps.length }));
+    steps.forEach((_, i) => { const d = el('span', i === tourAt ? 'dot on' : 'dot'); dots.appendChild(d); });
+    $('#tourBack').hidden = tourAt === 0;
+    $('#tourNext').textContent = tourAt === steps.length - 1 ? t('tourStart') : t('tourNext');
+    $('#tourSkip').hidden = tourAt === steps.length - 1;
+  }
+  $('#tourNext').addEventListener('click', () => goTour(1));
+  $('#tourBack').addEventListener('click', () => goTour(-1));
+  $('#tourSkip').addEventListener('click', closeTour);
+  tour.addEventListener('cancel', () => tourSeen());
+  (() => {
+    let from = null;
+    tour.addEventListener('pointerdown', (e) => { from = { x: e.clientX, y: e.clientY }; });
+    tour.addEventListener('pointerup', (e) => {
+      if (!from) return;
+      const dx = e.clientX - from.x, dy = e.clientY - from.y;
+      from = null;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const forward = document.documentElement.dir === 'rtl' ? dx > 0 : dx < 0;
+      goTour(forward ? 1 : -1);
+    });
+  })();
+  const menu = $('#menu');
+  function openMenu() {
+    $('#forgetAsk').hidden = true;
+    $('#forget').hidden = false;
+    $('#forget').disabled = !sides.some((s) => s.file);
+    if (typeof menu.showModal === 'function' && !menu.open) menu.showModal();
+  }
+  $('#menuBtn').addEventListener('click', openMenu);
+  $('#installOpen').addEventListener('click', openInstall);
+  $('#tourOpen').addEventListener('click', () => { menu.close(); openTour(); });
+  $('#menuClose').addEventListener('click', () => menu.close());
+  $('#forget').addEventListener('click', () => { $('#forget').hidden = true; $('#forgetAsk').hidden = false; $('#forgetNo').focus(); });
+  $('#forgetNo').addEventListener('click', () => { $('#forgetAsk').hidden = true; $('#forget').hidden = false; $('#forget').focus(); });
+  $('#forgetYes').addEventListener('click', () => { forgetVideos(); menu.close(); });
+  (() => {
+    const DOUBLE_MS = 600, DOUBLE_PX = 40;
+    const CONTROL = 'button, a[href], input, select, textarea, video';
+    let last = null, dropping = false, replaced = false;
+    const drop = (e) => { if (e.cancelable) e.preventDefault(); e.stopPropagation(); };
+    window.addEventListener('pointerdown', (e) => {
+      if (!e.isPrimary || e.button !== 0 || !(e.target instanceof Element)) return;
+      const element = e.target.closest(CONTROL) || e.target;
+      dropping = false; replaced = false;
+      if (last && element !== last.element && Math.hypot(e.clientX - last.x, e.clientY - last.y) <= DOUBLE_PX) {
+        const now = last.element.isConnected ? document.elementFromPoint(last.x, last.y) : null;
+        replaced = !now || !last.element.contains(now) || last.element.closest('[hidden]') !== null;
+        dropping = replaced && e.timeStamp - last.at <= DOUBLE_MS;
+      }
+      if (dropping && last) last = Object.assign({}, last, { at: e.timeStamp });
+      else last = { element: element, x: e.clientX, y: e.clientY, at: e.timeStamp };
+      if (dropping) drop(e);
+    }, true);
+    window.addEventListener('mousedown', (e) => { if (e.button === 0 && ((e.detail >= 2 && replaced) || dropping)) { dropping = true; drop(e); } }, true);
+    const touch = (e) => { if (dropping) drop(e); };
+    window.addEventListener('touchstart', touch, { capture: true, passive: false });
+    window.addEventListener('touchend', touch, { capture: true, passive: false });
+    window.addEventListener('click', (e) => { if (e.detail > 0 && dropping) drop(e); }, true);
+    window.addEventListener('keydown', () => { last = null; dropping = false; replaced = false; }, true);
+  })();
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     document.body.classList.add('kbd');
     const target = e.target;
-    const sheet = $('#keysSheet');
-    if (sheet.open) return;
-    if (target instanceof HTMLSelectElement) return;
+    if (document.querySelector('dialog[open]')) return;
+    if (target instanceof HTMLSelectElement || (target instanceof HTMLInputElement && target.type === 'text')) return;
     if (target instanceof HTMLButtonElement && (e.key === ' ' || e.key === 'Enter')) return;
-    const isRange = target instanceof HTMLInputElement && target.type === 'range';
-    if (isRange && !e.shiftKey && (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End' || e.key.startsWith('Page'))) return;
-    const s = sides[active];
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    const repeatOk = { ArrowLeft: e.shiftKey, ArrowRight: e.shiftKey, z: true, w: true, a: true, s: true, d: true };
+    const repeatOk = { ArrowLeft: true, ArrowRight: true, ',': true, '.': true, z: true, w: true, a: true, s: true, d: true };
     if (e.repeat && !repeatOk[k]) { if (k === ' ') e.preventDefault(); return; }
+    const i = active;
+    const step = (code) => { if (syncing) ownStep(i, code); else jointStep(code); };
+    const zs = sides[pointed];
     let done = true;
-    const jump = (by) => { if (s.ready) { pairOffset = null; s.stepper.reset(); s.video.currentTime = Math.max(0, Math.min(s.video.duration, s.video.currentTime + by)); } };
     switch (k) {
-      case ' ': case 'k': toggleBoth(); break;
-      case 't': playBothFromStart(); break;
-      case 'ArrowLeft': if (e.shiftKey) { pairOffset = null; if (s.ready) s.stepper.step(-1); } else jump(-5); break;
-      case 'ArrowRight': if (e.shiftKey) { pairOffset = null; if (s.ready) s.stepper.step(1); } else jump(5); break;
-      case 'j': jump(-10); break;
-      case 'l': jump(10); break;
-      case 'm': setStart(s); break;
-      case '1': setActive(0); break;
-      case '2': setActive(1); break;
-      case 'z': zoomAct(s, e.shiftKey ? 'out' : 'in'); break;
-      case '0': zoomAct(s, 'whole'); break;
-      case 'w': zoomAct(s, 'up'); break;
-      case 's': zoomAct(s, 'down'); break;
-      case 'a': zoomAct(s, 'left'); break;
-      case 'd': zoomAct(s, 'right'); break;
-      case '-': { const i = RATES.indexOf(rate); if (i < RATES.length - 1) setRate(RATES[i + 1]); break; }
-      case '+': { const i = RATES.indexOf(rate); if (i > 0) setRate(RATES[i - 1]); break; }
+      case ' ': case 'k': if (syncing) ownToggle(i); else togglePair(); break;
+      case 'j': step('-10s'); break;
+      case 'l': step('10s'); break;
+      case 'ArrowLeft': step(e.shiftKey ? '-1f' : '-5s'); break;
+      case 'ArrowRight': step(e.shiftKey ? '1f' : '5s'); break;
+      case ',': step('-1f'); break;
+      case '.': step('1f'); break;
+      case 'p': if (!syncing) stepToStop(-1); break;
+      case 'n': if (!syncing) stepToStop(1); break;
+      case '-': { const r = RATES.indexOf(rate); if (r > 0) setRate(RATES[r - 1]); break; }
+      case '+': { const r = RATES.indexOf(rate); if (r < RATES.length - 1) setRate(RATES[r + 1]); break; }
+      case 'z': zoomAct(zs, e.shiftKey ? 'out' : 'in'); break;
+      case '0': zoomAct(zs, 'whole'); break;
+      case 'w': zoomAct(zs, 'up'); break;
+      case 's': zoomAct(zs, 'down'); break;
+      case 'a': zoomAct(zs, 'left'); break;
+      case 'd': zoomAct(zs, 'right'); break;
+      case 'v': setLayout(layoutNow() === 'side' ? 'stack' : 'side'); break;
+      case 'Escape': if (syncing) endSync(); else done = false; break;
       case '?': openKeys(); break;
       default: done = false;
     }
@@ -949,9 +3071,10 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
   });
   document.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') document.body.classList.remove('kbd'); });
   function openKeys() {
-    const sheet = $('#keysSheet');
+    const sheetK = $('#keysSheet');
+    if (menu.open) menu.close();
     renderKeys();
-    if (typeof sheet.showModal === 'function' && !sheet.open) sheet.showModal();
+    if (typeof sheetK.showModal === 'function' && !sheetK.open) sheetK.showModal();
   }
   $('#keysBtn').addEventListener('click', openKeys);
   $('#keysClose').addEventListener('click', () => $('#keysSheet').close());
@@ -959,16 +3082,17 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     const sh = t('keyShift');
     const rows = [
       [t('keySpace') + ' / K', t('kToggle')],
-      ['T', t('kFromStart')],
-      ['← / →', t('kSeek5')],
       ['J / L', t('kSeek10')],
-      [sh + '+← / ' + sh + '+→', t('kFrame')],
-      ['M', t('setStart')],
-      ['1 / 2', t('kSide')],
+      ['← / →', t('kSeek5')],
+      [sh + '+← / ' + sh + '+→  ·  , / .', t('kFrame')],
+      ['P / N', t('kPoints')],
+      ['− / +', t('kSpeed')],
       ['Z / ' + sh + '+Z', t('kZoom')],
       ['W A S D', t('kPan')],
       ['0', t('whole')],
-      ['− / +', t('kSpeed')],
+      [t('keyWheel'), t('kWheel')],
+      ['V', t('layoutSide') + ' / ' + t('layoutStack')],
+      ['Esc', t('kEsc')],
       ['?', t('kHelp')],
     ];
     const body = $('#keysRows');
@@ -984,20 +3108,65 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     btn.title = keys ? text + ' (' + keys + ')' : text;
   }
   function renderTime(s) {
-    const v = s.video, range = s.q('input[type=range]');
-    const now = s.ready ? v.currentTime : 0;
-    if (document.activeElement !== range || !range.matches(':active')) range.value = String(now);
+    const v = s.video, range = s.q('.ctl input[type=range]');
+    const now = s.ready ? (syncing ? player.whereIs(s.i) : v.currentTime) : 0;
+    if (document.activeElement !== range) range.value = String(now);
     range.setAttribute('aria-valuetext', fineTime(now));
-    s.q('.name').textContent = t('video', { n: s.i + 1 }) + ' · ' + fineTime(now);
+    if (syncing) renderFine(s, now);
+    s.q('.name').textContent = t('video', { n: s.i + 1 });
+    s.q('.time').textContent = s.ready ? fineTime(now, 2) + ' · ' + t('frameNo', { n: Math.floor(now / s.stepper.frame() + 1e-3) + 1 }) : '';
+    if (s.i === 0 && !syncing) renderTimeline();
+  }
+  const LONG_SECONDS = 15 * 60;
+  const FINE_SECONDS = 120;
+  function fineStart(time, length) { return Math.max(0, Math.min(Math.floor(time - FINE_SECONDS / 2), Math.ceil(length - FINE_SECONDS))); }
+  function renderFine(s, now) {
+    const length = s.video.duration || 0;
+    const long = s.ready && length > LONG_SECONDS;
+    const box = s.q('.fine');
+    box.hidden = !long;
+    if (!long) return;
+    if (!s.fineHeld && (now < s.fineFrom || now > s.fineFrom + FINE_SECONDS)) s.fineFrom = fineStart(now, length);
+    const fine = s.q('.finerange');
+    fine.min = String(s.fineFrom);
+    fine.max = String(Math.min(length, s.fineFrom + FINE_SECONDS));
+    if (document.activeElement !== fine) fine.value = String(now);
+    fine.setAttribute('aria-label', t('fineAria') + ', ' + t('video', { n: s.i + 1 }));
+    fine.setAttribute('aria-valuetext', fineTime(now));
+    s.q('.finelabel').textContent = t('fine');
+  }
+  function renderWait(s) {
+    const w = s.q('.wait');
+    const waits = !syncing && player.waiting()[s.i];
+    w.hidden = !waits;
+    w.textContent = t('waiting');
   }
   function renderZoom(s) {
     const zoomed = s.view.scale > 1;
     const amount = s.q('.amount');
     amount.hidden = !zoomed;
     amount.textContent = zoomLabel(s.view.scale);
-    s.q('.whole').hidden = !zoomed;
-    s.q('.zout').setAttribute('aria-disabled', String(!zoomed));
-    s.q('.zin').setAttribute('aria-disabled', String(s.view.scale >= MAX_ZOOM));
+    s.el.querySelectorAll('.whole').forEach((b) => { b.hidden = !zoomed; });
+    s.el.querySelectorAll('.zout').forEach((b) => b.setAttribute('aria-disabled', String(!zoomed)));
+    s.el.querySelectorAll('.zin').forEach((b) => b.setAttribute('aria-disabled', String(s.view.scale >= MAX_ZOOM)));
+    if (s.ready) fitBars(s);
+  }
+  function stepButtons(box) {
+    box.querySelectorAll('button[data-step]').forEach((b) => {
+      const code = b.dataset.step;
+      const back = code.startsWith('-');
+      const frame = code.endsWith('f');
+      const unit = frame ? t('frameUnit') : t('sec', { n: '' }).trim();
+      b.textContent = '';
+      const arrow = el('span', 'arr', back ? '◀' : '▶');
+      arrow.setAttribute('aria-hidden', 'true');
+      const num = el('span', 'num', '1');
+      const u = el('span', 'unit', ' ' + unit);
+      if (back) { b.appendChild(arrow); b.appendChild(document.createTextNode(' ')); b.appendChild(num); b.appendChild(u); }
+      else { b.appendChild(num); b.appendChild(u); b.appendChild(document.createTextNode(' ')); b.appendChild(arrow); }
+      const text = frame ? (back ? t('prevFrame') : t('nextFrame')) : (back ? t('secBack', { n: 1 }) : t('secFwd', { n: 1 }));
+      label(b, text, frame ? t('keyShift') + (back ? '+← / ,' : '+→ / .') : '');
+    });
   }
   function renderSide(s) {
     const name = t('video', { n: s.i + 1 });
@@ -1006,26 +3175,31 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     s.q('.empty').hidden = has;
     s.q('.over.top').hidden = !has;
     s.q('.over.bottom').hidden = !s.ready;
+    const refusedBox = s.q('.refusedbox');
+    refusedBox.hidden = !s.refused;
+    s.q('.refusedmsg').textContent = s.refused === 'notStarted' ? t('notStarted') : s.refused ? t('cantPlayThis') : '';
+    s.q('.retry').textContent = t('retry');
     const err = s.q('.err');
     err.hidden = !s.problem;
     err.textContent = s.problem ? t(s.problem) : '';
     s.q('.privacy').hidden = s.i !== 0 || !!s.problem;
     s.q('.same').hidden = !(s.i === 1 && sides[0] && sides[0].file);
-    const playing = s.ready && !s.video.paused && !s.video.ended;
+    const ctl = s.q('.ctl');
+    ctl.hidden = !syncing || !s.ready;
     const own = s.q('.own');
+    const playing = s.ready && !s.video.paused && !s.video.ended;
     own.innerHTML = playing ? ICON.pause : ICON.play;
-    label(own, playing ? t('pauseThis') : t('playThis'));
-    label(s.q('.prev'), t('prevFrame'), t('keyShift') + '+←');
-    label(s.q('.next'), t('nextFrame'), t('keyShift') + '+→');
-    label(s.q('.mark'), t('setStart'), 'M');
-    label(s.q('.zin'), t('zoomIn') + ': ' + name, 'Z');
-    label(s.q('.zout'), t('zoomOut') + ': ' + name, t('keyShift') + '+Z');
-    label(s.q('.whole'), t('whole') + ': ' + name, '0');
-    label(s.q('.change'), t('change') + ': ' + name);
-    const range = s.q('input[type=range]');
+    label(own, (playing ? t('pause') : t('play')) + ': ' + name);
+    stepButtons(ctl);
+    ctl.querySelectorAll('button').forEach((b) => { b.disabled = !s.ready; });
+    const range = s.q('.ctl input[type=range]');
     range.setAttribute('aria-label', t('position') + ', ' + name);
-    ['.own', '.prev', '.next', '.mark'].forEach((c) => { s.q(c).disabled = !s.ready; });
-    range.disabled = !s.ready;
+    range.dataset.scrubber = String(s.i);
+    renderTicks(s.q('.ctl .ticks'), s.video.duration || 0, points.map((p) => (s.i === 0 ? p.top : p.bottom)), null);
+    s.el.querySelectorAll('.zin').forEach((b) => label(b, t('zoomIn') + ': ' + name, 'Z'));
+    s.el.querySelectorAll('.zout').forEach((b) => label(b, t('zoomOut') + ': ' + name, t('keyShift') + '+Z'));
+    s.el.querySelectorAll('.whole').forEach((b) => label(b, t('whole') + ': ' + name, '0'));
+    label(s.q('.change'), t('change') + ': ' + name);
     const snd = s.q('.sound');
     const on = sound === s.i;
     snd.setAttribute('aria-pressed', String(on));
@@ -1033,56 +3207,236 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     const disc = $('.disc', snd);
     disc.innerHTML = on ? ICON.soundOn : ICON.soundOff;
     disc.classList.toggle('on', on);
-    s.q('.start').textContent = t('startAt', { t: fineTime(s.start) });
     s.video.setAttribute('aria-label', name);
+    s.el.classList.toggle('chosen', syncing && active === s.i);
     renderZoom(s);
+    renderWait(s);
     renderTime(s);
+    fitBars(s);
   }
-  function renderFooter() {
-    const playing = anyPlaying();
-    const list = live();
+  function renderTicks(box, length, times, onPick) {
+    box.textContent = '';
+    if (!length) return;
+    times.forEach((tm, i) => {
+      const tk = el(onPick ? 'button' : 'span', 'tick');
+      tk.style.setProperty('--at', String(Math.max(0, Math.min(1, tm / length))));
+      if (onPick) {
+        tk.type = 'button';
+        tk.tabIndex = -1;
+        const stop = player.line.stops[i];
+        label(tk, stop ? pointLabel(stop.point, i) : '');
+        tk.addEventListener('click', () => onPick(i));
+      }
+      box.appendChild(tk);
+    });
+  }
+  function renderTimeline() {
+    const line = player.line;
+    tlRange.max = String(line.length);
+    if (document.activeElement !== tlRange) tlRange.value = String(Math.min(line.length, player.time));
+    tlRange.setAttribute('aria-valuetext', fineTime(player.time) + ' / ' + fineTime(line.length));
+    $('#tlTime').textContent = fineTime(player.time).replace(/[.,]\d$/, '') + ' / ' + fineTime(line.length).replace(/[.,]\d$/, '');
+  }
+  const SYNC_LEAST = 160;
+  function fitSync() {
+    const body = document.body;
+    body.classList.remove('syncside', 'syncstack');
+    layoutEl.classList.remove('auto');
+    layoutEl.title = t('layout');
+    if (!syncing) { sides.forEach(fitBars); return; }
+    const pic = (s) => { const r = s.box.getBoundingClientRect(); return s.pic ? Math.min(r.height, r.width * s.pic.height / s.pic.width) : r.height; };
+    const least = () => Math.min(...sides.map(pic));
+    const chosen = least();
+    if (chosen < SYNC_LEAST) {
+      const other = body.dataset.layout === 'stack' ? 'syncside' : 'syncstack';
+      body.classList.add(other);
+      if (least() <= chosen) body.classList.remove(other);
+    }
+    const auto = body.classList.contains('syncside') || body.classList.contains('syncstack');
+    layoutEl.classList.toggle('auto', auto);
+    layoutEl.title = auto ? t('layoutAuto') : t('layout');
+    sides.forEach(fitBars);
+  }
+  window.addEventListener('resize', () => requestAnimationFrame(fitSync));
+  function renderControls() {
+    const any = sides.some((s) => s.ready);
+    const alone = aloneSide();
+    document.body.classList.toggle('syncing', syncing);
+    $('#together').hidden = syncing;
+    $('#syncing').hidden = !syncing;
+    tlRange.disabled = !any;
+    tlRange.setAttribute('aria-label', t('positionBoth'));
+    renderTimeline();
+    renderTicks(document.querySelector('#together .ticks'), player.line.length, player.line.stops.map((s) => s.at), (i) => player.seek(player.line.stops[i].at));
+    stepButtons($('#jointSteps'));
+    $('#jointSteps').querySelectorAll('button').forEach((b) => { b.disabled = !any; });
+    const playing = player.playing;
+    const what = alone === null ? (playing ? t('pauseBoth') : t('playBoth')) : playing ? t('pause') : t('playOnly', { n: alone + 1 });
     playBothBtn.innerHTML = (playing ? ICON.pause : ICON.play) + '<span></span>';
-    $('span', playBothBtn).textContent = playing ? t('pause') : t('playBoth');
-    playBothBtn.setAttribute('aria-disabled', String(!list.length));
-    playBothBtn.setAttribute('aria-keyshortcuts', playing ? 'Space' : 'T');
-    playBothBtn.title = !list.length ? t('pickFirst') : refused ? t('cantStart') : playing ? t('pause') + ' (' + t('keySpace') + ')' : t('playBothTip') + ' (T)';
-    const away = list.some((s) => Math.abs(s.video.currentTime - s.start) > 0.05 && !s.video.ended);
-    resumeBtn.hidden = playing || !away;
-    resumeBtn.textContent = t('resume');
-    resumeBtn.title = t('resumeTip') + ' (' + t('keySpace') + ')';
-    resumeBtn.setAttribute('aria-keyshortcuts', 'Space');
+    $('span', playBothBtn).textContent = what;
+    playBothBtn.setAttribute('aria-disabled', String(!any));
+    playBothBtn.title = !any ? t('pickFirst') : what + ' (' + t('keySpace') + ' / K)';
+    const before = stepStop(player.line, player.time, -1), after = stepStop(player.line, player.time, 1);
+    const stopName = (at) => { const i = player.line.stops.findIndex((s) => s.at === at); return i >= 0 ? pointLabel(player.line.stops[i].point, i) : t('start'); };
+    const prev = $('#prevStop'), next = $('#nextStop');
+    prev.innerHTML = ICON.stopPrev; next.innerHTML = ICON.stopNext;
+    prev.disabled = !any || before === null; next.disabled = !any || after === null;
+    label(prev, before === null ? t('prevPoint') : t('prevPoint') + ': ' + stopName(before), 'P');
+    label(next, after === null ? t('nextPoint') : t('nextPoint') + ': ' + stopName(after), 'N');
+    $('#pointsBtn').textContent = countLabel(points.length);
+    $('#pointsBtn').disabled = !any;
+    $('#syncBtn').textContent = t('sync');
+    $('#syncBtn').disabled = !both();
+    const aloneNote = $('#aloneNote');
+    aloneNote.hidden = !(any && !both());
+    aloneNote.textContent = t('syncNeedsBoth');
+    const stalled = player.stalledSince !== null && performance.now() - player.stalledSince > 10000;
+    $('#stallNote').hidden = !stalled;
+    $('#stallNote').textContent = t('waiting');
+    renderSpeed();
+    if (syncing) {
+      const d = draft();
+      const input = $('#pointName');
+      if (document.activeElement !== input) input.value = nameNow() || '';
+      input.placeholder = t('noName');
+      $('#syncSave').textContent = saveLabel(d.replaced);
+    }
+    requestAnimationFrame(fitSync);
+    $('#pointsCol').hidden = !wide();
+    $('#pointsBtn').hidden = wide();
+    renderPoints();
   }
-  function renderSpeed() {
-    speedEl.setAttribute('aria-label', t('speed'));
-    speedEl.textContent = '';
-    RATES.forEach((r) => {
+  function wide() { return window.matchMedia('(min-width: 1000px) and (min-height: 560px)').matches; }
+  function fitCrowd(s) {
+    const b = s.box;
+    if (!s.ready) return;
+    const tops = [...b.querySelectorAll('.over.top .chip, .over.top button')].filter((e) => !e.closest('[hidden]')).map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+    const bottoms = [...b.querySelectorAll('.over.bottom .chip, .over.bottom button')].filter((e) => !e.closest('[hidden]')).map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+    const br = b.getBoundingClientRect();
+    const out = (r) => r.top < br.top - 0.5 || r.bottom > br.bottom + 0.5;
+    const hit = tops.some((a) => bottoms.some((c) => a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top)) || tops.concat(bottoms).some(out);
+    if (!hit) return;
+    b.classList.add('crowded');
+    const top = [...b.querySelectorAll('.over.top .chip, .over.top button')].filter((e) => !e.closest('[hidden]')).map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+    if (top.some(out)) b.classList.add('crowded2');
+  }
+  const NARROW_PX = 260;
+  const COVER_SHARE = 0.12;
+  function fitBars(s) {
+    s.box.classList.remove('crowded', 'crowded2', 'crowded3');
+    s.el.classList.remove('zoomrow');
+    s.el.querySelectorAll('.zoombar').forEach((z) => { z.hidden = true; });
+    placeLabels(s);
+    fitCrowd(s);
+    const row = s.box.classList.contains('crowded');
+    s.el.classList.toggle('zoomrow', row);
+    s.q('.zoombar:not(.inctl)').hidden = !row || syncing;
+    s.q('.zoombar.inctl').hidden = !row || !syncing;
+    const br = s.box.getBoundingClientRect();
+    const outside = () => [...s.box.querySelectorAll('.over.top .chip, .over.top button')].some((e) => {
+      if (e.closest('[hidden]') || getComputedStyle(e).display === 'none') return false;
+      const r = e.getBoundingClientRect(); return r.width && (r.top < br.top - 0.5 || r.bottom > br.bottom + 0.5);
+    });
+    if (outside()) s.box.classList.add('crowded', 'crowded2');
+    if (outside()) s.box.classList.add('crowded3');
+  }
+  function placeLabels(s) {
+    const b = s.box;
+    b.classList.remove('bars', 'sidecols');
+    b.style.removeProperty('--side');
+    if (!s.ready || !s.pic) return;
+    const W = b.clientWidth, H = b.clientHeight;
+    if (!W || !H) return;
+    const k = Math.min(W / s.pic.width, H / s.pic.height);
+    const pw = s.pic.width * k, ph = s.pic.height * k;
+    const pl = (W - pw) / 2, pt = (H - ph) / 2;
+    const br = b.getBoundingClientRect();
+    let hit = false;
+    let covered = 0;
+    b.querySelectorAll('.over > *, .over .labels > *, .over .row > *').forEach((e) => {
+      if (e.hidden || e.classList.contains('grow') || e.classList.contains('labels') || e.classList.contains('row')) return;
+      const r = e.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const l = r.left - br.left, tp = r.top - br.top;
+      const ow = Math.min(l + r.width, pl + pw) - Math.max(l, pl), oh = Math.min(tp + r.height, pt + ph) - Math.max(tp, pt);
+      if (ow > 0 && oh > 0) { hit = true; covered += ow * oh; }
+    });
+    const narrow = W < NARROW_PX;
+    if (!(hit && (narrow || covered > COVER_SHARE * pw * ph))) return;
+    const full = Math.min(W / s.pic.width, H / s.pic.height);
+    const keeps = () => { const r = s.stage.getBoundingClientRect(); return Math.min(r.width / s.pic.width, r.height / s.pic.height) >= full * 0.995; };
+    if (H - ph >= 88) {
+      b.classList.add('bars');
+      if (keeps()) return;
+      b.classList.remove('bars');
+    }
+    const sideRoom = (W - pw) / 2;
+    const need = Math.max(60, ...['.change span', '.whole span'].map((q) => s.q(q).scrollWidth + 8));
+    if (sideRoom >= need) { b.classList.add('sidecols'); b.style.setProperty('--side', Math.floor(sideRoom) + 'px'); }
+  }
+  function renderSeg(el, group, items, current, pick) {
+    el.setAttribute('aria-label', group);
+    el.textContent = '';
+    items.forEach((it, i) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('role', 'radio');
-      b.setAttribute('aria-checked', String(r === rate));
-      b.tabIndex = r === rate ? 0 : -1;
-      b.textContent = rateLabel(r);
-      b.title = t('speed') + ' ' + rateLabel(r) + ' (− / +)';
-      b.addEventListener('click', () => { setRate(r); speedEl.querySelector('[aria-checked="true"]').focus(); });
+      b.setAttribute('aria-checked', String(it.value === current));
+      b.tabIndex = it.value === current ? 0 : -1;
+      if (it.html) { b.innerHTML = it.html; b.setAttribute('aria-label', it.label); } else b.textContent = it.text;
+      b.title = it.title || it.label || it.text;
+      b.addEventListener('click', () => { pick(it.value); focusChecked(el); });
       b.addEventListener('keydown', (e) => {
-        const i = RATES.indexOf(rate);
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); setRate(RATES[Math.min(RATES.length - 1, i + 1)]); speedEl.querySelector('[aria-checked="true"]').focus(); }
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); setRate(RATES[Math.max(0, i - 1)]); speedEl.querySelector('[aria-checked="true"]').focus(); }
+        const flip = document.documentElement.dir === 'rtl' ? -1 : 1;
+        const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : e.key === 'ArrowRight' ? flip : e.key === 'ArrowLeft' ? -flip : 0;
+        if (!d) return;
+        e.preventDefault(); e.stopPropagation();
+        pick(items[Math.max(0, Math.min(items.length - 1, i + d))].value);
+        focusChecked(el);
       });
-      speedEl.appendChild(b);
+      el.appendChild(b);
     });
   }
+  function focusChecked(el) { const b = el.querySelector('[aria-checked="true"]'); if (b) b.focus(); }
+  function renderSegs() {
+    [layoutEl, layoutMenuEl].forEach((box) => renderSeg(box, t('layout'), [
+      { value: 'side', html: ICON.side + (box === layoutMenuEl ? '<span>' + t('layoutSide') + '</span>' : ''), label: t('layoutSide') },
+      { value: 'stack', html: ICON.stack + (box === layoutMenuEl ? '<span>' + t('layoutStack') + '</span>' : ''), label: t('layoutStack') },
+    ], layoutNow(), setLayout));
+  }
+  function layoutNow() { return layoutPick || (window.innerWidth > window.innerHeight ? 'side' : 'stack'); }
+  function applyLayout() {
+    const now = layoutNow();
+    if (document.body.dataset.layout !== now) document.body.dataset.layout = now;
+    [layoutEl, layoutMenuEl].forEach((box) => box.querySelectorAll('[role=radio]').forEach((b, i) => {
+      const on = (i === 0 ? 'side' : 'stack') === now;
+      b.setAttribute('aria-checked', String(on));
+      b.tabIndex = on ? 0 : -1;
+    }));
+  }
+  function setLayout(v) {
+    layoutPick = v;
+    save(LAYOUT_KEY, v);
+    applyLayout();
+  }
+  window.addEventListener('resize', () => { applyLayout(); renderControls(); });
   function renderAll() {
     document.documentElement.lang = lang;
+    document.documentElement.dir = RTL.includes(lang) ? 'rtl' : 'ltr';
     document.title = t('appName');
     const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
     if (meta) meta.content = t('homeName');
+    const about = document.querySelector('meta[name="description"]');
+    if (about) about.content = t('tagline');
     document.querySelectorAll('[data-t]').forEach((n) => { n.textContent = t(n.getAttribute('data-t')); });
     document.querySelectorAll('[data-tl]').forEach((n) => { label(n, t(n.getAttribute('data-tl')), '?'); });
     sides.forEach(renderSide);
-    renderFooter();
-    renderSpeed();
+    renderControls();
+    renderSegs();
+    applyLayout();
     if ($('#keysSheet').open) renderKeys();
+    renderInstall();
+    if (tour.open) renderTour();
   }
   const langSel = $('#lang');
   LANGS.forEach((code) => {
@@ -1093,18 +3447,21 @@ if (typeof module !== 'undefined') module.exports = { LANGS, LANG_NAMES, STRINGS
     langSel.appendChild(o);
   });
   langSel.value = lang;
-  langSel.addEventListener('change', () => {
-    if (!STRINGS[langSel.value]) return;
-    lang = langSel.value;
+  function setLang(code) {
+    if (!STRINGS[code]) return;
+    lang = code;
+    langSel.value = code;
     save(LANG_KEY, lang);
     renderAll();
-  });
-  sides[0].el.classList.add('active');
-  renderAll();
-  if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {  });
   }
-  window.__vertailu = { sides: sides, get lang() { return lang; }, get rate() { return rate; }, get pairOffset() { return pairOffset; } };
+  langSel.addEventListener('change', () => setLang(langSel.value));
+  renderAll();
+  restorePair();
+  if (load(TOUR_KEY) !== 'seen') openTour();
+  if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {  });
+  }
+  window.__vertailu = { sides: sides, get lang() { return lang; }, get rate() { return rate; }, get layout() { return layoutNow(); }, get points() { return points; }, get syncing() { return syncing; }, player: player, kept: () => keeping };
 })();
 </script>
 </body>
