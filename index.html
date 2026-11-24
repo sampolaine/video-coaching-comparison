@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tP+gSbYusZO/WCUs4BPoG+y2xUAyMPIJgR2qAONTFAw='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<!-- No viewport-fit=cover: iOS keeps the status bar its own opaque strip and draws nothing of ours under it, so its
+     iOS 26 blur ("scroll edge effect") has nothing to blur. The env() paddings stay, as 0 where there is no inset. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fd55CHpsomiufzVVMj/F6E5UDTaN+81EIZUZjWjPbQY='; style-src 'sha256-ntshVEwZuf/o9JKmUrQh2tzcsN3WiUIINTkAPkEVC/c='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="vcc-build" content="bcda8634c91c 2026-11-24">
+<meta name="vcc-build" content="d133c6f69896 2026-11-24">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -145,7 +147,7 @@ footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padd
 .seg.icons button { min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
 .steptext { font: 600 14px/1 Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .labels { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
-.labels .row { display: flex; gap: 4px; min-width: 0; max-width: 100%; }
+.labels .row { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; max-width: 100%; }
 .box.learning video { opacity: 0; }
 html { touch-action: manipulation; }
 button { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -247,7 +249,9 @@ header { gap: 4px; padding: 2px 8px; }
   #tour { inset: 0; max-width: none; max-height: none; width: 100vw; height: 100dvh; margin: 0; border: 0; border-radius: 0;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 }
-.tourtop { display: flex; justify-content: flex-end; padding: 4px 8px 0; min-height: 44px; }
+.tourtop { display: flex; justify-content: space-between; align-items: center; padding-block: 4px 0; padding-inline: 20px 8px; min-height: 44px; }
+.tourcount { font-size: 14px; font-weight: 600; color: var(--ink-3); }
+.tourtop .link { margin-inline-start: auto; }
 .tourbody { flex: 1; overflow-y: auto; padding: 4px 20px 12px; overscroll-behavior: contain; }
 .tourbody h2 { font-size: 24px; margin: 4px 0 16px; }
 .tourbody p { margin: 0 0 12px; font-size: 16px; }
@@ -638,6 +642,32 @@ body.syncing.syncstack #slots { grid-template-columns: minmax(0, 1fr); grid-temp
 body.syncing .box .over .change { display: none; }
 .steps .glyphs { display: inline-flex; gap: 6px; flex: none; }
 .updatebar .updclose { background: transparent; border-color: transparent; color: var(--page); font-size: 24px; font-weight: 500; }
+.cm { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+.cm-shade { position: fixed; pointer-events: auto; background: transparent; touch-action: none; }
+.cm-ring { position: fixed; pointer-events: none; box-shadow: 0 0 0 3px var(--brand), 0 0 0 9999px rgba(10, 12, 20, 0.62); animation: cm-pulse 0.9s ease-out 2; }
+.cm-light .cm-ring { box-shadow: 0 0 0 3px var(--brand); }
+@keyframes cm-pulse { 0% { box-shadow: 0 0 0 3px var(--brand), 0 0 0 9999px rgba(10, 12, 20, 0.62); } 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--brand) 35%, transparent), 0 0 0 9999px rgba(10, 12, 20, 0.62); } 100% { box-shadow: 0 0 0 3px var(--brand), 0 0 0 9999px rgba(10, 12, 20, 0.62); } }
+.cm-light .cm-ring { animation-name: cm-pulse-light; }
+@keyframes cm-pulse-light { 50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--brand) 35%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .cm-ring { animation: none; } }
+.cm-tip { position: fixed; pointer-events: auto; box-sizing: border-box; padding: 10px 14px 12px; background: var(--surface); color: var(--ink);
+  border: 1px solid var(--hair); border-radius: 14px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); }
+.cm-top { display: flex; align-items: center; justify-content: space-between; min-height: 24px; gap: 8px; }
+.cm-count { font-size: 13px; font-weight: 600; color: var(--ink-3); }
+.cm-skip { margin-inline-start: auto; min-height: 44px; }
+.cm-title { font-size: 18px; margin: 0 0 4px; }
+.cm-text { margin: 0; font-size: 15px; line-height: 1.4; }
+.cm-nav { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+.cm-nav .btn { min-height: 44px; }
+.cm-nav .cm-next { flex: 0 1 auto; padding: 0 16px; }
+.cm-light .cm-tip { padding: 8px 12px; }
+.menupair { display: flex; gap: 8px; }
+#menu .menupair .btn { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.15; height: auto; min-height: 44px; padding: 4px 8px; }
+@media (orientation: landscape) and (max-height: 520px) { #menu .menupair { display: contents; } }
+@media (orientation: landscape) and (max-height: 520px) and (min-width: 700px) { #menu[open] { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.chip.amount { display: inline-flex; align-items: center; gap: 3px; }
+.chip.amount svg { width: 14px; height: 14px; flex: none; }
+.chip.amount[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -684,7 +714,7 @@ body.syncing .box .over .change { display: none; }
   <label class="lang"><span data-t="language"></span><select id="lang"></select></label>
   <div class="menurow"><span data-t="layout"></span><div class="seg labelled" role="radiogroup" id="layoutMenu"></div></div>
   <p class="muted" data-t="privacy"></p>
-  <button type="button" id="tourOpen" class="btn ghost" data-t="tour"></button>
+  <div class="menupair"><button type="button" id="tourOpen" class="btn ghost" data-t="tour"></button><button type="button" id="tipsAgain" class="btn ghost" data-t="tipsAgain"></button></div>
   <button type="button" id="keysBtn" class="btn ghost fine-only" data-t="keys" aria-keyshortcuts="?"></button>
   <button type="button" id="installOpen" class="btn ghost" hidden></button>
   <button type="button" id="forget" class="btn ghost danger" data-t="forget"></button>
@@ -692,17 +722,16 @@ body.syncing .box .over .change { display: none; }
     <p data-t="forgetWhat"></p>
     <div class="askrow"><button type="button" id="forgetNo" class="btn ghost" data-t="cancel"></button><button type="button" id="forgetYes" class="btn ghost danger" data-t="forget"></button></div>
   </div>
-  <details class="about"><summary data-t="about"></summary><p data-t="tagline"></p><p class="muted">Inter &amp; Gabarito fonts: SIL Open Font License 1.1 (<a href="fonts-LICENSE-Inter.txt">Inter</a>, <a href="fonts-LICENSE-Gabarito.txt">Gabarito</a>).</p><p class="muted" id="buildLine"></p></details>
+  <details class="about"><summary data-t="about"></summary><p data-t="tagline"></p><div id="aboutPrivacy"></div><p class="muted">Inter &amp; Gabarito fonts: SIL Open Font License 1.1 (<a href="fonts-LICENSE-Inter.txt">Inter</a>, <a href="fonts-LICENSE-Gabarito.txt">Gabarito</a>).</p><p class="muted" id="buildLine"></p></details>
 </dialog>
 <dialog id="install">
   <div class="sheethead"><h2 id="installHead"></h2><button type="button" id="installClose" class="btn ghost" data-t="close"></button></div>
   <div class="installbody"></div>
 </dialog>
 <dialog id="tour">
-  <div class="tourtop"><button type="button" id="tourSkip" class="link" data-t="tourSkip"></button></div>
+  <div class="tourtop"><span id="tourCount" class="tourcount"></span><button type="button" id="tourSkip" class="link" data-t="tourSkip"></button></div>
   <div id="tourBody" class="tourbody"></div>
   <div class="tourfoot">
-    <div id="tourDots" class="dots-row" role="img"></div>
     <div class="tournav"><button type="button" id="tourBack" class="btn ghost" data-t="tourBack"></button><button type="button" id="tourNext" class="btn primary"></button></div>
   </div>
 </dialog>
@@ -724,15 +753,40 @@ const LANG_NAMES = {
 };
 const STRINGS = {
   fi: {
+    zoomIs: "Suurennus {n}",
+    tourPrivacyShort: "Videoita ei lähetetä minnekään. Ei tiliä, ei seurantaa.",
+    moreInfo: "Lisää tietoa",
+    installHead: "Kotinäytölle",
+    installWhy: "Kuvakkeesta sovellus aukeaa koko näytölle ja toimii ilman verkkoa.",
+    markPick1: "Aloita: valitse ensimmäinen video.",
+    markPick2Head: "Toinen video",
+    markPick2: "Valitse tähän toinen video. Kun ensimmäinen on valittu, tässä on myös {same}.",
+    tipPlay: "Toistaa molemmat videot yhtä aikaa.",
+    tipStepHead: "Askel kerrallaan",
+    tipStep: "{frame} siirtää yhden kuvan, {sec} sekunnin. Pidä painettuna, niin askel jatkuu.",
+    tipSync: "Merkitse sama hetki kumpaankin videoon, niin ne kulkevat tahdissa.",
+    tryIt: "Kokeile",
+    tipLayout: "Rinnakkain tai päällekkäin.",
+    tipV1: "Etsi hetki, esimerkiksi kun uke lähtee liikkeelle. Kummallakin videolla on nyt omat askeleet.",
+    tipV2: "Etsi sama hetki tästä videosta.",
+    tipNameHead: "Nimeä kohta",
+    tipName: "Esimerkiksi Kuzushi. Voit jättää tyhjäksi.",
+    tipSave: "Tallentaa parin: tämä hetki videossa 1 = tämä hetki videossa 2. Lisää niin monta kuin haluat, sitten {done}.",
+    tipJumpHead: "Hyppää kohtaan",
+    tipJump: "{start} vie molemmat alkuun, kohta kummankin omaan hetkeensä. Napissa lukee, mihin.",
+    tipTogetherHead: "Tahdissa",
+    tipTogether: "Molemmat lähtevät yhtä aikaa. Kohtaan ensin ehtivä odottaa siinä toista.",
+    tipWait: "Video {a} odottaa, että video {b} ehtii samaan kohtaan.",
+    tipZoom: "Vedä kuvaa siirtääksesi. {whole} palauttaa.",
+    skipTips: "Ohita vinkit",
+    tipsAgain: "Näytä vinkit uudelleen",
+    tipsAgainDone: "Vinkit näytetään taas.",
     layoutAuto: "Synkkauksessa asettelu valitaan isompien kuvien mukaan; valintasi palaa sen jälkeen.",
     retry: "Yritä uudelleen",
     notStarted: "Selain ei aloittanut tämän videon toistoa.",
     cantPlayThis: "Selain ei pystynyt toistamaan tätä videota.",
     fine: "Tarkka",
     fineAria: "Tarkka kohta kahden minuutin sisällä",
-    tourStepBoth: "Ilman {sync}-tilaa askeleet liikuttavat molempia videoita yhtä aikaa; {sync}-tilassa kummankin videon alla on omat.",
-    tourStepHead: "Ruutu ruudulta",
-    tourSyncHead: "Synkkaa samat hetket",
     tagline: "Vertaa kahta videota rinnakkain – ruutu ruudulta, omassa puhelimessasi.",
     installIos: "{app} Koti-valikkoon",
     installAndroid: "{app} aloitusnäyttöön",
@@ -799,21 +853,12 @@ const STRINGS = {
     tourSkip: "Ohita",
     tourNext: "Seuraava",
     tourBack: "Takaisin",
-    tourStart: "Aloita",
     tourStepOf: "Vaihe {n}/{m}",
     tourLangHead: "Valitse kieli",
     tourPrivacyHead: "Videosi pysyvät puhelimessasi",
     tourPrivacy1: "Tämä sivu ei lähetä videoitasi minnekään. Ei tilejä, ei analytiikkaa, ei seurantaa, ei evästeitä.",
     tourPrivacy2: "Pari ja asetukset tallentuvat vain tähän laitteeseen ensi kertaa varten. Valikon {forget} poistaa tallennetut videot.",
     tourPrivacy3: "Itse sivu latautuu GitHub Pagesista kuten mikä tahansa verkkosivu, ja tarkistaa sieltä, onko uudempi versio tullut.",
-    tourFeaturesHead: "Näin se toimii",
-    fPick: "Valitse kaksi videota – tai {same}, joka alkaa puolivälistä.",
-    fStart: "{sync}: etsi sama hetki kummastakin videosta, nimeä kohta (esim. Kuzushi) ja paina {here}.",
-    fPlay: "{play} käynnistää molemmat yhtä aikaa, kumpikin omasta alustaan. Jokainen kohta on pari, hetki kummassakin videossa: se, joka ehtii kohtaan ensin, odottaa siinä toista, ja sitten ne jatkavat yhdessä.",
-    fStep: "◀ 1 ruutu ▶ ja ◀ 1 s ▶ askeltavat taakse ja eteen. Pidä painettuna, niin askel jatkuu.",
-    fZoom: "Nipistä kuvaa tai käytä suurennuslaseja; vedä siirtääksesi.",
-    fLayout: "Yläreunan kuvakkeet: rinnakkain tai päällekkäin.",
-    fSpeed: "Nopeus 0,25×–2×.",
     installDone: "{app} on jo kotinäytölläsi.",
     otherPhones: "Muut puhelimet",
     installNow: "Asenna",
@@ -839,7 +884,6 @@ const STRINGS = {
     atStart: "Alussa",
     atEnd: "Lopussa",
     pointPre: "Kohta:",
-    tourJump: "{prev} ja {next} {play} -painikkeen vieressä siirtävät molempia videoita yhdessä: Alku vie kummankin alkuun, kohta kummankin omaan hetkeensä siinä kohdassa ja Loppu kummankin loppuun. Painikkeessa lukee, minne se vie.",
     updateReady: "Uusi versio saatavilla",
     updateNow: "Päivitä",
     version: "Versio {date} · {hash}",
@@ -859,15 +903,40 @@ const STRINGS = {
     kEsc: "Pois synkkauksesta",
   },
   sv: {
+    zoomIs: "Förstoring {n}",
+    tourPrivacyShort: "Videorna skickas ingenstans. Inget konto, ingen spårning.",
+    moreInfo: "Mer information",
+    installHead: "Till hemskärmen",
+    installWhy: "Från ikonen öppnas appen i helskärm och fungerar utan nät.",
+    markPick1: "Börja här: välj den första videon.",
+    markPick2Head: "Den andra videon",
+    markPick2: "Välj den andra videon här. När den första är vald finns även {same} här.",
+    tipPlay: "Spelar båda videorna samtidigt.",
+    tipStepHead: "Ett steg i taget",
+    tipStep: "{frame} flyttar en bild, {sec} en sekund. Håll intryckt så fortsätter stegen.",
+    tipSync: "Markera samma ögonblick i båda videorna så går de i takt.",
+    tryIt: "Prova",
+    tipLayout: "Sida vid sida eller ovanpå varandra.",
+    tipV1: "Hitta ett ögonblick, till exempel när uke börjar röra sig. Varje video har nu egna steg.",
+    tipV2: "Hitta samma ögonblick i den här videon.",
+    tipNameHead: "Namnge punkten",
+    tipName: "Till exempel Kuzushi. Du kan lämna det tomt.",
+    tipSave: "Sparar paret: det här ögonblicket i video 1 = det här i video 2. Lägg till så många du vill, sedan {done}.",
+    tipJumpHead: "Hoppa till en punkt",
+    tipJump: "{start} tar båda till början, en punkt var och en till sitt ögonblick. Knappen visar vart.",
+    tipTogetherHead: "I takt",
+    tipTogether: "Båda startar samtidigt. Den som når punkten först väntar där på den andra.",
+    tipWait: "Video {a} väntar tills video {b} når samma punkt.",
+    tipZoom: "Dra i bilden för att flytta den. {whole} återställer.",
+    skipTips: "Hoppa över tipsen",
+    tipsAgain: "Visa tipsen igen",
+    tipsAgainDone: "Tipsen visas igen.",
     layoutAuto: "Vid synkning väljs layouten för större bilder; ditt val kommer tillbaka efteråt.",
     retry: "Försök igen",
     notStarted: "Webbläsaren startade inte den här videon.",
     cantPlayThis: "Webbläsaren kunde inte spela den här videon.",
     fine: "Fin",
     fineAria: "Exakt position inom två minuter",
-    tourStepBoth: "Utanför {sync} flyttar stegen båda videorna samtidigt; i {sync} har varje video egna under sig.",
-    tourStepHead: "Bildruta för bildruta",
-    tourSyncHead: "Synka samma ögonblick",
     tagline: "Jämför två videor sida vid sida – bildruta för bildruta, i din egen telefon.",
     installIos: "{app} på hemskärmen",
     installAndroid: "{app} på startskärmen",
@@ -934,21 +1003,12 @@ const STRINGS = {
     tourSkip: "Hoppa över",
     tourNext: "Nästa",
     tourBack: "Tillbaka",
-    tourStart: "Börja",
     tourStepOf: "Steg {n} av {m}",
     tourLangHead: "Välj språk",
     tourPrivacyHead: "Dina videor stannar i telefonen",
     tourPrivacy1: "Den här sidan skickar aldrig dina videor någonstans. Inga konton, ingen analys, ingen spårning, inga kakor.",
     tourPrivacy2: "Paret och inställningarna sparas bara på den här enheten till nästa gång. {forget} i menyn tar bort de sparade videorna.",
     tourPrivacy3: "Själva sidan laddas från GitHub Pages som vilken webbsida som helst, och kollar där om en nyare version finns.",
-    tourFeaturesHead: "Så fungerar det",
-    fPick: "Välj två videor – eller {same}, som börjar halvvägs.",
-    fStart: "{sync}: hitta samma ögonblick i båda videorna, namnge punkten (t.ex. Kuzushi) och tryck {here}.",
-    fPlay: "{play} startar båda samtidigt, var och en från sin egen början. Varje punkt är ett par, ett ögonblick i vardera videon: den som når punkten först väntar där på den andra, sedan fortsätter de tillsammans.",
-    fStep: "◀ 1 ruta ▶ och ◀ 1 s ▶ stegar bakåt och framåt. Håll intryckt så fortsätter det.",
-    fZoom: "Nyp i bilden eller använd förstoringsglasen; dra för att flytta.",
-    fLayout: "Ikonerna högst upp: sida vid sida eller över varandra.",
-    fSpeed: "Hastighet 0,25×–2×.",
     installDone: "{app} finns redan på hemskärmen.",
     otherPhones: "Andra telefoner",
     installNow: "Installera",
@@ -974,7 +1034,6 @@ const STRINGS = {
     atStart: "I början",
     atEnd: "I slutet",
     pointPre: "Punkt:",
-    tourJump: "{prev} och {next} bredvid {play} flyttar båda videorna tillsammans: Början tar var och en till sin början, en punkt till sitt eget ögonblick för punkten och Slut till sitt slut. Knappen visar vart den går.",
     updateReady: "Ny version finns",
     updateNow: "Uppdatera",
     version: "Version {date} · {hash}",
@@ -994,15 +1053,40 @@ const STRINGS = {
     kEsc: "Lämna synkningen",
   },
   en: {
+    zoomIs: "Zoom {n}",
+    tourPrivacyShort: "Your videos are sent nowhere. No account, no tracking.",
+    moreInfo: "More information",
+    installHead: "To the Home Screen",
+    installWhy: "From the icon the app opens full screen and works offline.",
+    markPick1: "Start here: choose the first video.",
+    markPick2Head: "The second video",
+    markPick2: "Choose the second video here. Once the first is in, {same} is here too.",
+    tipPlay: "Plays both videos at once.",
+    tipStepHead: "One step at a time",
+    tipStep: "{frame} moves one picture, {sec} one second. Hold to keep stepping.",
+    tipSync: "Mark the same moment in both videos, and they keep in step.",
+    tryIt: "Try it",
+    tipLayout: "Side by side or one above the other.",
+    tipV1: "Find a moment, for example when uke starts to move. Each video now has its own steps.",
+    tipV2: "Find the same moment in this video.",
+    tipNameHead: "Name the point",
+    tipName: "For example Kuzushi. You can leave it empty.",
+    tipSave: "Saves the pair: this moment in video 1 = this moment in video 2. Add as many as you like, then {done}.",
+    tipJumpHead: "Jump to a point",
+    tipJump: "{start} takes both to the beginning, a point each to its own moment. The button says where.",
+    tipTogetherHead: "In step",
+    tipTogether: "Both start together. The one that reaches a point first waits there for the other.",
+    tipWait: "Video {a} waits until video {b} reaches the same point.",
+    tipZoom: "Drag the picture to move it. {whole} resets it.",
+    skipTips: "Skip tips",
+    tipsAgain: "Show tips again",
+    tipsAgainDone: "Tips will show again.",
     layoutAuto: "While syncing, the layout is chosen for bigger pictures; your pick comes back after.",
     retry: "Try again",
     notStarted: "The browser didn't start this video.",
     cantPlayThis: "The browser couldn't play this video.",
     fine: "Fine",
     fineAria: "Exact position within two minutes",
-    tourStepBoth: "Outside {sync} the steps move both videos together; in {sync} each video has its own under it.",
-    tourStepHead: "Frame by frame",
-    tourSyncHead: "Sync the same moments",
     tagline: "Compare two videos side by side – frame by frame, on your own phone.",
     installIos: "{app} on your Home Screen",
     installAndroid: "{app} on your home screen",
@@ -1069,21 +1153,12 @@ const STRINGS = {
     tourSkip: "Skip",
     tourNext: "Next",
     tourBack: "Back",
-    tourStart: "Start",
     tourStepOf: "Step {n} of {m}",
     tourLangHead: "Choose your language",
     tourPrivacyHead: "Your videos stay on your phone",
     tourPrivacy1: "This page never sends your videos anywhere. No accounts, no analytics, no tracking, no cookies.",
     tourPrivacy2: "The pair and your settings are saved only on this device, for next time. {forget} in the menu removes the saved videos.",
     tourPrivacy3: "The page itself loads from GitHub Pages, like any website, and checks there whether a newer version is out.",
-    tourFeaturesHead: "How it works",
-    fPick: "Choose two videos – or {same}, which starts half way.",
-    fStart: "{sync}: find the same moment in both videos, name the point (e.g. Kuzushi) and press {here}.",
-    fPlay: "{play} starts both at once, each from its own beginning. Every point is a pair, one moment in each video: the one that reaches it first waits there for the other, then they go on together.",
-    fStep: "◀ 1 frame ▶ and ◀ 1 s ▶ step back and forward. Hold one down to keep stepping.",
-    fZoom: "Pinch the picture or use the magnifiers; drag to move it.",
-    fLayout: "The icons at the top: side by side or one above the other.",
-    fSpeed: "Speed 0.25×–2×.",
     installDone: "{app} is already on your home screen.",
     otherPhones: "Other phones",
     installNow: "Install",
@@ -1109,7 +1184,6 @@ const STRINGS = {
     atStart: "At start",
     atEnd: "At end",
     pointPre: "Point:",
-    tourJump: "{prev} and {next} beside {play} move both videos together: Start takes each to its beginning, a point takes each to its own moment of that point, and End takes each to its end. Each button says where it goes.",
     updateReady: "New version available",
     updateNow: "Update",
     version: "Version {date} · {hash}",
@@ -1129,15 +1203,40 @@ const STRINGS = {
     kEsc: "Leave syncing",
   },
   ru: {
+    zoomIs: "Увеличение {n}",
+    tourPrivacyShort: "Видео никуда не отправляются. Без аккаунта, без слежки.",
+    moreInfo: "Подробнее",
+    installHead: "На главный экран",
+    installWhy: "С иконки приложение открывается на весь экран и работает без сети.",
+    markPick1: "Начните здесь: выберите первое видео.",
+    markPick2Head: "Второе видео",
+    markPick2: "Выберите здесь второе видео. Когда первое выбрано, здесь есть и «{same}».",
+    tipPlay: "Воспроизводит оба видео одновременно.",
+    tipStepHead: "По шагу",
+    tipStep: "«{frame}» — на один кадр, «{sec}» — на секунду. Удерживайте, чтобы шагать дальше.",
+    tipSync: "Отметьте один и тот же момент в обоих видео, и они пойдут в такт.",
+    tryIt: "Попробовать",
+    tipLayout: "Рядом или одно над другим.",
+    tipV1: "Найдите момент, например, когда уке начинает движение. Теперь у каждого видео свои шаги.",
+    tipV2: "Найдите тот же момент в этом видео.",
+    tipNameHead: "Назовите точку",
+    tipName: "Например, Kuzushi. Можно оставить пустым.",
+    tipSave: "Сохраняет пару: этот момент в видео 1 = этот момент в видео 2. Добавьте сколько угодно, затем «{done}».",
+    tipJumpHead: "Переход к точке",
+    tipJump: "«{start}» ведёт оба видео к началу, точка — каждое к своему моменту. На кнопке написано, куда.",
+    tipTogetherHead: "В такт",
+    tipTogether: "Оба стартуют вместе. То, что дошло до точки первым, ждёт там другое.",
+    tipWait: "Видео {a} ждёт, пока видео {b} дойдёт до той же точки.",
+    tipZoom: "Перетаскивайте кадр, чтобы сдвинуть. «{whole}» вернёт как было.",
+    skipTips: "Пропустить советы",
+    tipsAgain: "Показать советы снова",
+    tipsAgainDone: "Советы будут показаны снова.",
     layoutAuto: "Во время синхронизации расположение выбирается для более крупных кадров; ваш выбор вернётся потом.",
     retry: "Повторить",
     notStarted: "Браузер не запустил это видео.",
     cantPlayThis: "Браузер не смог воспроизвести это видео.",
     fine: "Точно",
     fineAria: "Точная позиция в пределах двух минут",
-    tourStepBoth: "Вне режима «{sync}» шаги двигают оба видео вместе; в режиме «{sync}» у каждого видео свои кнопки под ним.",
-    tourStepHead: "Кадр за кадром",
-    tourSyncHead: "Синхронизируйте одни и те же моменты",
     tagline: "Сравнивайте два видео рядом — кадр за кадром, на своём телефоне.",
     installIos: "{app} на экране «Домой»",
     installAndroid: "{app} на главном экране",
@@ -1204,21 +1303,12 @@ const STRINGS = {
     tourSkip: "Пропустить",
     tourNext: "Далее",
     tourBack: "Назад",
-    tourStart: "Начать",
     tourStepOf: "Шаг {n} из {m}",
     tourLangHead: "Выберите язык",
     tourPrivacyHead: "Ваши видео остаются в телефоне",
     tourPrivacy1: "Эта страница никуда не отправляет ваши видео. Без учётных записей, аналитики, отслеживания и cookie.",
     tourPrivacy2: "Пара видео и настройки сохраняются только на этом устройстве, до следующего раза. «{forget}» в меню удаляет сохранённые видео.",
     tourPrivacy3: "Сама страница загружается с GitHub Pages, как любой сайт, и проверяет там, не вышла ли новая версия.",
-    tourFeaturesHead: "Как это работает",
-    fPick: "Выберите два видео — или «{same}», которое начнётся с середины.",
-    fStart: "«{sync}»: найдите один и тот же момент в обоих видео, назовите точку (например, Kuzushi) и нажмите «{here}».",
-    fPlay: "«{play}» запускает оба одновременно, каждое со своего начала. Каждая точка — пара, по моменту в каждом видео: то, что дойдёт до точки первым, ждёт там другое, и дальше они идут вместе.",
-    fStep: "◀ 1 кадр ▶ и ◀ 1 с ▶ — шаги назад и вперёд. Удерживайте, чтобы шагать дальше.",
-    fZoom: "Сводите и разводите пальцы или нажимайте лупы; перетаскивайте кадр.",
-    fLayout: "Значки вверху: рядом или друг над другом.",
-    fSpeed: "Скорость 0,25×–2×.",
     installDone: "{app} уже на главном экране.",
     otherPhones: "Другие телефоны",
     installNow: "Установить",
@@ -1244,7 +1334,6 @@ const STRINGS = {
     atStart: "В начале",
     atEnd: "В конце",
     pointPre: "Точка:",
-    tourJump: "{prev} и {next} рядом с «{play}» переносят оба видео вместе: «Начало» — каждое к своему началу, точка — каждое к своему моменту этой точки, «Конец» — каждое к своему концу. На кнопке написано, куда она ведёт.",
     updateReady: "Доступна новая версия",
     updateNow: "Обновить",
     version: "Версия {date} · {hash}",
@@ -1264,15 +1353,40 @@ const STRINGS = {
     kEsc: "Выйти из синхронизации",
   },
   et: {
+    zoomIs: "Suurendus {n}",
+    tourPrivacyShort: "Videoid ei saadeta kuhugi. Kontot pole, jälgimist pole.",
+    moreInfo: "Lisateave",
+    installHead: "Avakuvale",
+    installWhy: "Ikoonilt avaneb rakendus täisekraanil ja töötab ilma võrguta.",
+    markPick1: "Alusta siit: vali esimene video.",
+    markPick2Head: "Teine video",
+    markPick2: "Vali siia teine video. Kui esimene on valitud, on siin ka {same}.",
+    tipPlay: "Esitab mõlemad videod korraga.",
+    tipStepHead: "Samm korraga",
+    tipStep: "{frame} liigutab ühe kaadri, {sec} ühe sekundi. Hoia all, et sammud jätkuksid.",
+    tipSync: "Märgi sama hetk mõlemas videos, siis liiguvad need koos.",
+    tryIt: "Proovi",
+    tipLayout: "Kõrvuti või üksteise all.",
+    tipV1: "Leia hetk, näiteks kui uke hakkab liikuma. Kummalgi videol on nüüd oma sammud.",
+    tipV2: "Leia sama hetk sellest videost.",
+    tipNameHead: "Nimeta punkt",
+    tipName: "Näiteks Kuzushi. Võid jätta tühjaks.",
+    tipSave: "Salvestab paari: see hetk videos 1 = see hetk videos 2. Lisa nii palju kui soovid, siis {done}.",
+    tipJumpHead: "Hüppa punkti",
+    tipJump: "{start} viib mõlemad algusse, punkt kumbagi oma hetke. Nupul on kirjas, kuhu.",
+    tipTogetherHead: "Koos",
+    tipTogether: "Mõlemad alustavad koos. Punkti esimesena jõudnu ootab seal teist.",
+    tipWait: "Video {a} ootab, kuni video {b} jõuab samasse punkti.",
+    tipZoom: "Lohista pilti, et seda liigutada. {whole} taastab.",
+    skipTips: "Jäta vihjed vahele",
+    tipsAgain: "Näita vihjeid uuesti",
+    tipsAgainDone: "Vihjeid näidatakse jälle.",
     layoutAuto: "Sünkroonimise ajal valitakse paigutus suuremate piltide järgi; sinu valik tuleb hiljem tagasi.",
     retry: "Proovi uuesti",
     notStarted: "Brauser ei alustanud selle video esitust.",
     cantPlayThis: "Brauser ei suutnud seda videot esitada.",
     fine: "Täpne",
     fineAria: "Täpne koht kahe minuti piires",
-    tourStepBoth: "Väljaspool {sync} liigutavad sammud mõlemat videot koos; {sync} ajal on igal videol oma nupud selle all.",
-    tourStepHead: "Kaader kaadri haaval",
-    tourSyncHead: "Sünkrooni samad hetked",
     tagline: "Võrdle kahte videot kõrvuti – kaader kaadri haaval, oma telefonis.",
     installIos: "{app} avakuvale",
     installAndroid: "{app} avaekraanile",
@@ -1339,21 +1453,12 @@ const STRINGS = {
     tourSkip: "Jäta vahele",
     tourNext: "Edasi",
     tourBack: "Tagasi",
-    tourStart: "Alusta",
     tourStepOf: "Samm {n}/{m}",
     tourLangHead: "Vali keel",
     tourPrivacyHead: "Sinu videod jäävad telefoni",
     tourPrivacy1: "See leht ei saada sinu videoid kuhugi. Pole kontosid, analüütikat, jälgimist ega küpsiseid.",
     tourPrivacy2: "Paar ja seaded salvestatakse ainult sellesse seadmesse järgmiseks korraks. Menüü „{forget}“ kustutab salvestatud videod.",
     tourPrivacy3: "Leht ise laaditakse GitHub Pagesist nagu iga veebileht ning kontrollib sealt, kas uuem versioon on olemas.",
-    tourFeaturesHead: "Kuidas see töötab",
-    fPick: "Vali kaks videot – või {same}, mis algab poolest.",
-    fStart: "{sync}: leia mõlemast videost sama hetk, nimeta punkt (nt Kuzushi) ja vajuta {here}.",
-    fPlay: "{play} käivitab mõlemad korraga, kumbki oma algusest. Iga punkt on paar, üks hetk kummaski videos: see, mis jõuab punkti esimesena, ootab seal teist ja siis jätkavad nad koos.",
-    fStep: "◀ 1 kaader ▶ ja ◀ 1 s ▶ sammuvad tagasi ja edasi. Hoia all, et edasi sammuda.",
-    fZoom: "Näpista pilti või kasuta luupe; lohista, et liigutada.",
-    fLayout: "Ülal olevad ikoonid: kõrvuti või üksteise kohal.",
-    fSpeed: "Kiirus 0,25×–2×.",
     installDone: "{app} on juba avakuval.",
     otherPhones: "Teised telefonid",
     installNow: "Paigalda",
@@ -1379,7 +1484,6 @@ const STRINGS = {
     atStart: "Alguses",
     atEnd: "Lõpus",
     pointPre: "Punkt:",
-    tourJump: "{prev} ja {next} nupu {play} kõrval liigutavad mõlemat videot koos: Algus viib kumbagi oma algusse, punkt kumbagi selle punkti oma hetke ja Lõpp kumbagi oma lõppu. Nupul on kirjas, kuhu see viib.",
     updateReady: "Uus versioon on saadaval",
     updateNow: "Uuenda",
     version: "Versioon {date} · {hash}",
@@ -1399,15 +1503,40 @@ const STRINGS = {
     kEsc: "Välju sünkroonimisest",
   },
   fr: {
+    zoomIs: "Zoom {n}",
+    tourPrivacyShort: "Vos vidéos ne sont envoyées nulle part. Pas de compte, pas de pistage.",
+    moreInfo: "Plus d'informations",
+    installHead: "Sur l'écran d'accueil",
+    installWhy: "Depuis l'icône, l'appli s'ouvre en plein écran et fonctionne hors ligne.",
+    markPick1: "Commencez ici : choisissez la première vidéo.",
+    markPick2Head: "La deuxième vidéo",
+    markPick2: "Choisissez ici la deuxième vidéo. Une fois la première choisie, {same} est aussi ici.",
+    tipPlay: "Lit les deux vidéos en même temps.",
+    tipStepHead: "Pas à pas",
+    tipStep: "{frame} avance d'une image, {sec} d'une seconde. Maintenez pour continuer.",
+    tipSync: "Marquez le même moment dans les deux vidéos : elles restent en phase.",
+    tryIt: "Essayer",
+    tipLayout: "Côte à côte ou l'une au-dessus de l'autre.",
+    tipV1: "Trouvez un moment, par exemple quand uke commence à bouger. Chaque vidéo a maintenant ses propres pas.",
+    tipV2: "Trouvez le même moment dans cette vidéo.",
+    tipNameHead: "Nommez le point",
+    tipName: "Par exemple Kuzushi. Vous pouvez laisser vide.",
+    tipSave: "Enregistre la paire : ce moment dans la vidéo 1 = ce moment dans la vidéo 2. Ajoutez-en autant que voulu, puis {done}.",
+    tipJumpHead: "Aller à un point",
+    tipJump: "{start} ramène les deux au début, un point chacune à son moment. Le bouton indique où.",
+    tipTogetherHead: "En phase",
+    tipTogether: "Les deux partent ensemble. Celle qui atteint un point en premier y attend l'autre.",
+    tipWait: "La vidéo {a} attend que la vidéo {b} atteigne le même point.",
+    tipZoom: "Faites glisser l'image pour la déplacer. {whole} la rétablit.",
+    skipTips: "Passer les conseils",
+    tipsAgain: "Revoir les conseils",
+    tipsAgainDone: "Les conseils seront de nouveau affichés.",
     layoutAuto: "Pendant la synchro, la disposition est choisie pour des images plus grandes ; votre choix revient ensuite.",
     retry: "Réessayer",
     notStarted: "Le navigateur n’a pas lancé cette vidéo.",
     cantPlayThis: "Le navigateur n’a pas pu lire cette vidéo.",
     fine: "Précis",
     fineAria: "Position précise sur deux minutes",
-    tourStepBoth: "Hors de {sync}, les pas déplacent les deux vidéos ensemble ; dans {sync}, chaque vidéo a les siens en dessous.",
-    tourStepHead: "Image par image",
-    tourSyncHead: "Synchronisez les mêmes moments",
     tagline: "Comparez deux vidéos côte à côte – image par image, sur votre téléphone.",
     installIos: "{app} sur l’écran d’accueil",
     installAndroid: "{app} sur l’écran d’accueil",
@@ -1474,21 +1603,12 @@ const STRINGS = {
     tourSkip: "Passer",
     tourNext: "Suivant",
     tourBack: "Retour",
-    tourStart: "Commencer",
     tourStepOf: "Étape {n} sur {m}",
     tourLangHead: "Choisissez votre langue",
     tourPrivacyHead: "Vos vidéos restent sur votre téléphone",
     tourPrivacy1: "Cette page n’envoie jamais vos vidéos nulle part. Pas de compte, pas de statistiques, pas de pistage, pas de cookies.",
     tourPrivacy2: "La paire et vos réglages sont gardés uniquement sur cet appareil, pour la prochaine fois. « {forget} » dans le menu supprime les vidéos gardées.",
     tourPrivacy3: "La page elle-même se charge depuis GitHub Pages, comme n’importe quel site, et y vérifie si une version plus récente existe.",
-    tourFeaturesHead: "Comment ça marche",
-    fPick: "Choisissez deux vidéos – ou {same}, qui démarre à mi-parcours.",
-    fStart: "{sync} : trouvez le même moment dans les deux vidéos, nommez le point (par ex. Kuzushi) et appuyez sur {here}.",
-    fPlay: "{play} lance les deux en même temps, chacune depuis son début. Chaque point est une paire, un moment dans chaque vidéo : celle qui l'atteint en premier y attend l'autre, puis elles continuent ensemble.",
-    fStep: "◀ 1 image ▶ et ◀ 1 s ▶ reculent et avancent. Maintenez appuyé pour continuer.",
-    fZoom: "Pincez l’image ou utilisez les loupes ; faites glisser pour la déplacer.",
-    fLayout: "Les icônes en haut : côte à côte ou l’une au-dessus de l’autre.",
-    fSpeed: "Vitesse 0,25×–2×.",
     installDone: "{app} est déjà sur votre écran d’accueil.",
     otherPhones: "Autres téléphones",
     installNow: "Installer",
@@ -1514,7 +1634,6 @@ const STRINGS = {
     atStart: "Au début",
     atEnd: "À la fin",
     pointPre: "Point :",
-    tourJump: "{prev} et {next}, à côté de {play}, déplacent les deux vidéos ensemble : Début mène chacune à son début, un point chacune à son propre moment de ce point, et Fin chacune à sa fin. Chaque bouton indique où il mène.",
     updateReady: "Nouvelle version disponible",
     updateNow: "Mettre à jour",
     version: "Version {date} · {hash}",
@@ -1534,15 +1653,40 @@ const STRINGS = {
     kEsc: "Quitter la synchro",
   },
   ar: {
+    zoomIs: "التكبير {n}",
+    tourPrivacyShort: "لا تُرسل الفيديوهات إلى أي مكان. بلا حساب، وبلا تتبّع.",
+    moreInfo: "مزيد من المعلومات",
+    installHead: "إلى الشاشة الرئيسية",
+    installWhy: "من الأيقونة يفتح التطبيق بملء الشاشة ويعمل دون إنترنت.",
+    markPick1: "ابدأ هنا: اختر الفيديو الأول.",
+    markPick2Head: "الفيديو الثاني",
+    markPick2: "اختر الفيديو الثاني هنا. بعد اختيار الأول يظهر هنا أيضًا «{same}».",
+    tipPlay: "يشغّل الفيديوين معًا.",
+    tipStepHead: "خطوة خطوة",
+    tipStep: "«{frame}» ينقل صورة واحدة، و«{sec}» ثانية واحدة. اضغط مطولًا لتستمر الخطوات.",
+    tipSync: "علّم اللحظة نفسها في الفيديوين ليسيرا معًا.",
+    tryIt: "جرّب",
+    tipLayout: "جنبًا إلى جنب أو أحدهما فوق الآخر.",
+    tipV1: "ابحث عن لحظة، مثلًا حين يبدأ الأوكي بالحركة. لكل فيديو الآن خطواته الخاصة.",
+    tipV2: "ابحث عن اللحظة نفسها في هذا الفيديو.",
+    tipNameHead: "سمِّ النقطة",
+    tipName: "مثل Kuzushi. يمكنك تركه فارغًا.",
+    tipSave: "يحفظ الزوج: هذه اللحظة في الفيديو 1 = هذه اللحظة في الفيديو 2. أضف ما تشاء، ثم «{done}».",
+    tipJumpHead: "انتقل إلى نقطة",
+    tipJump: "«{start}» تأخذ الفيديوين إلى البداية، والنقطة كلًّا إلى لحظته. يظهر على الزر وجهته.",
+    tipTogetherHead: "معًا",
+    tipTogether: "يبدآن معًا. الذي يصل إلى النقطة أولًا ينتظر الآخر عندها.",
+    tipWait: "الفيديو {a} ينتظر حتى يصل الفيديو {b} إلى النقطة نفسها.",
+    tipZoom: "اسحب الصورة لتحريكها. «{whole}» يعيدها.",
+    skipTips: "تخطَّ النصائح",
+    tipsAgain: "أظهر النصائح مجددًا",
+    tipsAgainDone: "ستظهر النصائح مجددًا.",
     layoutAuto: "أثناء المزامنة يُختار التخطيط لصور أكبر؛ ويعود اختيارك بعد ذلك.",
     retry: "إعادة المحاولة",
     notStarted: "لم يبدأ المتصفح تشغيل هذا الفيديو.",
     cantPlayThis: "لم يتمكن المتصفح من تشغيل هذا الفيديو.",
     fine: "دقيق",
     fineAria: "موضع دقيق ضمن دقيقتين",
-    tourStepBoth: "خارج «{sync}» تحرّك الخطوات الفيديوين معًا؛ وفي «{sync}» لكل فيديو أزراره تحته.",
-    tourStepHead: "إطارًا بإطار",
-    tourSyncHead: "زامن اللحظات نفسها",
     tagline: "قارن بين فيديوين جنبًا إلى جنب، إطارًا بإطار، على هاتفك.",
     installIos: "{app} على الشاشة الرئيسية",
     installAndroid: "{app} على الشاشة الرئيسية",
@@ -1609,21 +1753,12 @@ const STRINGS = {
     tourSkip: "تخطي",
     tourNext: "التالي",
     tourBack: "السابق",
-    tourStart: "ابدأ",
     tourStepOf: "الخطوة {n} من {m}",
     tourLangHead: "اختر لغتك",
     tourPrivacyHead: "تبقى فيديوهاتك على هاتفك",
     tourPrivacy1: "هذه الصفحة لا ترسل فيديوهاتك إلى أي مكان. لا حسابات ولا تحليلات ولا تتبّع ولا ملفات تعريف ارتباط.",
     tourPrivacy2: "يُحفظ الزوج وإعداداتك على هذا الجهاز فقط للمرة القادمة. «{forget}» في القائمة يحذف الفيديوهات المحفوظة.",
     tourPrivacy3: "تُحمَّل الصفحة نفسها من GitHub Pages مثل أي موقع، وتتحقق من هناك من وجود إصدار أحدث.",
-    tourFeaturesHead: "طريقة الاستخدام",
-    fPick: "اختر فيديوين، أو «{same}» الذي يبدأ من منتصفه.",
-    fStart: "«{sync}»: ابحث عن اللحظة نفسها في الفيديوين، وسمِّ النقطة (مثل Kuzushi) واضغط «{here}».",
-    fPlay: "«{play}» يبدأ الفيديوين معًا، كلٌّ من بدايته. كل نقطة زوج، لحظة في كل فيديو: الذي يصل إليها أولًا ينتظر الآخر عندها، ثم يكملان معًا.",
-    fStep: "◀ 1 إطار ▶ و◀ 1 ث ▶ للرجوع والتقدّم. اضغط مطولًا للاستمرار.",
-    fZoom: "باعِد أصابعك على الصورة أو استخدم العدسات، واسحب لتحريكها.",
-    fLayout: "الأيقونات في الأعلى: جنبًا إلى جنب أو واحد فوق الآخر.",
-    fSpeed: "السرعة من 0,25× إلى 2×.",
     installDone: "{app} موجود بالفعل على شاشتك الرئيسية.",
     otherPhones: "هواتف أخرى",
     installNow: "تثبيت",
@@ -1649,7 +1784,6 @@ const STRINGS = {
     atStart: "في البداية",
     atEnd: "في النهاية",
     pointPre: "نقطة:",
-    tourJump: "{prev} و{next} بجانب «{play}» تنقلان الفيديوين معًا: البداية تأخذ كلًّا منهما إلى بدايته، والنقطة إلى لحظته الخاصة في تلك النقطة، والنهاية إلى نهايته. يظهر على كل زر وجهته.",
     updateReady: "يتوفر إصدار جديد",
     updateNow: "تحديث",
     version: "الإصدار {date} · {hash}",
@@ -1779,19 +1913,19 @@ function withPoint(points, point) {
   return { points: kept.concat([added]).sort((a, b) => a.top - b.top), replaced: replaced };
 }
 const TICK_MS = 40;
-const DRIFT_ADJUST = 0.04, DRIFT_OK = 0.015, DRIFT_SEEK = 0.2, ADJUST = 0.08;
+const DRIFT_HOLD = 0.04, DRIFT_SEEK = 0.2;
 const END = 0.3, SEEK_TIMEOUT_MS = 1500, FIRST_FRAME = 0.001, CAN_PLAY = 3;
 class PairPlayer {
   constructor() {
     this.line = buildTimeline([], 0, 0);
     this.time = 0; this.playing = false; this.rate = 1; this.separate = false;
-    this.slots = [0, 1].map(() => ({ media: null, queued: null, soughtAt: 0, held: null, adjusting: false }));
+    this.slots = [0, 1].map(() => ({ media: null, queued: null, soughtAt: 0, held: null, ahead: false }));
     this.last = 0; this.stalledSince = null;
     this.onChange = () => {};
     this.onRefused = () => {};
     this.snap = (i, t) => t;
   }
-  attach(i, media) { Object.assign(this.slots[i], { media: media, queued: null, soughtAt: 0, held: null, adjusting: false }); if (media) media.playbackRate = this.rate; }
+  attach(i, media) { Object.assign(this.slots[i], { media: media, queued: null, soughtAt: 0, held: null, ahead: false }); if (media) media.playbackRate = this.rate; }
   setLine(line, time) {
     const place = placeOf(this.line, this.time);
     const was = this.line.length > 0;
@@ -1799,7 +1933,7 @@ class PairPlayer {
     this.line = line;
     this.seek(time !== undefined ? time : (was && !unmoved ? timelineAt(line, place.side, place.time) : this.time));
   }
-  setRate(rate) { this.rate = rate; for (const s of this.slots) { s.adjusting = false; if (s.media) s.media.playbackRate = rate; } }
+  setRate(rate) { this.rate = rate; for (const s of this.slots) { if (s.media) s.media.playbackRate = rate; } }
   toggle() { if (this.playing) this.pause(); else this.play(); }
   play() {
     if (this.line.length <= 0 || !this.slots.some((s) => s.media)) return;
@@ -1809,7 +1943,7 @@ class PairPlayer {
     for (const i of [0, 1]) {
       const slot = this.slots[i], media = slot.media;
       if (!media) continue;
-      slot.held = null;
+      slot.held = null; slot.ahead = false;
       if (Math.abs(media.currentTime - at[i].time) > 0.05) this.put(i, at[i].time);
       media.playbackRate = this.rate;
       if (media.ended && !at[i].runs) continue;
@@ -1872,17 +2006,16 @@ class PairPlayer {
     const off = media.currentTime - side.time;
     if (!side.runs) {
       if (!media.paused) media.pause();
-      if (slot.held !== side.time) { slot.held = side.time; if (Math.abs(off) > 0.02) this.put(i, side.time); }
+      if (slot.held !== side.time || (Math.abs(off) > 0.1 && !media.seeking)) { slot.held = side.time; if (Math.abs(off) > 0.02) this.put(i, side.time); }
       return;
     }
     slot.held = null;
     if (media.seeking) return;
-    if (media.ended) { if (off > DRIFT_SEEK) this.put(i, side.time); return; }
-    if (Math.abs(off) > DRIFT_SEEK) { this.put(i, side.time); slot.adjusting = false; }
-    else if (Math.abs(off) > DRIFT_ADJUST) slot.adjusting = true;
-    else if (Math.abs(off) < DRIFT_OK) slot.adjusting = false;
-    const rate = slot.adjusting ? this.rate * (off > 0 ? 1 - ADJUST : 1 + ADJUST) : this.rate;
-    if (Math.abs(media.playbackRate - rate) > 0.001) media.playbackRate = rate;
+    if (media.playbackRate !== this.rate) media.playbackRate = this.rate;
+    if (media.ended) { slot.ahead = false; if (off > DRIFT_SEEK) this.put(i, side.time); return; }
+    if (off > DRIFT_HOLD || (slot.ahead && off > 0.005)) { slot.ahead = true; if (!media.paused) media.pause(); return; }
+    slot.ahead = false;
+    if (off < -DRIFT_SEEK) this.put(i, side.time);
     if (media.paused) this.playOne(i);
   }
   lacksData(i, side) {
@@ -1909,6 +2042,140 @@ class PairPlayer {
   }
 }
 if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stopIndex, withPoint, placeOf, stopList, stopFrom, stopAt, movesOnAt, cleanPoints };
+const Coach = (() => {
+  const PAD = 6, GAP = 12, EDGE = 8, MAXW = 340;
+  let cur = null;
+  const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
+  function usable(e) {
+    if (!e || !e.isConnected || e.disabled || e.closest('[hidden],[inert]')) return false;
+    const r = e.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden';
+  }
+  function holeOf(targets) {
+    const rs = targets.map((e) => e.getBoundingClientRect());
+    const l = Math.min(...rs.map((r) => r.left)), t = Math.min(...rs.map((r) => r.top));
+    const r = Math.max(...rs.map((x) => x.right)), b = Math.max(...rs.map((x) => x.bottom));
+    return { left: l - PAD, top: t - PAD, right: r + PAD, bottom: b + PAD, width: r - l + 2 * PAD, height: b - t + 2 * PAD };
+  }
+  function hide() {
+    if (!cur) return;
+    const c = cur;
+    cur = null;
+    c.root.remove();
+    window.removeEventListener('resize', place);
+    window.removeEventListener('scroll', place, true);
+    if (window.visualViewport) window.visualViewport.removeEventListener('resize', place);
+    document.removeEventListener('keydown', c.keys, true);
+    if (c.observer) c.observer.disconnect();
+  }
+  function show(o) {
+    hide();
+    const targets = (o.targets || []).filter(Boolean);
+    if (!targets.length || !targets.every(usable)) return false;
+    const blocking = o.blocking !== false;
+    targets[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const root = mk('div', 'cm' + (blocking ? ' cm-block' : ' cm-light'));
+    const shades = blocking ? [0, 1, 2, 3].map(() => root.appendChild(mk('div', 'cm-shade'))) : [];
+    const lid = blocking && !o.action ? root.appendChild(mk('div', 'cm-shade cm-lid')) : null;
+    const ring = root.appendChild(mk('div', 'cm-ring'));
+    const tip = root.appendChild(mk('div', 'cm-tip'));
+    const id = 'cm' + Math.random().toString(36).slice(2, 8);
+    tip.setAttribute('role', blocking ? 'dialog' : 'status');
+    if (blocking) { tip.setAttribute('aria-modal', 'true'); tip.setAttribute('aria-labelledby', id + 't'); tip.setAttribute('aria-describedby', id + 'd'); }
+    const top = tip.appendChild(mk('div', 'cm-top'));
+    if (o.counter) top.appendChild(mk('span', 'cm-count')).textContent = o.counter;
+    if (o.skip) { const s = top.appendChild(mk('button', 'link cm-skip')); s.type = 'button'; s.textContent = o.skip.label; s.addEventListener('click', o.skip.fn); }
+    if (o.title) { const h = tip.appendChild(mk('h2', 'cm-title')); h.id = id + 't'; h.textContent = o.title; }
+    const p = tip.appendChild(mk('p', 'cm-text'));
+    p.id = id + 'd';
+    p.textContent = o.text;
+    if (o.back || o.next) {
+      const nav = tip.appendChild(mk('div', 'cm-nav'));
+      for (const [k, cls] of [['back', 'btn ghost cm-back'], ['next', 'btn primary cm-next']]) {
+        if (!o[k]) continue;
+        const b = nav.appendChild(mk('button', cls));
+        b.type = 'button';
+        b.textContent = o[k].label;
+        b.addEventListener('click', o[k].fn);
+      }
+    }
+    const keys = (e) => {
+      if (!cur || !blocking) return;
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); (o.onEsc || (o.skip && o.skip.fn) || hide)(); return; }
+      if (e.key !== 'Tab') return;
+      const list = [...tip.querySelectorAll('button')].concat(o.action ? targets : []);
+      const i = list.indexOf(document.activeElement);
+      const n = e.shiftKey ? (i <= 0 ? list.length - 1 : i - 1) : (i + 1) % list.length;
+      e.preventDefault();
+      list[n].focus();
+    };
+    cur = { root, shades, lid, ring, tip, targets, keys, o, blocking };
+    document.body.appendChild(root);
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', place);
+    document.addEventListener('keydown', keys, true);
+    if (typeof ResizeObserver === 'function') { cur.observer = new ResizeObserver(() => place()); targets.forEach((tg) => cur.observer.observe(tg)); }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => place());
+    place();
+    if (blocking) { const first = tip.querySelector('.cm-next') || tip.querySelector('button'); if (first) first.focus({ preventScroll: true }); }
+    return true;
+  }
+  function place() {
+    if (!cur) return;
+    const { shades, lid, ring, tip, targets } = cur;
+    const W = document.documentElement.clientWidth, H = window.innerHeight;
+    const h = holeOf(targets);
+    const rect = (e, l, t, w, hh) => Object.assign(e.style, { left: l + 'px', top: t + 'px', width: Math.max(0, w) + 'px', height: Math.max(0, hh) + 'px' });
+    if (shades.length) {
+      rect(shades[0], 0, 0, W, h.top);
+      rect(shades[1], 0, h.bottom, W, H - h.bottom);
+      rect(shades[2], 0, h.top, h.left, h.height);
+      rect(shades[3], h.right, h.top, W - h.right, h.height);
+    }
+    if (lid) rect(lid, h.left, h.top, h.width, h.height);
+    const rl = Math.max(1, h.left), rt = Math.max(1, h.top);
+    rect(ring, rl, rt, Math.min(W - 1, h.right) - rl, Math.min(H - 1, h.bottom) - rt);
+    const radius = parseFloat(getComputedStyle(targets[0]).borderTopLeftRadius) || 8;
+    ring.style.borderRadius = radius + 4 + 'px';
+    const rtl = document.documentElement.dir === 'rtl';
+    const maxW = Math.min(MAXW, W - 2 * EDGE);
+    tip.classList.remove('cm-sheet');
+    Object.assign(tip.style, { width: maxW + 'px', left: '0px', top: '0px', maxHeight: '', overflowY: '' });
+    const th = tip.offsetHeight, tw = tip.offsetWidth;
+    const cx = Math.max(EDGE, Math.min(W - EDGE - tw, (h.left + h.right) / 2 - tw / 2));
+    const roomBelow = H - EDGE - (h.bottom + GAP), roomAbove = h.top - GAP - EDGE;
+    let x, y, where;
+    if (th <= roomBelow) { where = 'below'; x = cx; y = h.bottom + GAP; }
+    else if (th <= roomAbove) { where = 'above'; x = cx; y = h.top - GAP - th; }
+    else {
+      const right = W - h.right - GAP - EDGE, left = h.left - GAP - EDGE;
+      const room = Math.max(right, left);
+      const w = Math.min(maxW, room);
+      if (w >= 200) { tip.style.width = w + 'px'; }
+      const hh = tip.offsetHeight;
+      if (w >= 200 && hh <= H - 2 * EDGE) {
+        where = 'beside';
+        const goRight = right === left ? !rtl : right > left;
+        x = goRight ? h.right + GAP : h.left - GAP - w;
+        y = Math.max(EDGE, Math.min(H - EDGE - hh, (h.top + h.bottom) / 2 - hh / 2));
+      } else {
+        where = 'sheet';
+        tip.classList.add('cm-sheet');
+        tip.style.width = W - 2 * EDGE + 'px';
+        x = EDGE;
+        const below = roomBelow >= roomAbove;
+        const room2 = Math.max(roomBelow, roomAbove);
+        if (tip.offsetHeight > room2) { tip.style.maxHeight = Math.max(80, room2) + 'px'; tip.style.overflowY = 'auto'; }
+        y = below ? h.bottom + GAP : h.top - GAP - tip.offsetHeight;
+      }
+    }
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+    tip.dataset.place = where;
+  }
+  return { show, hide, place, get open() { return !!cur; }, get blocking() { return !!(cur && cur.blocking); }, get tip() { return cur && cur.tip; } };
+})();
 (function () {
   'use strict';
   const LANG_KEY = 'vcc-lang';
@@ -1936,7 +2203,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   let lang = firstLang();
   function t(key, vars) {
     let s = STRINGS[lang][key];
-    if (vars) for (const k in vars) s = s.replace('{' + k + '}', vars[k]);
+    if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
     return s;
   }
   function decimal() { return lang === 'en' ? '.' : ','; }
@@ -2449,7 +2716,9 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       around(s, apart(a1, b1) / apart(a0, b0), m0);
       changeView(s, (at, b, pic) => moveBy(at, { x: m1.x - m0.x, y: m1.y - m0.y }, b, pic));
     });
-    const up = (e) => press.points.delete(e.pointerId);
+    const snapBack = () => { if (s.view.scale > 1 && s.view.scale < 1.15) changeView(s, () => WHOLE); };
+    const up = (e) => { press.points.delete(e.pointerId); if (press.pinched && press.points.size === 0) snapBack(); };
+    box.addEventListener('gestureend', (e) => { e.preventDefault(); snapBack(); });
     v.addEventListener('pointerup', up);
     v.addEventListener('pointercancel', up);
     v.addEventListener('lostpointercapture', up);
@@ -2580,6 +2849,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   }
   function beginSync() {
     if (!both()) return;
+    if (typeof Coach !== 'undefined' && Coach.open && !touring) { Coach.hide(); tipRun = null; }
     player.split();
     syncing = true;
     picked = undefined;
@@ -3002,15 +3272,15 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     hint.hidden = !on || gone;
     $('.install', hint).textContent = headFor(platform());
     const dlg = $('#install');
-    if (dlg.open) { $('#installHead').textContent = headFor(dlg.querySelector('.installbody').dataset.view || platform()); installBlock(dlg.querySelector('.installbody'), dlg.querySelector('.installbody').dataset.view || platform()); }
-    if (tour.open && tourSteps()[tourAt] === 'install') renderTour();
+    if (dlg.open) { $('#installHead').textContent = t('installHead'); installBlock(dlg.querySelector('.installbody'), dlg.querySelector('.installbody').dataset.view || platform()); }
+    if (tour.open && tourList[tourAt] === 'install') renderTour();
   }
   function hintGone() { try { localStorage.setItem(HINT_KEY, 'gone'); } catch (e) {  } sides[0].q('.hint').hidden = true; }
   function openInstall() {
     if (menu.open) menu.close();
     const d = $('#install');
     const body = d.querySelector('.installbody');
-    $('#installHead').textContent = headFor(platform());
+    $('#installHead').textContent = t('installHead');
     installBlock(body, platform());
     if (typeof d.showModal === 'function' && !d.open) d.showModal();
   }
@@ -3018,50 +3288,74 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   sides[0].q('.hint .notnow').addEventListener('click', hintGone);
   $('#installClose').addEventListener('click', () => $('#install').close());
   const TOUR_KEY = 'vcc-tour';
+  const TIPS_OFF = 'vcc-tips';
+  const TIP_NAMES = ['pair', 'sync', 'jump', 'wait', 'zoom'];
   const tour = $('#tour');
-  let tourAt = 0;
-  function tourSteps() { return ['lang', 'privacy', 'sync', 'steps', 'features'].concat(standalone() ? [] : ['install']); }
+  let tourAt = 0, tourList = [], touring = false;
+  const shownNow = new Set();
+  const pickBtn = (i) => sides[i] && sides[i].q('.pick');
+  function visible(e) { if (!e || e.closest('[hidden]')) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
+  function tourSteps() {
+    const list = ['lang', 'privacy'];
+    if (platform() !== 'desktop' && !standalone()) list.push('install');
+    if (visible(pickBtn(0))) list.push('pick1');
+    if (visible(pickBtn(1))) list.push('pick2');
+    return list;
+  }
   function tourSeen() { save(TOUR_KEY, 'seen'); }
   function openTour() {
+    Coach.hide(); tipRun = null;
+    touring = true;
+    tourList = tourSteps();
     tourAt = 0;
-    renderTour();
-    if (typeof tour.showModal === 'function' && !tour.open) tour.showModal();
-    $('#tourNext').focus();
-    showChosen();
+    showTourStep();
   }
   function showChosen() {
     const b = $('#tourBody .langs [aria-checked="true"]');
     if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' });
   }
-  function closeTour() { tourSeen(); if (tour.open) tour.close(); }
+  function closeTour() {
+    tourSeen();
+    touring = false;
+    Coach.hide();
+    if (tour.open) tour.close();
+    if (visible(pickBtn(0))) pickBtn(0).focus({ preventScroll: true });
+    maybeTips();
+  }
   function goTour(d) {
-    const n = tourSteps().length;
-    if (tourAt + d >= n) { closeTour(); return; }
+    if (tourAt + d >= tourList.length) { closeTour(); return; }
     tourAt = Math.max(0, tourAt + d);
+    showTourStep(d);
+  }
+  const counter = () => (tourAt + 1) + '/' + tourList.length;
+  function showTourStep(d) {
+    const at = tourList[tourAt];
+    const last = tourAt === tourList.length - 1;
+    if (at === 'pick1' || at === 'pick2') {
+      if (tour.open) tour.close();
+      const ok = Coach.show({
+        targets: [pickBtn(at === 'pick1' ? 0 : 1)],
+        title: at === 'pick1' ? t('pick') : t('markPick2Head'),
+        text: at === 'pick1' ? t('markPick1') : t('markPick2', { same: t('same') }),
+        counter: counter(),
+        skip: last ? null : { label: t('tourSkip'), fn: closeTour },
+        back: { label: t('tourBack'), fn: () => goTour(-1) },
+        next: { label: last ? t('done') : t('tourNext'), fn: () => goTour(1) },
+        action: true,
+        onEsc: closeTour,
+      });
+      if (!ok) { tourList.splice(tourAt, 1); if (d < 0) tourAt = Math.max(0, tourAt - 1); if (tourAt >= tourList.length) closeTour(); else showTourStep(d); }
+      return;
+    }
+    Coach.hide();
     renderTour();
-    const next = $('#tourNext');
-    if (next) next.focus();
+    if (typeof tour.showModal === 'function' && !tour.open) tour.showModal();
+    $('#tourNext').focus();
+    showChosen();
   }
-  function drawing(kind) {
-    const v1 = esc(t('video', { n: 1 })), v2 = esc(t('video', { n: 2 }));
-    const svgText = kind === 'mark'
-      ? '<svg class="draw" viewBox="0 0 340 96" aria-hidden="true"><text x="0" y="20">' + v1 + '</text><rect class="bar" x="0" y="26" width="330" height="14" rx="4"/>' +
-        '<text x="0" y="70">' + v2 + '</text><rect class="bar" x="0" y="76" width="330" height="14" rx="4"/>' +
-        '<line class="link" x1="120" y1="40" x2="200" y2="76"/><rect class="pt" x="117" y="24" width="6" height="18" rx="2"/><rect class="pt" x="197" y="74" width="6" height="18" rx="2"/>' +
-        '<text x="210" y="58">Kuzushi</text></svg>'
-      : '<svg class="draw" viewBox="0 0 340 100" aria-hidden="true"><text x="0" y="20">' + v1 + '</text><rect class="bar" x="10" y="26" width="310" height="10" rx="4"/>' +
-        '<text x="0" y="66">' + v2 + '</text><rect class="bar" x="10" y="72" width="310" height="10" rx="4"/>' +
-        '<rect class="pt" x="157" y="22" width="6" height="18" rx="2"/><rect class="pt" x="217" y="68" width="6" height="18" rx="2"/>' +
-        '<circle class="head h1" cx="10" cy="31" r="7"/><circle class="head h2" cx="10" cy="77" r="7"/>' +
-        '<text class="wait w1" x="172" y="54">' + esc(t('waiting')) + '</text></svg>';
-    const box = el('div');
-    box.innerHTML = svgText;
-    return box.firstChild;
-  }
-  function esc(x) { return String(x).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
   function renderTour() {
-    const steps = tourSteps();
-    const at = steps[tourAt];
+    const at = tourList[tourAt];
+    const last = tourAt === tourList.length - 1;
     const body = $('#tourBody');
     body.textContent = '';
     const head = el('h2');
@@ -3087,76 +3381,32 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     } else if (at === 'privacy') {
       head.textContent = t('tourPrivacyHead');
       body.appendChild(head);
-      body.appendChild(el('p', 'lead', t('tourPrivacy1')));
-      body.appendChild(el('p', '', t('tourPrivacy2', { forget: t('forget') })));
-      body.appendChild(el('p', 'muted', t('tourPrivacy3')));
-    } else if (at === 'sync') {
-      head.textContent = t('tourSyncHead');
-      body.appendChild(head);
-      body.appendChild(drawing('mark'));
-      body.appendChild(el('p', '', t('fStart', { sync: t('sync'), here: t('syncHere') })));
-      body.appendChild(drawing('wait'));
-      body.appendChild(el('p', '', t('fPlay', { play: t('playBoth') })));
-      const demo = el('div', 'playrow demo-jump');
-      demo.setAttribute('aria-hidden', 'true');
-      demo.innerHTML = '<button class="btn ghost jump" tabindex="-1"></button><button class="btn primary" tabindex="-1"></button><button class="btn ghost jump" tabindex="-1"></button>';
-      const [dp, dplay, dn] = demo.children;
-      dp.innerHTML = ICON.stopPrev + '<span class="jumptext"><span class="nm"></span></span>';
-      dp.querySelector('.nm').textContent = t('stopStart');
-      dplay.innerHTML = ICON.play + '<span></span>';
-      dplay.querySelector('span').textContent = t('playBoth');
-      dn.innerHTML = '<span class="jumptext"><span class="nm"></span></span>' + ICON.stopNext;
-      dn.querySelector('.nm').textContent = 'Kuzushi';
-      body.appendChild(demo);
-      const p = el('p');
-      t('tourJump', { play: t('playBoth'), prev: '\u0001', next: '\u0002' }).split(/(\u0001|\u0002)/).forEach((part) => {
-        if (part === '\u0001' || part === '\u0002') { const g = el('span', 'inlineicon'); g.innerHTML = part === '\u0001' ? ICON.stopPrev : ICON.stopNext; p.appendChild(g); } else p.appendChild(document.createTextNode(part));
-      });
-      body.appendChild(p);
-    } else if (at === 'steps') {
-      head.textContent = t('tourStepHead');
-      body.appendChild(head);
-      const demo = el('div', 'demo-steps');
-      demo.setAttribute('aria-hidden', 'true');
-      demo.innerHTML = '<button class="btn ghost stepbtn sec" data-step="-1s" tabindex="-1"></button><button class="btn ghost stepbtn" data-step="-1f" tabindex="-1"></button>' +
-        '<button class="btn ghost stepbtn" data-step="1f" tabindex="-1"></button><button class="btn ghost stepbtn sec" data-step="1s" tabindex="-1"></button>';
-      stepButtons(demo);
-      body.appendChild(demo);
-      body.appendChild(el('p', '', t('fStep')));
-      body.appendChild(el('p', 'muted', t('tourStepBoth', { sync: t('sync') })));
-    } else if (at === 'features') {
-      head.textContent = t('tourFeaturesHead');
-      body.appendChild(head);
-      const list = el('ul', 'features');
-      [[ICON.side, t('fPick', { same: t('same') })],
-        [ICON.zoomIn, t('fZoom')], [ICON.stack, t('fLayout')], ['1×', t('fSpeed')]].forEach(([icon, text]) => {
-        const li = el('li');
-        const g = el('span', 'ficon');
-        if (icon.startsWith('<')) g.innerHTML = icon; else g.textContent = icon;
-        li.appendChild(g);
-        li.appendChild(el('span', '', text));
-        list.appendChild(li);
-      });
-      body.appendChild(list);
+      body.appendChild(el('p', 'lead', t('tourPrivacyShort')));
+      const more = el('button', 'link', t('moreInfo'));
+      more.type = 'button';
+      more.id = 'tourMore';
+      more.addEventListener('click', () => { openMenu(); const about = $('#menu .about'); about.open = true; about.scrollIntoView({ block: 'nearest' }); });
+      body.appendChild(more);
     } else {
-      head.textContent = headFor(platform() === 'desktop' ? 'ios' : platform());
+      head.textContent = t('installHead');
       body.appendChild(head);
+      body.appendChild(el('p', 'lead', t('installWhy')));
       const box = el('div', 'installbody');
       body.appendChild(box);
       installBlock(box, platform());
     }
-    const dots = $('#tourDots');
-    dots.textContent = '';
-    dots.setAttribute('aria-label', t('tourStepOf', { n: tourAt + 1, m: steps.length }));
-    steps.forEach((_, i) => { const d = el('span', i === tourAt ? 'dot on' : 'dot'); dots.appendChild(d); });
+    const count = $('#tourCount');
+    count.textContent = counter();
+    count.setAttribute('aria-label', t('tourStepOf', { n: tourAt + 1, m: tourList.length }));
     $('#tourBack').hidden = tourAt === 0;
-    $('#tourNext').textContent = tourAt === steps.length - 1 ? t('tourStart') : t('tourNext');
-    $('#tourSkip').hidden = tourAt === steps.length - 1;
+    $('#tourNext').textContent = last ? t('done') : t('tourNext');
+    $('#tourSkip').hidden = last;
   }
   $('#tourNext').addEventListener('click', () => goTour(1));
   $('#tourBack').addEventListener('click', () => goTour(-1));
   $('#tourSkip').addEventListener('click', closeTour);
-  tour.addEventListener('cancel', () => tourSeen());
+  tour.addEventListener('cancel', (e) => { e.preventDefault(); closeTour(); });
+  [0, 1].forEach((i) => pickBtn(i) && pickBtn(i).addEventListener('click', () => { if (touring) { tourSeen(); touring = false; Coach.hide(); } }, true));
   (() => {
     let from = null;
     tour.addEventListener('pointerdown', (e) => { from = { x: e.clientX, y: e.clientY }; });
@@ -3169,6 +3419,84 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       goTour(forward ? 1 : -1);
     });
   })();
+  let tipRun = null;
+  function tipSeen(name) { return shownNow.has(name) || load('vcc-tip-' + name) === 'seen' || load(TIPS_OFF) === 'off'; }
+  function resetTips() {
+    shownNow.clear();
+    try { TIP_NAMES.forEach((n) => localStorage.removeItem('vcc-tip-' + n)); localStorage.removeItem(TIPS_OFF); } catch (e) {  }
+  }
+  function endTips(all) {
+    if (all) save(TIPS_OFF, 'off');
+    if (all) TIP_NAMES.forEach((n) => shownNow.add(n));
+    tipRun = null;
+    Coach.hide();
+  }
+  function runTip(name, steps) {
+    shownNow.add(name);
+    save('vcc-tip-' + name, 'seen');
+    tipRun = { name: name, steps: steps, at: 0 };
+    tipStep(1);
+  }
+  function tipStep(d) {
+    const r = tipRun;
+    while (r && r === tipRun && r.at >= 0 && r.at < r.steps.length) {
+      const s = r.steps[r.at];
+      const m = r.steps.length, last = r.at === m - 1;
+      const ok = Coach.show({
+        targets: s.targets(), title: s.title, text: s.text, counter: m > 1 ? (r.at + 1) + '/' + m : null,
+        skip: { label: t('skipTips'), fn: () => endTips(true) },
+        back: r.at > 0 ? { label: t('tourBack'), fn: () => { r.at--; tipStep(-1); } } : null,
+        next: s.next || { label: last ? t('done') : t('tourNext'), fn: () => { r.at++; tipStep(1); } },
+        action: !!s.action,
+        onEsc: () => endTips(false),
+      });
+      if (ok) return;
+      r.at += d < 0 ? -1 : 1;
+    }
+    if (r === tipRun) endTips(false);
+  }
+  const anyDialog = () => [...document.querySelectorAll('dialog')].some((x) => x.open);
+  let tipsQueued = false;
+  function maybeTips() {
+    if (tipsQueued) return;
+    tipsQueued = true;
+    setTimeout(() => {
+      tipsQueued = false;
+      if (touring || tipRun || Coach.open || anyDialog() || player.playing || sides.some((s) => s.restore || s.learning)) return;
+      if (syncing && !tipSeen('sync')) {
+        runTip('sync', [
+          { targets: () => [sides[0].q('.ctl')], title: t('video', { n: 1 }), text: t('tipV1'), action: true },
+          { targets: () => [sides[1].q('.ctl')], title: t('video', { n: 2 }), text: t('tipV2'), action: true },
+          { targets: () => [$('#syncing .namefield')], title: t('tipNameHead'), text: t('tipName'), action: true },
+          { targets: () => [$('#syncSave')], title: t('syncHere'), text: t('tipSave', { done: t('done') }), action: true },
+        ]);
+      } else if (!syncing && both() && !tipSeen('pair')) {
+        runTip('pair', [
+          { targets: () => [$('#playBoth')], title: t('playBoth'), text: t('tipPlay') },
+          { targets: () => [$('#jointSteps')], title: t('tipStepHead'), text: t('tipStep', { frame: '1 ' + t('frameUnit'), sec: t('sec', { n: 1 }) }) },
+          { targets: () => [$('#layout')], title: t('layout'), text: t('tipLayout') },
+          { targets: () => [$('#syncBtn')], title: t('sync'), text: t('tipSync'), action: true, next: { label: t('tryIt'), fn: () => { endTips(false); beginSync(); } } },
+        ]);
+      } else if (!syncing && both() && points.length && !tipSeen('jump')) {
+        runTip('jump', [
+          { targets: () => [$('#prevStop'), $('#nextStop')].filter(visible), title: t('tipJumpHead'), text: t('tipJump', { start: t('stopStart') }) },
+          { targets: () => [$('#playBoth')], title: t('tipTogetherHead'), text: t('tipTogether') },
+        ]);
+      }
+    }, 350);
+  }
+  let waitTipTimer = 0;
+  function waitTip(s) {
+    if (tipSeen('wait') || touring || tipRun || Coach.open || anyDialog()) return;
+    shownNow.add('wait');
+    save('vcc-tip-wait', 'seen');
+    const other = s.i === 0 ? 2 : 1;
+    if (!Coach.show({ targets: [s.q('.wait')], text: t('tipWait', { a: s.i + 1, b: other }), blocking: false })) return;
+    const tip = Coach.tip;
+    tip.addEventListener('click', () => Coach.hide());
+    clearTimeout(waitTipTimer);
+    waitTipTimer = setTimeout(() => { if (Coach.tip === tip) Coach.hide(); }, 4000);
+  }
   const menu = $('#menu');
   function openMenu() {
     $('#forgetAsk').hidden = true;
@@ -3179,6 +3507,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   $('#menuBtn').addEventListener('click', openMenu);
   $('#installOpen').addEventListener('click', openInstall);
   $('#tourOpen').addEventListener('click', () => { menu.close(); openTour(); });
+  $('#tipsAgain').addEventListener('click', () => { menu.close(); resetTips(); sayToast(t('tipsAgainDone')); maybeTips(); });
   $('#menuClose').addEventListener('click', () => menu.close());
   $('#forget').addEventListener('click', () => { $('#forget').hidden = true; $('#forgetAsk').hidden = false; $('#forgetNo').focus(); });
   $('#forgetNo').addEventListener('click', () => { $('#forgetAsk').hidden = true; $('#forget').hidden = false; $('#forget').focus(); });
@@ -3213,6 +3542,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     document.body.classList.add('kbd');
     const target = e.target;
     if (document.querySelector('dialog[open]')) return;
+    if (Coach.open && Coach.blocking) return;
     if (target instanceof HTMLSelectElement || (target instanceof HTMLInputElement && target.type === 'text')) return;
     if (target instanceof HTMLButtonElement && (e.key === ' ' || e.key === 'Enter')) return;
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
@@ -3317,14 +3647,17 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const w = s.q('.wait');
     const waits = !syncing && player.waiting()[s.i];
     w.hidden = !waits;
+    if (waits && player.playing) waitTip(s);
     const on = waits ? movesOnAt(player.line, s.i, player.time) : null;
     w.textContent = on === null ? t('waiting') : t('waitsFor', { s: Math.max(0.1, (on - player.time) / (player.rate || 1)).toFixed(1).replace('.', decimal()) });
   }
   function renderZoom(s) {
     const zoomed = s.view.scale > 1;
+    if (zoomed && !tipSeen('zoom') && !touring) { shownNow.add('zoom'); save('vcc-tip-zoom', 'seen'); sayToast(t('tipZoom', { whole: t('whole') })); }
     const amount = s.q('.amount');
     amount.hidden = !zoomed;
-    amount.textContent = zoomLabel(s.view.scale);
+    keyed(amount, lang + zoomLabel(s.view.scale), () => { amount.innerHTML = ICON.zoomIn + '<span></span>'; amount.lastChild.textContent = zoomLabel(s.view.scale); });
+    amount.setAttribute('aria-label', t('zoomIs', { n: zoomLabel(s.view.scale) }));
     s.el.querySelectorAll('.whole').forEach((b) => { b.hidden = !zoomed; });
     s.el.querySelectorAll('.zout').forEach((b) => b.setAttribute('aria-disabled', String(!zoomed)));
     s.el.querySelectorAll('.zin').forEach((b) => b.setAttribute('aria-disabled', String(s.view.scale >= MAX_ZOOM)));
@@ -3621,6 +3954,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     if ($('#keysSheet').open) renderKeys();
     renderInstall();
     if (tour.open) renderTour();
+    maybeTips();
   }
   const langSel = $('#lang');
   LANGS.forEach((code) => {
@@ -3640,7 +3974,14 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   }
   langSel.addEventListener('change', () => setLang(langSel.value));
   const BUILD = (() => { const m = document.querySelector('meta[name="vcc-build"]'); const [hash, date] = ((m && m.content) || '').split(' '); return { hash: hash || '', date: date || '' }; })();
-  function renderBuild() { $('#buildLine').textContent = t('version', { date: BUILD.date, hash: BUILD.hash }); }
+  function renderBuild() {
+    $('#buildLine').textContent = t('version', { date: BUILD.date, hash: BUILD.hash });
+    const box = $('#aboutPrivacy');
+    box.textContent = '';
+    box.appendChild(el('p', '', t('tourPrivacy1')));
+    box.appendChild(el('p', '', t('tourPrivacy2', { forget: t('forget') })));
+    box.appendChild(el('p', 'muted', t('tourPrivacy3')));
+  }
   let newer = null;
   let dismissedFor = null;
   const RELOAD_KEY = 'vcc-reloaded-for';
