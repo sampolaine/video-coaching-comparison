@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-HduoaNh/541vbP8drDuJeVqK2kP9lTDUmyR0ZpEq2/o='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tP+gSbYusZO/WCUs4BPoG+y2xUAyMPIJgR2qAONTFAw='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="vcc-build" content="6dfee5c0b3cd 2026-11-24">
+<meta name="vcc-build" content="bcda8634c91c 2026-11-24">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -780,7 +780,7 @@ const STRINGS = {
     soundOn: "Ääni päälle",
     soundOff: "Ääni pois",
     waiting: "Odottaa",
-    startsIn: "Alkaa {s} s",
+    waitsFor: "Odottaa {s} s",
     cantPlay: "Tämä selain ei pysty näyttämään tätä videota.",
     keys: "Näppäimet",
     close: "Sulje",
@@ -809,7 +809,7 @@ const STRINGS = {
     tourFeaturesHead: "Näin se toimii",
     fPick: "Valitse kaksi videota – tai {same}, joka alkaa puolivälistä.",
     fStart: "{sync}: etsi sama hetki kummastakin videosta, nimeä kohta (esim. Kuzushi) ja paina {here}.",
-    fPlay: "{play} toistaa molemmat omalla nopeudellaan; nopeampi odottaa jokaisessa kohdassa.",
+    fPlay: "{play} käynnistää molemmat yhtä aikaa, kumpikin omasta alustaan. Jokainen kohta on pari, hetki kummassakin videossa: se, joka ehtii kohtaan ensin, odottaa siinä toista, ja sitten ne jatkavat yhdessä.",
     fStep: "◀ 1 ruutu ▶ ja ◀ 1 s ▶ askeltavat taakse ja eteen. Pidä painettuna, niin askel jatkuu.",
     fZoom: "Nipistä kuvaa tai käytä suurennuslaseja; vedä siirtääksesi.",
     fLayout: "Yläreunan kuvakkeet: rinnakkain tai päällekkäin.",
@@ -839,7 +839,7 @@ const STRINGS = {
     atStart: "Alussa",
     atEnd: "Lopussa",
     pointPre: "Kohta:",
-    tourJump: "{prev} ja {next} {play} -painikkeen vieressä hyppäävät edelliseen ja seuraavaan synkkauskohtaan. Painikkeessa lukee, minne se vie: kohdan nimi, Alku tai Loppu.",
+    tourJump: "{prev} ja {next} {play} -painikkeen vieressä siirtävät molempia videoita yhdessä: Alku vie kummankin alkuun, kohta kummankin omaan hetkeensä siinä kohdassa ja Loppu kummankin loppuun. Painikkeessa lukee, minne se vie.",
     updateReady: "Uusi versio saatavilla",
     updateNow: "Päivitä",
     version: "Versio {date} · {hash}",
@@ -915,7 +915,7 @@ const STRINGS = {
     soundOn: "Ljud på",
     soundOff: "Ljud av",
     waiting: "Laddar",
-    startsIn: "Börjar om {s} s",
+    waitsFor: "Väntar {s} s",
     cantPlay: "Webbläsaren kan inte spela den här videon.",
     keys: "Tangenter",
     close: "Stäng",
@@ -944,7 +944,7 @@ const STRINGS = {
     tourFeaturesHead: "Så fungerar det",
     fPick: "Välj två videor – eller {same}, som börjar halvvägs.",
     fStart: "{sync}: hitta samma ögonblick i båda videorna, namnge punkten (t.ex. Kuzushi) och tryck {here}.",
-    fPlay: "{play} spelar båda i sin egen takt; den snabbare väntar vid varje punkt.",
+    fPlay: "{play} startar båda samtidigt, var och en från sin egen början. Varje punkt är ett par, ett ögonblick i vardera videon: den som når punkten först väntar där på den andra, sedan fortsätter de tillsammans.",
     fStep: "◀ 1 ruta ▶ och ◀ 1 s ▶ stegar bakåt och framåt. Håll intryckt så fortsätter det.",
     fZoom: "Nyp i bilden eller använd förstoringsglasen; dra för att flytta.",
     fLayout: "Ikonerna högst upp: sida vid sida eller över varandra.",
@@ -974,7 +974,7 @@ const STRINGS = {
     atStart: "I början",
     atEnd: "I slutet",
     pointPre: "Punkt:",
-    tourJump: "{prev} och {next} bredvid {play} hoppar till föregående och nästa synkpunkt. Knappen visar vart den går: punktens namn, Början eller Slut.",
+    tourJump: "{prev} och {next} bredvid {play} flyttar båda videorna tillsammans: Början tar var och en till sin början, en punkt till sitt eget ögonblick för punkten och Slut till sitt slut. Knappen visar vart den går.",
     updateReady: "Ny version finns",
     updateNow: "Uppdatera",
     version: "Version {date} · {hash}",
@@ -1050,7 +1050,7 @@ const STRINGS = {
     soundOn: "Sound on",
     soundOff: "Sound off",
     waiting: "Loading",
-    startsIn: "Starts in {s} s",
+    waitsFor: "Waiting {s} s",
     cantPlay: "This browser can't play this video.",
     keys: "Keys",
     close: "Close",
@@ -1079,7 +1079,7 @@ const STRINGS = {
     tourFeaturesHead: "How it works",
     fPick: "Choose two videos – or {same}, which starts half way.",
     fStart: "{sync}: find the same moment in both videos, name the point (e.g. Kuzushi) and press {here}.",
-    fPlay: "{play} plays both at their own pace; the faster one waits at each point.",
+    fPlay: "{play} starts both at once, each from its own beginning. Every point is a pair, one moment in each video: the one that reaches it first waits there for the other, then they go on together.",
     fStep: "◀ 1 frame ▶ and ◀ 1 s ▶ step back and forward. Hold one down to keep stepping.",
     fZoom: "Pinch the picture or use the magnifiers; drag to move it.",
     fLayout: "The icons at the top: side by side or one above the other.",
@@ -1109,7 +1109,7 @@ const STRINGS = {
     atStart: "At start",
     atEnd: "At end",
     pointPre: "Point:",
-    tourJump: "{prev} and {next} beside {play} jump to the previous and next sync point. Each says where it goes: the point's name, Start or End.",
+    tourJump: "{prev} and {next} beside {play} move both videos together: Start takes each to its beginning, a point takes each to its own moment of that point, and End takes each to its end. Each button says where it goes.",
     updateReady: "New version available",
     updateNow: "Update",
     version: "Version {date} · {hash}",
@@ -1185,7 +1185,7 @@ const STRINGS = {
     soundOn: "Включить звук",
     soundOff: "Выключить звук",
     waiting: "Загрузка",
-    startsIn: "Начнётся через {s} с",
+    waitsFor: "Ждёт {s} с",
     cantPlay: "Браузер не может воспроизвести это видео.",
     keys: "Клавиши",
     close: "Закрыть",
@@ -1214,7 +1214,7 @@ const STRINGS = {
     tourFeaturesHead: "Как это работает",
     fPick: "Выберите два видео — или «{same}», которое начнётся с середины.",
     fStart: "«{sync}»: найдите один и тот же момент в обоих видео, назовите точку (например, Kuzushi) и нажмите «{here}».",
-    fPlay: "«{play}» воспроизводит оба в их собственном темпе; более быстрое ждёт в каждой точке.",
+    fPlay: "«{play}» запускает оба одновременно, каждое со своего начала. Каждая точка — пара, по моменту в каждом видео: то, что дойдёт до точки первым, ждёт там другое, и дальше они идут вместе.",
     fStep: "◀ 1 кадр ▶ и ◀ 1 с ▶ — шаги назад и вперёд. Удерживайте, чтобы шагать дальше.",
     fZoom: "Сводите и разводите пальцы или нажимайте лупы; перетаскивайте кадр.",
     fLayout: "Значки вверху: рядом или друг над другом.",
@@ -1244,7 +1244,7 @@ const STRINGS = {
     atStart: "В начале",
     atEnd: "В конце",
     pointPre: "Точка:",
-    tourJump: "{prev} и {next} рядом с «{play}» переходят к предыдущей и следующей точке синхронизации. На кнопке написано, куда она ведёт: имя точки, «Начало» или «Конец».",
+    tourJump: "{prev} и {next} рядом с «{play}» переносят оба видео вместе: «Начало» — каждое к своему началу, точка — каждое к своему моменту этой точки, «Конец» — каждое к своему концу. На кнопке написано, куда она ведёт.",
     updateReady: "Доступна новая версия",
     updateNow: "Обновить",
     version: "Версия {date} · {hash}",
@@ -1320,7 +1320,7 @@ const STRINGS = {
     soundOn: "Heli sisse",
     soundOff: "Heli välja",
     waiting: "Laadimine",
-    startsIn: "Algab {s} s pärast",
+    waitsFor: "Ootab {s} s",
     cantPlay: "Brauser ei suuda seda videot esitada.",
     keys: "Klahvid",
     close: "Sulge",
@@ -1349,7 +1349,7 @@ const STRINGS = {
     tourFeaturesHead: "Kuidas see töötab",
     fPick: "Vali kaks videot – või {same}, mis algab poolest.",
     fStart: "{sync}: leia mõlemast videost sama hetk, nimeta punkt (nt Kuzushi) ja vajuta {here}.",
-    fPlay: "{play} esitab mõlemad omas tempos; kiirem ootab igas punktis.",
+    fPlay: "{play} käivitab mõlemad korraga, kumbki oma algusest. Iga punkt on paar, üks hetk kummaski videos: see, mis jõuab punkti esimesena, ootab seal teist ja siis jätkavad nad koos.",
     fStep: "◀ 1 kaader ▶ ja ◀ 1 s ▶ sammuvad tagasi ja edasi. Hoia all, et edasi sammuda.",
     fZoom: "Näpista pilti või kasuta luupe; lohista, et liigutada.",
     fLayout: "Ülal olevad ikoonid: kõrvuti või üksteise kohal.",
@@ -1379,7 +1379,7 @@ const STRINGS = {
     atStart: "Alguses",
     atEnd: "Lõpus",
     pointPre: "Punkt:",
-    tourJump: "{prev} ja {next} nupu {play} kõrval hüppavad eelmisse ja järgmisse sünkroonimispunkti. Nupul on kirjas, kuhu see viib: punkti nimi, Algus või Lõpp.",
+    tourJump: "{prev} ja {next} nupu {play} kõrval liigutavad mõlemat videot koos: Algus viib kumbagi oma algusse, punkt kumbagi selle punkti oma hetke ja Lõpp kumbagi oma lõppu. Nupul on kirjas, kuhu see viib.",
     updateReady: "Uus versioon on saadaval",
     updateNow: "Uuenda",
     version: "Versioon {date} · {hash}",
@@ -1455,7 +1455,7 @@ const STRINGS = {
     soundOn: "Activer le son",
     soundOff: "Couper le son",
     waiting: "Chargement",
-    startsIn: "Démarre dans {s} s",
+    waitsFor: "Attend {s} s",
     cantPlay: "Ce navigateur ne peut pas lire cette vidéo.",
     keys: "Raccourcis",
     close: "Fermer",
@@ -1484,7 +1484,7 @@ const STRINGS = {
     tourFeaturesHead: "Comment ça marche",
     fPick: "Choisissez deux vidéos – ou {same}, qui démarre à mi-parcours.",
     fStart: "{sync} : trouvez le même moment dans les deux vidéos, nommez le point (par ex. Kuzushi) et appuyez sur {here}.",
-    fPlay: "{play} lit les deux à leur rythme ; la plus rapide attend à chaque point.",
+    fPlay: "{play} lance les deux en même temps, chacune depuis son début. Chaque point est une paire, un moment dans chaque vidéo : celle qui l'atteint en premier y attend l'autre, puis elles continuent ensemble.",
     fStep: "◀ 1 image ▶ et ◀ 1 s ▶ reculent et avancent. Maintenez appuyé pour continuer.",
     fZoom: "Pincez l’image ou utilisez les loupes ; faites glisser pour la déplacer.",
     fLayout: "Les icônes en haut : côte à côte ou l’une au-dessus de l’autre.",
@@ -1514,7 +1514,7 @@ const STRINGS = {
     atStart: "Au début",
     atEnd: "À la fin",
     pointPre: "Point :",
-    tourJump: "{prev} et {next}, à côté de {play}, sautent au point de synchro précédent ou suivant. Chacun indique où il mène : le nom du point, Début ou Fin.",
+    tourJump: "{prev} et {next}, à côté de {play}, déplacent les deux vidéos ensemble : Début mène chacune à son début, un point chacune à son propre moment de ce point, et Fin chacune à sa fin. Chaque bouton indique où il mène.",
     updateReady: "Nouvelle version disponible",
     updateNow: "Mettre à jour",
     version: "Version {date} · {hash}",
@@ -1590,7 +1590,7 @@ const STRINGS = {
     soundOn: "تشغيل الصوت",
     soundOff: "كتم الصوت",
     waiting: "جارٍ التحميل",
-    startsIn: "يبدأ بعد {s} ث",
+    waitsFor: "ينتظر {s} ث",
     cantPlay: "لا يستطيع هذا المتصفح تشغيل هذا الفيديو.",
     keys: "المفاتيح",
     close: "إغلاق",
@@ -1619,7 +1619,7 @@ const STRINGS = {
     tourFeaturesHead: "طريقة الاستخدام",
     fPick: "اختر فيديوين، أو «{same}» الذي يبدأ من منتصفه.",
     fStart: "«{sync}»: ابحث عن اللحظة نفسها في الفيديوين، وسمِّ النقطة (مثل Kuzushi) واضغط «{here}».",
-    fPlay: "«{play}» يشغّل الاثنين بسرعتهما؛ والأسرع ينتظر عند كل نقطة.",
+    fPlay: "«{play}» يبدأ الفيديوين معًا، كلٌّ من بدايته. كل نقطة زوج، لحظة في كل فيديو: الذي يصل إليها أولًا ينتظر الآخر عندها، ثم يكملان معًا.",
     fStep: "◀ 1 إطار ▶ و◀ 1 ث ▶ للرجوع والتقدّم. اضغط مطولًا للاستمرار.",
     fZoom: "باعِد أصابعك على الصورة أو استخدم العدسات، واسحب لتحريكها.",
     fLayout: "الأيقونات في الأعلى: جنبًا إلى جنب أو واحد فوق الآخر.",
@@ -1649,7 +1649,7 @@ const STRINGS = {
     atStart: "في البداية",
     atEnd: "في النهاية",
     pointPre: "نقطة:",
-    tourJump: "{prev} و{next} بجانب «{play}» تنتقلان إلى نقطة المزامنة السابقة أو التالية. يظهر على كل زر وجهته: اسم النقطة أو البداية أو النهاية.",
+    tourJump: "{prev} و{next} بجانب «{play}» تنقلان الفيديوين معًا: البداية تأخذ كلًّا منهما إلى بدايته، والنقطة إلى لحظته الخاصة في تلك النقطة، والنهاية إلى نهايته. يظهر على كل زر وجهته.",
     updateReady: "يتوفر إصدار جديد",
     updateNow: "تحديث",
     version: "الإصدار {date} · {hash}",
@@ -1671,56 +1671,67 @@ const STRINGS = {
 };
 if (typeof module !== 'undefined') module.exports = { LANGS, RTL, LANG_NAMES, STRINGS };
 const SAME_MOMENT = 0.5;
-function buildTimeline(points, top, bottom, opened) {
+function buildTimeline(points, top, bottom) {
   const ends = [Math.max(0, top), Math.max(0, bottom)];
   const moments = points.slice().sort((a, b) => a.top - b.top)
     .map((point) => ({ point: point, times: [Math.min(point.top, ends[0]), Math.min(point.bottom, ends[1])] }));
   const segments = [];
   const stops = [];
   let at = 0;
-  const starts = [0, 0];
-  const stopsAt = [ends[0], ends[1]];
-  const meet = moments.length === 0 && opened && (opened[0] !== 0 || opened[1] !== 0)
-    ? [Math.min(Math.max(0, opened[0]), ends[0]), Math.min(Math.max(0, opened[1]), ends[1])] : null;
-  const anchors = meet ? [{ times: meet, point: null }] : moments;
-  const first = anchors[0];
-  if (first) {
-    const runs = [Math.max(0, first.times[0] - starts[0]), Math.max(0, first.times[1] - starts[1])];
-    const from = [first.times[0] - runs[0], first.times[1] - runs[1]];
+  let from = [0, 0];
+  for (const a of moments.concat([{ point: null, times: ends }])) {
+    const runs = [Math.max(0, a.times[0] - from[0]), Math.max(0, a.times[1] - from[1])];
     const length = Math.max(runs[0], runs[1]);
-    segments.push({ at: at, length: length, from: from, runs: runs, lead: true });
+    segments.push({ at: at, length: length, from: from, runs: runs });
     at += length;
-  } else {
-    const runs = [Math.max(0, stopsAt[0] - starts[0]), Math.max(0, stopsAt[1] - starts[1])];
-    const length = Math.max(runs[0], runs[1]);
-    segments.push({ at: at, length: length, from: starts, runs: runs, lead: false });
-    at += length;
+    if (a.point) stops.push({ point: a.point, at: at, times: a.times.slice() });
+    from = [Math.max(from[0], a.times[0]), Math.max(from[1], a.times[1])];
   }
-  anchors.forEach((a, i) => {
-    const following = anchors[i + 1];
-    const next = following ? following.times : stopsAt;
-    const runs = [Math.max(0, next[0] - a.times[0]), Math.max(0, next[1] - a.times[1])];
-    const length = Math.max(runs[0], runs[1]);
-    if (a.point) stops.push({ point: a.point, at: at });
-    segments.push({ at: at, length: length, from: a.times, runs: runs, lead: false });
-    at += length;
-  });
-  return { segments: segments, length: at, stops: stops };
+  return { segments: segments, length: at, stops: stops, ends: ends };
 }
 function aloneTimeline(side, length) { return side === 0 ? buildTimeline([], length, 0) : buildTimeline([], 0, length); }
-function bothStart(line) {
-  const seg = line.segments[0];
-  if (!seg || !seg.lead) return 0;
-  return seg.at + seg.length - Math.min(seg.runs[0], seg.runs[1]);
+function stopList(line) {
+  const all = [{ kind: 'start', at: 0, times: [0, 0], index: -1 }]
+    .concat(line.stops.map((s, i) => ({ kind: 'point', at: s.at, times: s.times, point: s.point, index: i })))
+    .concat([{ kind: 'end', at: line.length, times: (line.ends || [0, 0]).slice(), index: -1 }]);
+  const list = [];
+  for (const s of all) {
+    const prev = list[list.length - 1];
+    if (prev && Math.abs(prev.times[0] - s.times[0]) < 0.002 && Math.abs(prev.times[1] - s.times[1]) < 0.002) continue;
+    list.push(s);
+  }
+  return list;
 }
-function startsAt(line, i, t) {
-  const seg = line.segments[0];
-  if (!seg || !seg.lead || t >= seg.at + seg.length) return null;
-  const from = seg.at + seg.length - seg.runs[i];
-  return t < from ? from : null;
+function stopFrom(list, cur, direction, eps) {
+  const near = (k) => list[k].times.every((x, i) => Math.abs(cur[i] - x) <= eps[i]);
+  if (direction < 0) {
+    for (let k = list.length - 1; k >= 0; k--) if (list[k].times.every((x, i) => x <= cur[i] + eps[i]) && !near(k)) return k;
+    return null;
+  }
+  for (let k = 0; k < list.length; k++) if (list[k].times.every((x, i) => x >= cur[i] - eps[i]) && !near(k)) return k;
+  return null;
 }
-function openingAt(line) {
-  return line.stops.length === 0 && line.segments[0] && line.segments[0].lead ? (line.segments[1] ? line.segments[1].at : 0) : 0;
+function stopAt(list, cur, eps) {
+  return list.findIndex((s) => s.times.every((x, i) => Math.abs(cur[i] - x) <= eps[i]));
+}
+function movesOnAt(line, i, t) {
+  let index = 0;
+  line.segments.forEach((s, k) => { if (s.at <= t) index = k; });
+  const seg = line.segments[index];
+  if (index === line.segments.length - 1) return null;
+  const into = t - seg.at;
+  return into >= seg.runs[i] && into < seg.length ? seg.at + seg.length : null;
+}
+function cleanPoints(raw, lengths) {
+  const ok = (x) => typeof x === 'number' && isFinite(x) && x >= 0;
+  let pts = [];
+  for (const p of Array.isArray(raw) ? raw : []) {
+    if (!p || !ok(p.top) || !ok(p.bottom)) continue;
+    if (lengths && (p.top > lengths[0] + 0.05 || p.bottom > lengths[1] + 0.05)) continue;
+    const d = withPoint(pts, { top: p.top, bottom: p.bottom, name: typeof p.name === 'string' && p.name ? p.name.slice(0, 60) : null });
+    if (d.replaced.length === 0) pts = d.points;
+  }
+  return pts;
 }
 function positionAt(line, t) {
   let index = 0;
@@ -1730,9 +1741,8 @@ function positionAt(line, t) {
   const into = Math.max(0, t - seg.at);
   const side = (i) => {
     const run = seg.runs[i];
-    const u = seg.lead ? into - (seg.length - run) : into;
-    const runs = u >= 0 && u < run;
-    return { time: seg.from[i] + Math.min(run, Math.max(0, u)), runs: runs, waits: !runs && into < seg.length && !(last && u >= run) };
+    const runs = into < run;
+    return { time: seg.from[i] + Math.min(run, into), runs: runs, waits: !runs && into < seg.length && !last };
   };
   return [side(0), side(1)];
 }
@@ -1747,18 +1757,9 @@ function timelineAt(line, i, time) {
     const u = time - seg.from[i];
     const run = seg.runs[i];
     const inIt = index === line.segments.length - 1 ? u <= run + 0.002 : u < run - 0.002;
-    if (inIt || (seg.lead && time <= 0)) {
-      const waited = seg.lead ? seg.length - seg.runs[i] : 0;
-      if (seg.lead && time <= 0) return 0;
-      return Math.min(line.length, seg.at + waited + Math.max(0, u));
-    }
+    if (inIt) return Math.min(line.length, seg.at + Math.max(0, u));
   }
   return line.length;
-}
-function stepStop(line, t, direction) {
-  if (direction === 1) { const s = line.stops.find((stop) => stop.at > t + 0.3); return s ? s.at : null; }
-  const before = line.stops.filter((stop) => stop.at < t - 1);
-  return before.length ? before[before.length - 1].at : (t > 0 ? 0 : null);
 }
 function stopIndex(line, t) {
   let index = -1;
@@ -1802,7 +1803,7 @@ class PairPlayer {
   toggle() { if (this.playing) this.pause(); else this.play(); }
   play() {
     if (this.line.length <= 0 || !this.slots.some((s) => s.media)) return;
-    if (this.time >= this.line.length - 0.05) this.time = bothStart(this.line);
+    if (this.time >= this.line.length - 0.05) this.time = 0;
     this.separate = false; this.playing = true; this.stalledSince = null; this.last = performance.now();
     const at = positionAt(this.line, this.time);
     for (const i of [0, 1]) {
@@ -1907,7 +1908,7 @@ class PairPlayer {
     try { const p = m.play(); if (p && p.catch) p.catch(refused); } catch (e) { refused(e); }
   }
 }
-if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stepStop, stopIndex, withPoint, placeOf, openingAt, bothStart, startsAt };
+if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stopIndex, withPoint, placeOf, stopList, stopFrom, stopAt, movesOnAt, cleanPoints };
 (function () {
   'use strict';
   const LANG_KEY = 'vcc-lang';
@@ -2190,7 +2191,6 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       clearTimeout(s.loadTimer);
       s.pic = v.videoWidth && v.videoHeight ? { width: v.videoWidth, height: v.videoHeight } : null;
       range.max = String(v.duration || 0);
-      if (s.sameAsHalf && v.duration) s.start = v.duration / 2;
       v.playbackRate = rate;
       v.muted = sound !== s.i;
       renderSide(s);
@@ -2273,6 +2273,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     if (back) s.start = back.t;
     if (syncing) endSync();
     points = [];
+    hideToast();
     keepPoints();
     s.stepper.forget();
     s.learning = false;
@@ -2479,12 +2480,12 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const [a, b] = lengths();
     const alone = aloneSide();
     if (alone !== null) return aloneTimeline(alone, alone === 0 ? a : b);
-    return buildTimeline(pts, a, b, pts.length ? null : [sides[0].start || 0, sides[1].start || 0]);
+    return buildTimeline(pts, a, b);
   }
   function newLine(place) {
     const line = lineFor(points);
     if (place && (place.side === 0 || place.side === 1)) player.setLine(line, timelineAt(line, place.side, place.time));
-    else if (!points.length) player.setLine(line, openingAt(line));
+    else if (!points.length) player.setLine(line, 0);
     else player.setLine(line);
   }
   function snapTo(s, t) {
@@ -2546,22 +2547,22 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const by = code === '1f' ? 1 / fps : code === '-1f' ? -1 / fps : code === '1s' ? 1 : code === '-1s' ? -1 : code === '5s' ? 5 : code === '-5s' ? -5 : code === '10s' ? 10 : -10;
     player.seek(player.time + by);
   }
+  function realPlaces() { return [0, 1].map((i) => (player.slots[i].media ? player.whereIs(i) : 0)); }
+  function stopSlack() { return sides.map((s) => Math.max(0.05, s.ready ? s.stepper.frame() : 0)); }
   function stopTarget(direction) {
-    let to = stepStop(player.line, player.time, direction);
-    const start = bothStart(player.line);
-    if (direction < 0 && (to === null || to < start + 0.001)) to = player.line.length > 0 && Math.abs(player.time - start) > 0.05 ? start : null;
-    if (to !== null) return to;
-    if (direction === 1 && player.line.length > 0 && player.time < player.line.length - 0.3) return player.line.length;
-    return null;
+    if (player.line.length <= 0) return null;
+    const list = stopList(player.line);
+    let k = stopFrom(list, realPlaces(), direction, stopSlack());
+    if (k !== null && direction < 0 && player.playing && k > 0 && player.time - list[k].at < 1) k--;
+    return k === null ? null : list[k];
   }
   function stepToStop(direction) {
     const to = stopTarget(direction);
-    if (to !== null) player.seek(to);
+    if (to !== null) player.seek(to.at);
   }
-  function stopName(at) {
-    const i = player.line.stops.findIndex((s) => s.at === at);
-    if (i >= 0) return { pre: true, name: pointLabel(player.line.stops[i].point, i) };
-    return { pre: false, name: at < player.line.length - 0.001 ? t('stopStart') : t('stopEnd') };
+  function stopName(stop) {
+    if (stop.kind === 'point') return { pre: true, name: pointLabel(stop.point, stop.index) };
+    return { pre: false, name: stop.kind === 'start' ? t('stopStart') : t('stopEnd') };
   }
   function jumpButton(b, direction, to, any) {
     const end = { pre: false, name: direction < 0 ? t('stopStart') : t('stopEnd') };
@@ -2881,11 +2882,11 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
       stored[side.name] = got[side.name];
       openFile(sides[i], got[side.name], false, { t: num(side.t, 0), view: view, place: place });
     });
-    const ok = Array.isArray(kept) ? kept.filter((p) => p && typeof p.top === 'number' && typeof p.bottom === 'number').map((p) => ({ top: p.top, bottom: p.bottom, name: typeof p.name === 'string' ? p.name.slice(0, 60) : null })) : [];
+    const ok = Array.isArray(kept) ? kept : [];
     if (ok.length && pair.every((x) => x && got[x.name])) {
       const again = () => {
         if (!both() || sides.some((x) => x.restore)) { if (sides.every((x) => x.file)) setTimeout(again, 100); return; }
-        points = ok;
+        points = cleanPoints(ok, lengths());
         keepPoints();
         newLine(place);
         renderAll();
@@ -2897,6 +2898,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     pauseAll();
     sides.forEach((s) => clearSide(s, null));
     points = [];
+    hideToast();
     try { localStorage.removeItem(PAIR_KEY); localStorage.removeItem(POINTS_KEY); } catch (e) {  }
     keeping = keeping.then(() => Promise.all(FILE_NAMES.map((n) => { delete stored[n]; return dropFile(n); })));
     return keeping;
@@ -3315,8 +3317,8 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const w = s.q('.wait');
     const waits = !syncing && player.waiting()[s.i];
     w.hidden = !waits;
-    const from = waits ? startsAt(player.line, s.i, player.time) : null;
-    w.textContent = from === null ? t('waiting') : t('startsIn', { s: Math.max(0.1, from - player.time).toFixed(1).replace('.', decimal()) });
+    const on = waits ? movesOnAt(player.line, s.i, player.time) : null;
+    w.textContent = on === null ? t('waiting') : t('waitsFor', { s: Math.max(0.1, (on - player.time) / (player.rate || 1)).toFixed(1).replace('.', decimal()) });
   }
   function renderZoom(s) {
     const zoomed = s.view.scale > 1;
