@@ -1,4 +1,4 @@
-const CACHE = 'vcc-0f8b2f9cfd09';
+const CACHE = 'vcc-6dfee5c0b3cd';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const OWN = new Set(FILES.map((f) => new URL(f, self.registration.scope).href));
 const PAGE = new Set(['./', './index.html'].map((f) => new URL(f, self.registration.scope).href));

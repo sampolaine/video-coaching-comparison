@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eWch3IAI9zXDuhdCTthzRgWcayMTHTRdVTV4guwyMh0='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-HduoaNh/541vbP8drDuJeVqK2kP9lTDUmyR0ZpEq2/o='; style-src 'sha256-hx7wllHbYzlGPKvDjpv0822/p6N4zyWKH7Lssmve71w='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="vcc-build" content="0f8b2f9cfd09 2026-11-24">
+<meta name="vcc-build" content="6dfee5c0b3cd 2026-11-24">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -780,6 +780,7 @@ const STRINGS = {
     soundOn: "Ääni päälle",
     soundOff: "Ääni pois",
     waiting: "Odottaa",
+    startsIn: "Alkaa {s} s",
     cantPlay: "Tämä selain ei pysty näyttämään tätä videota.",
     keys: "Näppäimet",
     close: "Sulje",
@@ -914,6 +915,7 @@ const STRINGS = {
     soundOn: "Ljud på",
     soundOff: "Ljud av",
     waiting: "Laddar",
+    startsIn: "Börjar om {s} s",
     cantPlay: "Webbläsaren kan inte spela den här videon.",
     keys: "Tangenter",
     close: "Stäng",
@@ -1048,6 +1050,7 @@ const STRINGS = {
     soundOn: "Sound on",
     soundOff: "Sound off",
     waiting: "Loading",
+    startsIn: "Starts in {s} s",
     cantPlay: "This browser can't play this video.",
     keys: "Keys",
     close: "Close",
@@ -1182,6 +1185,7 @@ const STRINGS = {
     soundOn: "Включить звук",
     soundOff: "Выключить звук",
     waiting: "Загрузка",
+    startsIn: "Начнётся через {s} с",
     cantPlay: "Браузер не может воспроизвести это видео.",
     keys: "Клавиши",
     close: "Закрыть",
@@ -1316,6 +1320,7 @@ const STRINGS = {
     soundOn: "Heli sisse",
     soundOff: "Heli välja",
     waiting: "Laadimine",
+    startsIn: "Algab {s} s pärast",
     cantPlay: "Brauser ei suuda seda videot esitada.",
     keys: "Klahvid",
     close: "Sulge",
@@ -1450,6 +1455,7 @@ const STRINGS = {
     soundOn: "Activer le son",
     soundOff: "Couper le son",
     waiting: "Chargement",
+    startsIn: "Démarre dans {s} s",
     cantPlay: "Ce navigateur ne peut pas lire cette vidéo.",
     keys: "Raccourcis",
     close: "Fermer",
@@ -1584,6 +1590,7 @@ const STRINGS = {
     soundOn: "تشغيل الصوت",
     soundOff: "كتم الصوت",
     waiting: "جارٍ التحميل",
+    startsIn: "يبدأ بعد {s} ث",
     cantPlay: "لا يستطيع هذا المتصفح تشغيل هذا الفيديو.",
     keys: "المفاتيح",
     close: "إغلاق",
@@ -1701,6 +1708,17 @@ function buildTimeline(points, top, bottom, opened) {
   return { segments: segments, length: at, stops: stops };
 }
 function aloneTimeline(side, length) { return side === 0 ? buildTimeline([], length, 0) : buildTimeline([], 0, length); }
+function bothStart(line) {
+  const seg = line.segments[0];
+  if (!seg || !seg.lead) return 0;
+  return seg.at + seg.length - Math.min(seg.runs[0], seg.runs[1]);
+}
+function startsAt(line, i, t) {
+  const seg = line.segments[0];
+  if (!seg || !seg.lead || t >= seg.at + seg.length) return null;
+  const from = seg.at + seg.length - seg.runs[i];
+  return t < from ? from : null;
+}
 function openingAt(line) {
   return line.stops.length === 0 && line.segments[0] && line.segments[0].lead ? (line.segments[1] ? line.segments[1].at : 0) : 0;
 }
@@ -1784,7 +1802,7 @@ class PairPlayer {
   toggle() { if (this.playing) this.pause(); else this.play(); }
   play() {
     if (this.line.length <= 0 || !this.slots.some((s) => s.media)) return;
-    if (this.time >= this.line.length - 0.05) this.time = 0;
+    if (this.time >= this.line.length - 0.05) this.time = bothStart(this.line);
     this.separate = false; this.playing = true; this.stalledSince = null; this.last = performance.now();
     const at = positionAt(this.line, this.time);
     for (const i of [0, 1]) {
@@ -1889,7 +1907,7 @@ class PairPlayer {
     try { const p = m.play(); if (p && p.catch) p.catch(refused); } catch (e) { refused(e); }
   }
 }
-if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stepStop, stopIndex, withPoint, placeOf, openingAt };
+if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt, timelineAt, stepStop, stopIndex, withPoint, placeOf, openingAt, bothStart, startsAt };
 (function () {
   'use strict';
   const LANG_KEY = 'vcc-lang';
@@ -2529,7 +2547,9 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     player.seek(player.time + by);
   }
   function stopTarget(direction) {
-    const to = stepStop(player.line, player.time, direction);
+    let to = stepStop(player.line, player.time, direction);
+    const start = bothStart(player.line);
+    if (direction < 0 && (to === null || to < start + 0.001)) to = player.line.length > 0 && Math.abs(player.time - start) > 0.05 ? start : null;
     if (to !== null) return to;
     if (direction === 1 && player.line.length > 0 && player.time < player.line.length - 0.3) return player.line.length;
     return null;
@@ -2541,7 +2561,7 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
   function stopName(at) {
     const i = player.line.stops.findIndex((s) => s.at === at);
     if (i >= 0) return { pre: true, name: pointLabel(player.line.stops[i].point, i) };
-    return { pre: false, name: at === 0 ? t('stopStart') : t('stopEnd') };
+    return { pre: false, name: at < player.line.length - 0.001 ? t('stopStart') : t('stopEnd') };
   }
   function jumpButton(b, direction, to, any) {
     const end = { pre: false, name: direction < 0 ? t('stopStart') : t('stopEnd') };
@@ -3295,7 +3315,8 @@ if (typeof module !== 'undefined') module.exports = { buildTimeline, positionAt,
     const w = s.q('.wait');
     const waits = !syncing && player.waiting()[s.i];
     w.hidden = !waits;
-    w.textContent = t('waiting');
+    const from = waits ? startsAt(player.line, s.i, player.time) : null;
+    w.textContent = from === null ? t('waiting') : t('startsIn', { s: Math.max(0.1, from - player.time).toFixed(1).replace('.', decimal()) });
   }
   function renderZoom(s) {
     const zoomed = s.view.scale > 1;
