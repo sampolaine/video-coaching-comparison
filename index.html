@@ -5,9 +5,9 @@
 <!-- No viewport-fit=cover: iOS keeps the status bar its own opaque strip and draws nothing of ours under it, so its
      iOS 26 blur ("scroll edge effect") has nothing to blur. The env() paddings stay, as 0 where there is no inset. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fd55CHpsomiufzVVMj/F6E5UDTaN+81EIZUZjWjPbQY='; style-src 'sha256-ntshVEwZuf/o9JKmUrQh2tzcsN3WiUIINTkAPkEVC/c='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fd55CHpsomiufzVVMj/F6E5UDTaN+81EIZUZjWjPbQY='; style-src 'sha256-mcWdM30J1lrWx6K6oJoJnswZDLM6q0veFK3iG3ZYz5g='; img-src 'self'; media-src blob:; font-src data:; manifest-src 'self'; worker-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="vcc-build" content="d133c6f69896 2026-11-24">
+<meta name="vcc-build" content="d2f5a48a6376 2026-11-25">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1915" media="(prefers-color-scheme: dark)">
@@ -63,6 +63,8 @@ button, select, input { font: inherit; color: inherit; }
 .muted { color: var(--ink-3); font-size: 14px; margin: 0; }
 :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 header { display: flex; align-items: center; gap: 8px; padding: 2px 12px; min-height: 48px; }
+header { position: sticky; top: 0; background: var(--page);
+  margin-top: calc(-1 * env(safe-area-inset-top)); border-top: env(safe-area-inset-top) solid var(--page); }
 h1 { font: 700 20px/1.2 Gabarito, Inter, system-ui, sans-serif; letter-spacing: -0.01em; margin: 0; flex: 1; min-width: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lang select {
