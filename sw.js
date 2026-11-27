@@ -1,5 +1,5 @@
-const CACHE = 'vcc-d2f5a48a6376';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const CACHE = 'vcc-374df66f6617';
+const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon.svg', './favicon-32.png', './favicon-16.png'];
 const OWN = new Set(FILES.map((f) => new URL(f, self.registration.scope).href));
 const PAGE = new Set(['./', './index.html'].map((f) => new URL(f, self.registration.scope).href));
 const WAIT_MS = 3000;
